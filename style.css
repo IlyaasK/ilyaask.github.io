@@ -5,9 +5,13 @@ body {
   font-family: Georgia, serif;
   font-size: 18px;
   line-height: 1.6em;
-  color: black;
+  color: white;
+  background: black;
 }
 h1, h2, h3 {
   font-family: sans-serif;
   font-weight: normal;
+}
+a {
+  color: green;
 }
