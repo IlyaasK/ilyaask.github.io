@@ -3,3 +3,9 @@
      to = "/:splat.html"
      status = 200
      force = false
+
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Type = "text/html; charset=utf-8"
