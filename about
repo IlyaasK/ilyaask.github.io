@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <title>PAGE TITLE HERE | SITE NAME HERE</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 <h1><a href="index.html">SITE NAME HERE</a></h1>
