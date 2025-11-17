@@ -3,14 +3,11 @@
 <head>
 <meta charset="utf-8">
 <title>PAGE TITLE HERE | SITE NAME HERE</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.
-0">
-<link rel="stylesheet" href="/style.
-css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/style.css">
 </head>
 <body>
-<h1><a href="index.
-html">SITE NAME HERE</a></h1>
+<h1><a href="index.html">SITE NAME HERE</a></h1>
 <hr>
 <h2>What am I doing now?</h2>
 <p>
