@@ -5,9 +5,10 @@ html {
 body {
   line-height: 1.4;
   font-size: 16px;
-  padding: 0 10px;
+  width: 650px;
+  max-width: calc(100% - 20px);
   margin: 50px auto;
-  max-width: 650px;
+  padding: 0;
   color: black;
   background: white;
 }
