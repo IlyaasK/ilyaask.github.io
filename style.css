@@ -1,5 +1,6 @@
 html {
   scrollbar-gutter: stable;
+  color-scheme: light dark;
 }
 
 body {
@@ -8,8 +9,8 @@ body {
   padding: 0 10px;
   margin: 50px auto;
   max-width: 650px;
-  color: black;
-  background: white;
+  color: CanvasText;
+  background: Canvas;
 }
 
 hr {
