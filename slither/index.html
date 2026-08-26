@@ -6,93 +6,41 @@
     <title>Slither — you vs 15 trained agents</title>
     <meta name="description" content="Play the same C arena I trained in. You are one snake. Fifteen copies of my RL agent hunt with you.">
     <style>
-      :root {
-        color-scheme: dark;
-        --bg: #061818;
-        --ink: #f1f1f1;
-        --muted: #8aa;
-        --cyan: #00bbbb;
-        --red: #bb0000;
-      }
+      :root { color-scheme: dark; }
       * { box-sizing: border-box; }
       html, body {
         margin: 0;
         height: 100%;
-        background: var(--bg);
-        color: var(--ink);
-        font: 16px/1.45 ui-sans-serif, system-ui, sans-serif;
+        background: #061818;
+        color: #f1f1f1;
+        font: 15px/1.4 ui-sans-serif, system-ui, sans-serif;
+        overflow: hidden;
       }
-      .wrap {
-        min-height: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 20px 16px 32px;
+      .bar {
+        position: absolute;
+        z-index: 2;
+        left: 0; right: 0; top: 0;
+        padding: 10px 16px 8px;
+        background: linear-gradient(to bottom, rgba(6,24,24,0.92), rgba(6,24,24,0));
+        pointer-events: none;
       }
-      header { max-width: 880px; text-align: center; }
-      h1 {
-        margin: 0 0 8px;
-        font-size: 1.6rem;
-        font-weight: 650;
-        letter-spacing: -0.02em;
-      }
-      h1 span { color: var(--cyan); }
-      .lede {
-        margin: 0 auto 10px;
-        max-width: 42rem;
-        color: var(--muted);
-      }
-      .controls {
-        margin: 0 0 16px;
-        color: var(--ink);
-        font-size: 0.95rem;
-      }
-      kbd {
-        display: inline-block;
-        padding: 1px 6px;
-        border: 1px solid #345;
-        border-radius: 4px;
-        background: #0b2424;
-        font: 12px/1.6 ui-monospace, monospace;
-      }
+      h1 { margin: 0; font-size: 1.05rem; font-weight: 650; }
+      h1 span { color: #00bbbb; }
+      .hint { margin: 2px 0 0; color: #8aa; font-size: 0.85rem; }
       canvas.emscripten {
-        width: min(1280px, 100%);
-        height: auto;
-        aspect-ratio: 1280 / 720;
-        background: #000;
-        border: 1px solid #123;
-        border-radius: 6px;
+        display: block;
+        width: 100vw;
+        height: 100vh;
+        background: #061818;
       }
-      footer {
-        margin-top: 14px;
-        max-width: 880px;
-        color: var(--muted);
-        font-size: 0.85rem;
-        text-align: center;
-      }
-      footer a { color: var(--cyan); }
     </style>
   </head>
   <body>
-    <div class="wrap">
-      <header>
-        <h1>You vs <span>15 trained agents</span></h1>
-        <p class="lede">
-          Same C simulator I trained in, running in your browser.
-          Cyan is you. Red snakes are copies of one RL policy.
-          Eat, cut, don't die. Try to outlast them.
-        </p>
-        <p class="controls">
-          <kbd>A</kbd>/<kbd>D</kbd> or arrows steer
-          &nbsp;·&nbsp;
-          <kbd>Space</kbd>/<kbd>W</kbd>/click boosts
-        </p>
-      </header>
-      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
-      <footer>
-        Client-side WASM. No server. Weights are a 10.7B-step selfplay checkpoint.
-      </footer>
+    <div class="bar">
+      <h1>You vs <span>15 trained agents</span></h1>
+      <p class="hint">Mouse aims · click or space boosts · cyan is you</p>
     </div>
+    <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
     <script>
       var Module = {
         canvas: document.getElementById('canvas'),
