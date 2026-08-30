@@ -1,9 +1,31 @@
+# Extensionless blog posts (and any unmatched file) render as HTML.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Type = "text/html; charset=utf-8"
+
+# Specific asset MIME types — declared AFTER the catch-all so they override it.
 [[headers]]
   for = "/*.css"
   [headers.values]
     Content-Type = "text/css"
 
 [[headers]]
-  for = "/*"
+  for = "/*.js"
   [headers.values]
-    Content-Type = "text/html; charset=utf-8"
+    Content-Type = "text/javascript"
+
+[[headers]]
+  for = "/*.json"
+  [headers.values]
+    Content-Type = "application/json"
+
+[[headers]]
+  for = "/*.wasm"
+  [headers.values]
+    Content-Type = "application/wasm"
+
+[[headers]]
+  for = "/*.data"
+  [headers.values]
+    Content-Type = "application/octet-stream"
