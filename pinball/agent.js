@@ -8,7 +8,7 @@
   var started = false;        // user clicked
   var runtimeReady = false;   // Module.calledRun observed
   var bound = false;          // cwrap done
-  var fillObs, applyAction, obsPtr;
+  var fillObs, applyAction, autoLaunch, obsPtr;
 
   function tanh(x) { return Math.tanh(x); }
 
@@ -33,6 +33,7 @@
 
   function tick() {
     if (!bound) return;
+    autoLaunch();
     fillObs(obsPtr);
     var obs = new Float32Array(Module.HEAPF32.buffer, obsPtr, OBS);
     applyAction(forward(obs));
@@ -53,6 +54,7 @@
     if (bound || !started || !runtimeReady || !layers) return;
     fillObs = Module.cwrap('web_fill_obs', null, ['number']);
     applyAction = Module.cwrap('web_apply_action', null, ['number']);
+    autoLaunch = Module.cwrap('web_auto_launch', null, []);
     obsPtr = Module._malloc(OBS * 4);
     bound = true;
     setInterval(tick, 16); // ~60 Hz agent tick; hold-state interface
