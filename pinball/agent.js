@@ -66,12 +66,28 @@
     tryBind();
   });
 
-  // Runtime-init watcher (Module.calledRun is set once main() is entered;
-  // the game loop never returns, so this is the ready signal).
+  // Runtime-ready signal. This Emscripten build never sets Module.calledRun
+  // (it stays a local `var` in the generated JS), so polling it never fired
+  // and the agent never bound. onRuntimeInitialized is the real signal: it
+  // fires once the WASM runtime is fully set up (exports, _malloc, cwrap)
+  // and just before main() runs.
+  function markReady() {
+    if (runtimeReady) return;
+    runtimeReady = true;
+    tryBind();
+  }
+  if (Module.onRuntimeInitialized) {
+    var prevInit = Module.onRuntimeInitialized;
+    Module.onRuntimeInitialized = function () { prevInit(); markReady(); };
+  } else {
+    Module.onRuntimeInitialized = markReady;
+  }
+  // Fallback poll in case onRuntimeInitialized was already consumed before
+  // this script ran (agent.js is synchronous, before the async WASM script,
+  // so it normally won't -- but keep a safety net on the real exports).
   var poll = setInterval(function () {
-    if (Module.calledRun) {
-      runtimeReady = true;
-      tryBind();
+    if (Module.cwrap && Module._web_fill_obs) {
+      markReady();
       clearInterval(poll);
     }
   }, 50);
