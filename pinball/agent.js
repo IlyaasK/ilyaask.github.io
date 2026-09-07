@@ -6,7 +6,7 @@
   var OBS = 30, ACTS = 8;
   var layers = null;          // [{weight, bias} x3], from policy_weights.json
   var started = false;        // user clicked
-  var runtimeReady = false;   // Module.calledRun observed
+  var runtimeReady = false;   // Module.onRuntimeInitialized fired
   var bound = false;          // cwrap done
   var fillObs, applyAction, autoLaunch, obsPtr;
 
