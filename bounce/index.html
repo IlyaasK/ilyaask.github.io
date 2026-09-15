@@ -29,10 +29,10 @@
 </div>
 <script>
   var Module = {
-    canvas: document.getElementById(canvas),
-    onRuntimeInitialized: function() { console.log(Bounce WASM loaded); }
+    canvas: document.getElementById('canvas'),
+    print: function (text) { console.log(text); }, printErr: function (text) { console.error(text); }
   };
 </script>
-<script src="game.js"></script>
+<script async type="text/javascript" src="game.js"></script>
 </body>
 </html>
