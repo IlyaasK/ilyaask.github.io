@@ -37,7 +37,7 @@
   }
   window.addEventListener('error', function (e) { webstatus('PAGE ERROR: ' + e.message); });
   var Module = {
-    arguments: ['bounce'],
+    arguments: ['bounce', 'base.website_dir=None'],
     canvas: document.getElementById('canvas'),
     print: function (text) { console.log(text); },
     printErr: function (text) { console.error(text); webstatus(text); },
