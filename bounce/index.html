@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bounce — AI Plays the 2001 Nokia Classic</title>
-<meta name="description" content="A PPO agent trained for 1B steps plays the 2001 Nokia Bounce in your browser via WebAssembly.">
+<meta name="description" content="A PPO agent trained for 553M steps plays the 2001 Nokia Bounce in your browser via WebAssembly.">
 <style>
   body { margin: 0; background: #111; color: #eee; font-family: -apple-system, sans-serif; display: flex; flex-direction: column; align-items: center; }
   h1 { margin: 20px 0 5px; font-size: 28px; }
@@ -18,15 +18,15 @@
 </head>
 <body>
 <h1>Bounce</h1>
-<p class="sub">The 2001 Nokia classic, played by an AI trained with PPO for 1 billion steps</p>
+<p class="sub">The 2001 Nokia classic, played by an AI trained with PPO for 553 million steps</p>
 <div id="game-container">
   <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
 </div>
 <div id="webstatus"></div>
 <div class="info">
-  <p>The original 2001 Nokia Bounce — all 11 levels, reverse-engineered from the JAR — running entirely in your browser via WebAssembly. The red ball is controlled by a neural network policy trained with PPO, learning to clear every level.</p>
+  <p>The original 2001 Nokia Bounce — all 11 levels, reverse-engineered from the JAR — running entirely in your browser via WebAssembly. The red ball is controlled by a neural network policy trained with PPO, currently clears Level 1; full 11-level training is in progress.</p>
   <p>Environment: C rewrite of the JAR game logic, 126-dim observations.<br>
-  Training: 1B timesteps, PPO, RTX 5070.</p>
+  Training: 553,648,128 timesteps, PPO, RTX 5070.</p>
   <p><a href="https://github.com/IlyaasK/pinball-rl">Source code</a></p>
 </div>
 <script>
