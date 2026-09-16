@@ -246,6 +246,7 @@ min = 0.5
 max = 2.0
 scale = auto
 [base]
+website_dir = None
 env_name = None
 
 # Multi-GPU (single GPU defaults)
