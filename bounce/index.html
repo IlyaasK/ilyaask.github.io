@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bounce — AI Plays the 2001 Nokia Classic</title>
-<meta name="description" content="A PPO agent trained for 553M steps plays the 2001 Nokia Bounce in your browser via WebAssembly.">
+<meta name="description" content="Two PPO agents trained in C play the 2001 Nokia Bounce in your browser via WebAssembly — one policy per level, switching as the game advances.">
 <style>
   body { margin: 0; background: #111; color: #eee; font-family: -apple-system, sans-serif; display: flex; flex-direction: column; align-items: center; }
   h1 { margin: 20px 0 5px; font-size: 28px; }
@@ -18,18 +18,35 @@
 </head>
 <body>
 <h1>Bounce</h1>
-<p class="sub">The 2001 Nokia classic, played by an AI trained with PPO for 553 million steps</p>
+<p class="sub">The 2001 Nokia classic, played by PPO agents trained on a C rewrite of the original</p>
 <div id="game-container">
   <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
 </div>
 <div id="webstatus"></div>
 <div class="info">
-  <p>The original 2001 Nokia Bounce — all 11 levels, reverse-engineered from the JAR — running entirely in your browser via WebAssembly. The red ball is controlled by a neural network policy trained with PPO, currently clears Level 1; full 11-level training is in progress.</p>
-  <p>Environment: C rewrite of the JAR game logic, 126-dim observations.<br>
-  Training: 553,648,128 timesteps, PPO, RTX 5070.</p>
+  <p>The original 2001 Nokia Bounce — all 11 levels, reverse-engineered from the JAR — running entirely in your browser via WebAssembly. The red ball is controlled by a separate neural network policy per level: the Level 1 policy clears Level 1, then the page switches to the Level 2 policy for Level 2, and wraps back to the start. Levels 3–11 are not trained yet.</p>
+  <p>Environment: C rewrite of the JAR game logic, 164-dim observations.<br>
+  Level 1 policy: 998M timesteps, 99.9% clear rate. Level 2 policy: 524M timesteps, 99.8% clear rate.<br>
+  PPO, trained on an RTX 5070.</p>
   <p><a href="https://github.com/IlyaasK/pinball-rl">Source code</a></p>
 </div>
 <script>
+  // Modern Chromium omits UIEvent.detail on resize/scroll, and the pinned
+  // Emscripten (3.1.50) writes it into the heap unguarded while assertions are
+  // on, which aborts the whole runtime -- so merely resizing the window killed
+  // the demo. Normalise it to 0 before Emscripten's own listener runs; this
+  // script registers first, and same-target listeners fire in registration
+  // order.
+  (function () {
+    function normalise(e) {
+      if (e.detail === undefined) {
+        try { Object.defineProperty(e, 'detail', { value: 0, configurable: true }); } catch (_) {}
+      }
+    }
+    window.addEventListener('resize', normalise, true);
+    window.addEventListener('scroll', normalise, true);
+  })();
+
   function webstatus(msg) {
     var el = document.getElementById('webstatus');
     el.style.display = 'block';
