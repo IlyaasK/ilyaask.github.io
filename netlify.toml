@@ -29,3 +29,27 @@
   for = "/*.data"
   [headers.values]
     Content-Type = "application/octet-stream"
+
+[[headers]]
+  for = "/*.pdf"
+  [headers.values]
+    Content-Type = "application/pdf"
+
+[[headers]]
+  for = "/resume"
+  [headers.values]
+    Content-Type = "application/pdf"
+    Content-Disposition = "inline; filename=\"Ilyaas_Kapadia_Resume_Sept2026.pdf\""
+
+[[redirects]]
+  from = "/resume"
+  to = "/resume.pdf"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/resume/"
+  to = "/resume.pdf"
+  status = 200
+  force = true
+
