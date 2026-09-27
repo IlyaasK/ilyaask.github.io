@@ -21,6 +21,32 @@
     Content-Type = "application/json"
 
 [[headers]]
+  for = "/*.png"
+  [headers.values]
+    Content-Type = "image/png"
+
+# Countdown's assets live below a nested path; match that segment explicitly.
+[[headers]]
+  for = "/countdown/assets/*.css"
+  [headers.values]
+    Content-Type = "text/css"
+
+[[headers]]
+  for = "/countdown/assets/*.js"
+  [headers.values]
+    Content-Type = "text/javascript"
+
+[[headers]]
+  for = "/countdown/mesh.png"
+  [headers.values]
+    Content-Type = "image/png"
+
+[[headers]]
+  for = "/countdown/wllama.wasm"
+  [headers.values]
+    Content-Type = "application/wasm"
+
+[[headers]]
   for = "/*.wasm"
   [headers.values]
     Content-Type = "application/wasm"
@@ -52,4 +78,3 @@
   to = "/resume.pdf"
   status = 200
   force = true
-
