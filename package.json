@@ -1,0 +1,8 @@
+{
+  "name": "ilyaask-github-io",
+  "private": true,
+  "description": "ilya.as static site + the /learn progress-sync function",
+  "dependencies": {
+    "@netlify/blobs": "^11.1.1"
+  }
+}

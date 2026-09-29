@@ -21,6 +21,8 @@
   ul.tree .sec > label > span { font-weight: 600; }
   ul.tree label:has(input:checked) > span { text-decoration: line-through; opacity: .5; }
   #progress { opacity: .6; font-variant-numeric: tabular-nums; }
+  #sync { opacity: .45; }
+  #sync:not(:empty)::before { content: " · "; }
   .sections { display: flex; flex-wrap: wrap; gap: .4em 1.1em; margin: 0 0 .5em; padding: 0; list-style: none; opacity: .8; }
   ul.tree li[hidden] { display: none; }
   .hidetoggle { margin: .1em 0 .7em; font-size: .95em; opacity: .85; }
@@ -34,8 +36,9 @@
 <h2>Learn</h2>
 <p>
 Everything I&rsquo;m working through. Tick a box when it&rsquo;s done &mdash;
-progress is saved in this browser. Titles link to the resource.
-<p id="progress"></p>
+your ticks are saved on the server, so they&rsquo;re the same on every device.
+Titles link to the resource.
+<p><span id="progress"></span><span id="sync"></span></p>
 
 <ul class="sections">
 <li><a href="#bootdev">Boot.dev</a></li>
@@ -384,12 +387,39 @@ or <b>cppreference</b> where learncpp has no equivalent.</small></p>
     var n = boxes.filter(function (b) { return b.checked; }).length;
     out.textContent = n + " / " + boxes.length + " done";
   }
+  // ---- server sync ------------------------------------------------------
+  // localStorage stays the instant, offline copy; the server blob is the shared
+  // one, so ticks match on every device.
+  var API = "/api/progress";
+  var syncEl = document.getElementById("sync");
+  var timer = null;
+  function setSync(text) { if (syncEl) syncEl.textContent = text; }
+  function cacheLocal() {
+    try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {}
+  }
+  function push(delay) {
+    clearTimeout(timer);
+    timer = setTimeout(function () {
+      setSync("saving…");
+      fetch(API, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(saved),
+      }).then(function (r) {
+        setSync(r.ok ? "saved" : "server error — kept on this device");
+      }).catch(function () {
+        setSync("offline — kept on this device");
+      });
+    }, typeof delay === "number" ? delay : 400);
+  }
+
   boxes.forEach(function (b) {
     b.addEventListener("change", function () {
       if (b.checked) { saved[b.dataset.k] = 1; } else { delete saved[b.dataset.k]; }
-      try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {}
+      cacheLocal();
       render();
       applyHide();
+      push();
     });
   });
 
@@ -427,6 +457,36 @@ or <b>cppreference</b> where learncpp has no equivalent.</small></p>
 
   render();
   applyHide();
+
+  // ---- initial load from the server -------------------------------------
+  setSync("loading…");
+  fetch(API, { cache: "no-store" })
+    .then(function (r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    })
+    .then(function (remote) {
+      if (!remote || typeof remote !== "object" || Array.isArray(remote)) {
+        throw new Error("unexpected payload");
+      }
+      // First run after moving to server storage: this device may already hold
+      // ticks the server has never seen. Seed the server rather than letting an
+      // empty blob wipe them.
+      if (Object.keys(remote).length === 0 && Object.keys(saved).length > 0) {
+        setSync("uploaded this device's progress");
+        push(0);
+        return;
+      }
+      saved = remote;
+      cacheLocal();
+      boxes.forEach(function (b) { b.checked = !!saved[b.dataset.k]; });
+      render();
+      applyHide();
+      setSync("saved");
+    })
+    .catch(function () {
+      setSync("offline — showing this device's progress");
+    });
 })();
 </script>
 </body>
