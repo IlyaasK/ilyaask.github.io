@@ -1,0 +1,393 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Learn | Ilyaas Kapadia</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<base href="../">
+<link rel="stylesheet" href="style.css">
+<style>
+  /* this page is always dark, regardless of the system preference */
+  html { color-scheme: dark; }
+  ul.tree { list-style: none; padding-left: 0; margin: .4em 0 1.6em; }
+  ul.tree ul {
+    list-style: none; padding-left: 1.1em; margin: .15em 0 .35em;
+    border-left: 1px solid color-mix(in srgb, CanvasText 18%, transparent);
+  }
+  ul.tree li { margin: .18em 0; }
+  ul.tree label { display: flex; gap: .5em; align-items: baseline; cursor: pointer; }
+  ul.tree input { flex: none; margin: 0; transform: translateY(1.5px); }
+  ul.tree .sec > label > span { font-weight: 600; }
+  ul.tree label:has(input:checked) > span { text-decoration: line-through; opacity: .5; }
+  #progress { opacity: .6; font-variant-numeric: tabular-nums; }
+  .sections { display: flex; flex-wrap: wrap; gap: .4em 1.1em; margin: 0 0 .5em; padding: 0; list-style: none; opacity: .8; }
+</style>
+</head>
+<body>
+<h1><a href="index.html">Ilyaas Kapadia</a></h1>
+<hr>
+<h2>Learn</h2>
+<p>
+Everything I&rsquo;m working through. Tick a box when it&rsquo;s done &mdash;
+progress is saved in this browser. Titles link to the resource.
+<p id="progress"></p>
+
+<ul class="sections">
+<li><a href="#bootdev">Boot.dev</a></li>
+<li><a href="#courses">Courses</a></li>
+<li><a href="#books">Books</a></li>
+<li><a href="#cpp">C++</a></li>
+</ul>
+
+<h3 id="bootdev">Boot.dev</h3>
+<ul class="tree">
+<li><label><input type="checkbox" data-k="boot:http-servers-in-go"><span>HTTP Servers in Go</span></label></li>
+<li><label><input type="checkbox" data-k="boot:file-servers-and-cdn"><span>File Servers and CDN</span></label></li>
+<li><label><input type="checkbox" data-k="boot:rabbitmq-pub-sub"><span>RabbitMQ Pub/Sub</span></label></li>
+<li><label><input type="checkbox" data-k="boot:web-app-security"><span>Web App Security</span></label></li>
+<li><label><input type="checkbox" data-k="boot:javascript"><span>JavaScript</span></label></li>
+<li><label><input type="checkbox" data-k="boot:typescript"><span>TypeScript</span></label></li>
+<li><label><input type="checkbox" data-k="boot:logging-in-go"><span>Logging in Go</span></label></li>
+<li><label><input type="checkbox" data-k="boot:cryptography-in-go"><span>Cryptography in Go</span></label></li>
+<li><label><input type="checkbox" data-k="boot:http-protocol-in-go"><span>HTTP Protocol in Go</span></label></li>
+<li><label><input type="checkbox" data-k="boot:algorithms"><span>Algorithms</span></label></li>
+<li><label><input type="checkbox" data-k="boot:algorithms-2"><span>Algorithms 2</span></label></li>
+<li><label><input type="checkbox" data-k="boot:rag-in-python"><span>RAG in Python</span></label></li>
+</ul>
+
+<h3 id="courses">Courses</h3>
+<ul class="tree">
+<li><label><input type="checkbox" data-k="course:nand2tetris"><span><a href="https://www.nand2tetris.org/" target="_blank" rel="noopener">nand2tetris</a></span></label>
+<ul>
+<li><label><input type="checkbox" data-k="course:nand2tetris:part-i-hardware"><span><a href="https://www.coursera.org/learn/build-a-computer" target="_blank" rel="noopener">Part I — Hardware (projects 1–6)</a></span></label></li>
+<li><label><input type="checkbox" data-k="course:nand2tetris:part-ii-software"><span><a href="https://www.coursera.org/learn/nand2tetris2" target="_blank" rel="noopener">Part II — Software (projects 7–12)</a></span></label></li>
+</ul>
+</li>
+<li><label><input type="checkbox" data-k="course:ben-eater"><span><a href="https://eater.net/" target="_blank" rel="noopener">Ben Eater</a></span></label>
+<ul>
+<li><label><input type="checkbox" data-k="course:ben-eater:build-an-8-bit-cpu-from-scratch"><span><a href="https://eater.net/8bit" target="_blank" rel="noopener">Build an 8-bit CPU from scratch</a></span></label></li>
+<li><label><input type="checkbox" data-k="course:ben-eater:build-a-6502-computer"><span><a href="https://eater.net/6502" target="_blank" rel="noopener">Build a 6502 computer</a></span></label></li>
+<li><label><input type="checkbox" data-k="course:ben-eater:build-a-digital-clock"><span><a href="https://eater.net/clock" target="_blank" rel="noopener">Build a digital clock</a></span></label></li>
+<li><label><input type="checkbox" data-k="course:ben-eater:learn-how-the-internet-works"><span><a href="https://eater.net/inet" target="_blank" rel="noopener">Learn how the Internet works</a></span></label></li>
+<li><label><input type="checkbox" data-k="course:ben-eater:lets-build-a-video-card"><span><a href="https://eater.net/vga" target="_blank" rel="noopener">Let&rsquo;s build a video card</a></span></label></li>
+<li><label><input type="checkbox" data-k="course:ben-eater:learn-about-error-detection"><span><a href="https://eater.net/crc" target="_blank" rel="noopener">Learn about error detection (parity, checksums, CRC)</a></span></label></li>
+</ul>
+</li>
+</ul>
+
+<h3 id="books">Books</h3>
+<ul class="tree">
+<li><label><input type="checkbox" data-k="book:the-c-programming-language-k-r"><span>The C Programming Language (K&R)</span></label></li>
+<li><label><input type="checkbox" data-k="book:designing-data-intensive-applications"><span>Designing Data-Intensive Applications</span></label></li>
+<li><label><input type="checkbox" data-k="book:the-manga-guide-to-microprocessors"><span>The Manga Guide to Microprocessors</span></label></li>
+<li><label><input type="checkbox" data-k="book:open-data-structures"><span>Open Data Structures</span></label></li>
+<li><label><input type="checkbox" data-k="book:operating-systems-three-easy-pieces"><span>Operating Systems: Three Easy Pieces</span></label>
+<ul>
+<li><label><input type="checkbox" data-k="book:operating-systems-three-easy-pieces:chapter-1-to-32"><span>Chapter 1 to 32</span></label></li>
+</ul>
+</li>
+<li><label><input type="checkbox" data-k="book:concurrency-in-go"><span>Concurrency in Go</span></label></li>
+<li><label><input type="checkbox" data-k="book:the-unix-programming-environment"><span>The Unix Programming Environment</span></label></li>
+<li><label><input type="checkbox" data-k="book:the-practice-of-programming"><span>The Practice of Programming</span></label></li>
+<li><label><input type="checkbox" data-k="book:dave-cheney-practical-go"><span>Dave Cheney — Practical Go</span></label></li>
+<li><label><input type="checkbox" data-k="book:dave-cheney-high-performance-go"><span>Dave Cheney — High Performance Go</span></label></li>
+<li><label><input type="checkbox" data-k="book:ray-tracing-in-one-weekend"><span><a href="https://raytracing.github.io/books/RayTracingInOneWeekend.html" target="_blank" rel="noopener">Ray Tracing in One Weekend</a></span></label></li>
+<li><label><input type="checkbox" data-k="book:ray-tracing-the-next-week"><span><a href="https://raytracing.github.io/books/RayTracingTheNextWeek.html" target="_blank" rel="noopener">Ray Tracing: The Next Week</a></span></label></li>
+<li><label><input type="checkbox" data-k="book:ray-tracing-the-rest-of-your-life"><span><a href="https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html" target="_blank" rel="noopener">Ray Tracing: The Rest Of Your Life</a></span></label></li>
+</ul>
+
+<p>From the shared sheet:</p>
+<ul class="tree">
+<li><label><input type="checkbox" data-k="book:tcp-ip-illustrated"><span>TCP/IP Illustrated</span></label>
+<ul>
+<li><label><input type="checkbox" data-k="book:tcp-ip-illustrated:chapter-1-to-1-4"><span>Chapter 1 to 1.4</span></label></li>
+<li><label><input type="checkbox" data-k="book:tcp-ip-illustrated:chapter-2-to-2-6"><span>Chapter 2 to 2.6</span></label></li>
+<li><label><input type="checkbox" data-k="book:tcp-ip-illustrated:chapter-3-to-3-4"><span>Chapter 3 to 3.4</span></label></li>
+<li><label><input type="checkbox" data-k="book:tcp-ip-illustrated:chapter-5-to-5-4"><span>Chapter 5 to 5.4</span></label></li>
+<li><label><input type="checkbox" data-k="book:tcp-ip-illustrated:chapter-7-to-7-4"><span>Chapter 7 to 7.4</span></label></li>
+<li><label><input type="checkbox" data-k="book:tcp-ip-illustrated:chapter-9-to-9-3"><span>Chapter 9 to 9.3</span></label></li>
+<li><label><input type="checkbox" data-k="book:tcp-ip-illustrated:chapter-10-to-10-13"><span>Chapter 10 to 10.13</span></label></li>
+<li><label><input type="checkbox" data-k="book:tcp-ip-illustrated:chapter-11-to-11-5"><span>Chapter 11 to 11.5</span></label></li>
+<li><label><input type="checkbox" data-k="book:tcp-ip-illustrated:chapter-12"><span>Chapter 12</span></label></li>
+<li><label><input type="checkbox" data-k="book:tcp-ip-illustrated:chapter-13-to-13-13-6"><span>Chapter 13 to 13.13.6</span></label></li>
+<li><label><input type="checkbox" data-k="book:tcp-ip-illustrated:chapter-14-to-14-7"><span>Chapter 14 to 14.7</span></label></li>
+<li><label><input type="checkbox" data-k="book:tcp-ip-illustrated:chapter-16-16-1-and-16-3"><span>Chapter 16: 16.1 and 16.3</span></label></li>
+<li><label><input type="checkbox" data-k="book:tcp-ip-illustrated:chapter-17"><span>Chapter 17</span></label></li>
+</ul>
+</li>
+<li><label><input type="checkbox" data-k="book:c-concurrency-in-action"><span>C++ Concurrency in Action</span></label>
+<ul>
+<li><label><input type="checkbox" data-k="book:c-concurrency-in-action:chapter-1-to-9-can-skip-5-6-and-9-on-a-first-read-through"><span>Chapter 1 to 9 — can skip 5, 6 and 9 on a first read through</span></label></li>
+</ul>
+</li>
+<li><label><input type="checkbox" data-k="book:inside-the-machine"><span>Inside the Machine</span></label>
+<ul>
+<li><label><input type="checkbox" data-k="book:inside-the-machine:chapter-1-4"><span>Chapter 1 – 4</span></label></li>
+<li><label><input type="checkbox" data-k="book:inside-the-machine:chapter-7"><span>Chapter 7</span></label></li>
+<li><label><input type="checkbox" data-k="book:inside-the-machine:chapter-9"><span>Chapter 9</span></label></li>
+<li><label><input type="checkbox" data-k="book:inside-the-machine:chapter-11"><span>Chapter 11</span></label></li>
+</ul>
+</li>
+<li><label><input type="checkbox" data-k="book:c-software-design"><span>C++ Software Design</span></label>
+<ul>
+<li><label><input type="checkbox" data-k="book:c-software-design:everything-except-chapter-8"><span>Everything except Chapter 8</span></label></li>
+</ul>
+</li>
+<li><label><input type="checkbox" data-k="book:beautiful-c"><span>Beautiful C++</span></label>
+<ul>
+<li><label><input type="checkbox" data-k="book:beautiful-c:everything-here-is-valuable"><span>Everything here is valuable</span></label></li>
+</ul>
+</li>
+</ul>
+<p><small>Chapters are inclusive — “16.1 to 16.3” means read up to and including 16.3.</small></p>
+
+<p>CUDA:</p>
+<ul class="tree">
+<li><label><input type="checkbox" data-k="book:cuda-by-example-jason-sanders-edward-kandrot"><span>CUDA by Example — Jason Sanders &amp; Edward Kandrot</span></label></li>
+<li><label><input type="checkbox" data-k="book:programming-massively-parallel-processors-2nd-ed-david-b-kir"><span>Programming Massively Parallel Processors (2nd ed) — David B. Kirk &amp; Wen-mei W. Hwu</span></label></li>
+<li><label><input type="checkbox" data-k="book:cuda-application-design-and-development-rob-farber"><span>CUDA Application Design and Development — Rob Farber</span></label></li>
+<li><label><input type="checkbox" data-k="book:cuda-programming-a-developer-s-guide-to-parallel-computing-w"><span>CUDA Programming: A Developer's Guide to Parallel Computing with GPUs — Shane Cook</span></label></li>
+</ul>
+
+<h3 id="cpp">C++</h3>
+<p><small>Beginner C++ progress tree &mdash; 25 sections, 103 lessons,
+in the order the tree is meant to be read (top&#8209;down, left&#8209;to&#8209;right).
+Every lesson links to its resource: the <b>learncpp.com</b> page it&rsquo;s named after,
+or <b>cppreference</b> where learncpp has no equivalent.</small></p>
+<ul class="tree" id="cpp-tree">
+<li class="sec"><label><input type="checkbox" data-k="cpp:transforming-data-and-organizing-code"><span><a href="https://www.learncpp.com/#Chapter2" target="_blank" rel="noopener">Transforming Data and Organizing Code</a></span></label>
+<ul>
+<li><label><input type="checkbox" data-k="cpp:transforming-data-and-organizing-code:declarations-definitions-and-multiple-code-files"><span><a href="https://www.learncpp.com/cpp-tutorial/forward-declarations/" target="_blank" rel="noopener">Declarations, Definitions, and Multiple Code Files</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:transforming-data-and-organizing-code:the-preprocessor-and-header-guards"><span><a href="https://www.learncpp.com/cpp-tutorial/header-guards/" target="_blank" rel="noopener">The Preprocessor and Header Guards</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:transforming-data-and-organizing-code:functions-parameters-arguments-and-return-values"><span><a href="https://www.learncpp.com/cpp-tutorial/introduction-to-functions/" target="_blank" rel="noopener">Functions, Parameters, Arguments and Return Values</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:transforming-data-and-organizing-code:scope"><span><a href="https://www.learncpp.com/cpp-tutorial/introduction-to-local-scope/" target="_blank" rel="noopener">Scope</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:transforming-data-and-organizing-code:namespaces"><span><a href="https://www.learncpp.com/cpp-tutorial/naming-collisions-and-an-introduction-to-namespaces/" target="_blank" rel="noopener">Namespaces</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:transforming-data-and-organizing-code:anonymous-functions"><span><a href="https://www.learncpp.com/cpp-tutorial/introduction-to-lambdas-anonymous-functions/" target="_blank" rel="noopener">Anonymous Functions</a></span></label></li>
+</ul>
+</li>
+<li class="sec"><label><input type="checkbox" data-k="cpp:debugging"><span><a href="https://www.learncpp.com/#Chapter3" target="_blank" rel="noopener">Debugging</a></span></label>
+<ul>
+<li><label><input type="checkbox" data-k="cpp:debugging:the-debugging-process"><span><a href="https://www.learncpp.com/cpp-tutorial/the-debugging-process/" target="_blank" rel="noopener">The Debugging Process</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:debugging:debugging-with-the-ide"><span><a href="https://www.learncpp.com/cpp-tutorial/using-an-integrated-debugger-stepping/" target="_blank" rel="noopener">Debugging with the IDE</a></span></label></li>
+</ul>
+</li>
+<li class="sec"><label><input type="checkbox" data-k="cpp:bit-manipulation"><span><a href="https://www.learncpp.com/#ChapterO" target="_blank" rel="noopener">Bit Manipulation</a></span></label>
+<ul>
+<li><label><input type="checkbox" data-k="cpp:bit-manipulation:bitflags-and-std-bitset"><span><a href="https://www.learncpp.com/cpp-tutorial/bit-flags-and-bit-manipulation-via-stdbitset/" target="_blank" rel="noopener">Bitflags and std::bitset</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:bit-manipulation:bitwise-operators-and-bit-masks"><span><a href="https://www.learncpp.com/cpp-tutorial/bit-manipulation-with-bitwise-operators-and-bit-masks/" target="_blank" rel="noopener">Bitwise Operators and Bit Masks</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:bit-manipulation:reinterpret-cast-and-std-memcpy"><span><a href="https://en.cppreference.com/w/cpp/language/reinterpret_cast" target="_blank" rel="noopener">reinterpret_cast and std::memcpy</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:bit-manipulation:std-bit-cast"><span><a href="https://en.cppreference.com/w/cpp/numeric/bit_cast" target="_blank" rel="noopener">std::bit_cast</a></span></label></li>
+</ul>
+</li>
+<li class="sec"><label><input type="checkbox" data-k="cpp:introduction-to-data-types"><span><a href="https://www.learncpp.com/#Chapter4" target="_blank" rel="noopener">Introduction to Data Types</a></span></label>
+<ul>
+<li><label><input type="checkbox" data-k="cpp:introduction-to-data-types:void"><span><a href="https://www.learncpp.com/cpp-tutorial/void/" target="_blank" rel="noopener">void</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:introduction-to-data-types:object-sizes"><span><a href="https://www.learncpp.com/cpp-tutorial/object-sizes-and-the-sizeof-operator/" target="_blank" rel="noopener">Object Sizes</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:introduction-to-data-types:signed-versus-unsigned-integers"><span><a href="https://www.learncpp.com/cpp-tutorial/signed-integers/" target="_blank" rel="noopener">Signed versus Unsigned Integers</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:introduction-to-data-types:fixed-width-integers"><span><a href="https://www.learncpp.com/cpp-tutorial/fixed-width-integers-and-size-t/" target="_blank" rel="noopener">Fixed Width Integers</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:introduction-to-data-types:floating-point-types"><span><a href="https://www.learncpp.com/cpp-tutorial/floating-point-numbers/" target="_blank" rel="noopener">Floating Point Types</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:introduction-to-data-types:bools"><span><a href="https://www.learncpp.com/cpp-tutorial/boolean-values/" target="_blank" rel="noopener">Bools</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:introduction-to-data-types:enumerations"><span><a href="https://www.learncpp.com/cpp-tutorial/unscoped-enumerations/" target="_blank" rel="noopener">Enumerations</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:introduction-to-data-types:static-cast"><span><a href="https://www.learncpp.com/cpp-tutorial/explicit-type-conversion-casting-and-static-cast/" target="_blank" rel="noopener">static_cast</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:introduction-to-data-types:auto"><span><a href="https://www.learncpp.com/cpp-tutorial/type-deduction-for-objects-using-the-auto-keyword/" target="_blank" rel="noopener">auto</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:introduction-to-data-types:tuple"><span><a href="https://en.cppreference.com/w/cpp/utility/tuple" target="_blank" rel="noopener">Tuple</a></span></label></li>
+</ul>
+</li>
+<li class="sec"><label><input type="checkbox" data-k="cpp:operators"><span><a href="https://www.learncpp.com/#Chapter6" target="_blank" rel="noopener">Operators</a></span></label>
+<ul>
+<li><label><input type="checkbox" data-k="cpp:operators:precedence"><span><a href="https://www.learncpp.com/cpp-tutorial/operator-precedence-and-associativity/" target="_blank" rel="noopener">Precedence</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:operators:arithmetic-operators"><span><a href="https://www.learncpp.com/cpp-tutorial/arithmetic-operators/" target="_blank" rel="noopener">Arithmetic Operators</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:operators:pre-and-post-decrement"><span><a href="https://www.learncpp.com/cpp-tutorial/increment-decrement-operators-and-side-effects/" target="_blank" rel="noopener">Pre and Post Decrement</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:operators:and"><span><a href="https://www.learncpp.com/cpp-tutorial/the-comma-operator/" target="_blank" rel="noopener">, and ?</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:operators:relational-operators"><span><a href="https://www.learncpp.com/cpp-tutorial/relational-operators-and-floating-point-comparisons/" target="_blank" rel="noopener">Relational Operators</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:operators:operator-overloading"><span><a href="https://www.learncpp.com/cpp-tutorial/introduction-to-operator-overloading/" target="_blank" rel="noopener">Operator Overloading</a></span></label></li>
+</ul>
+</li>
+<li class="sec"><label><input type="checkbox" data-k="cpp:control-flow"><span><a href="https://www.learncpp.com/#Chapter8" target="_blank" rel="noopener">Control Flow</a></span></label>
+<ul>
+<li><label><input type="checkbox" data-k="cpp:control-flow:if"><span><a href="https://www.learncpp.com/cpp-tutorial/if-statements-and-blocks/" target="_blank" rel="noopener">if</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:control-flow:switch-and-fallthrough"><span><a href="https://www.learncpp.com/cpp-tutorial/switch-fallthrough-and-scoping/" target="_blank" rel="noopener">Switch and Fallthrough</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:control-flow:loops-i-while-do-while-for"><span><a href="https://www.learncpp.com/cpp-tutorial/introduction-to-loops-and-while-statements/" target="_blank" rel="noopener">Loops I: while, do-while, for</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:control-flow:loops-ii-break-and-continue"><span><a href="https://www.learncpp.com/cpp-tutorial/break-and-continue/" target="_blank" rel="noopener">Loops II: break and continue</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:control-flow:ending-early"><span><a href="https://www.learncpp.com/cpp-tutorial/halts-exiting-your-program-early/" target="_blank" rel="noopener">Ending Early</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:control-flow:range-based-for-loop"><span><a href="https://www.learncpp.com/cpp-tutorial/range-based-for-loops-for-each/" target="_blank" rel="noopener">range-based for-loop</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:control-flow:recursion"><span><a href="https://www.learncpp.com/cpp-tutorial/recursion/" target="_blank" rel="noopener">Recursion</a></span></label></li>
+</ul>
+</li>
+<li class="sec"><label><input type="checkbox" data-k="cpp:allocating-space"><span><a href="https://www.learncpp.com/#Chapter19" target="_blank" rel="noopener">Allocating Space</a></span></label>
+<ul>
+<li><label><input type="checkbox" data-k="cpp:allocating-space:stack"><span><a href="https://www.learncpp.com/cpp-tutorial/the-stack-and-the-heap/" target="_blank" rel="noopener">Stack</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:allocating-space:heap"><span><a href="https://www.learncpp.com/cpp-tutorial/dynamic-memory-allocation-with-new-and-delete/" target="_blank" rel="noopener">Heap</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:allocating-space:storage-durations"><span><a href="https://www.learncpp.com/cpp-tutorial/scope-duration-and-linkage-summary/" target="_blank" rel="noopener">Storage Durations</a></span></label></li>
+</ul>
+</li>
+<li class="sec"><label><input type="checkbox" data-k="cpp:error-handling"><span><a href="https://www.learncpp.com/#Chapter27" target="_blank" rel="noopener">Error Handling</a></span></label>
+<ul>
+<li><label><input type="checkbox" data-k="cpp:error-handling:std-exception-and-stack-unwinding"><span><a href="https://www.learncpp.com/cpp-tutorial/exceptions-functions-and-stack-unwinding/" target="_blank" rel="noopener">std::exception and Stack Unwinding</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:error-handling:std-optional-and-nullopt"><span><a href="https://www.learncpp.com/cpp-tutorial/stdoptional/" target="_blank" rel="noopener">std::optional and nullopt</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:error-handling:std-expected-t-e"><span><a href="https://en.cppreference.com/w/cpp/utility/expected" target="_blank" rel="noopener">std::expected<T, E></a></span></label></li>
+</ul>
+</li>
+<li class="sec"><label><input type="checkbox" data-k="cpp:pointers-references-and-const"><span><a href="https://www.learncpp.com/#Chapter12" target="_blank" rel="noopener">Pointers, References, and Const</a></span></label>
+<ul>
+<li><label><input type="checkbox" data-k="cpp:pointers-references-and-const:const"><span><a href="https://www.learncpp.com/cpp-tutorial/constant-variables-named-constants/" target="_blank" rel="noopener">Const</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:pointers-references-and-const:pointers"><span><a href="https://www.learncpp.com/cpp-tutorial/introduction-to-pointers/" target="_blank" rel="noopener">Pointers</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:pointers-references-and-const:references"><span><a href="https://www.learncpp.com/cpp-tutorial/lvalue-references/" target="_blank" rel="noopener">References</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:pointers-references-and-const:move-semantics"><span><a href="https://www.learncpp.com/cpp-tutorial/introduction-to-smart-pointers-move-semantics/" target="_blank" rel="noopener">Move Semantics</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:pointers-references-and-const:lvalue-rvalue-xvalue-prvalue-glvalue"><span><a href="https://en.cppreference.com/w/cpp/language/value_category" target="_blank" rel="noopener">lvalue, rvalue, xvalue, prvalue, glvalue</a></span></label></li>
+</ul>
+</li>
+<li class="sec"><label><input type="checkbox" data-k="cpp:smart-pointers"><span><a href="https://www.learncpp.com/#Chapter22" target="_blank" rel="noopener">Smart Pointers</a></span></label>
+<ul>
+<li><label><input type="checkbox" data-k="cpp:smart-pointers:std-unique-ptr"><span><a href="https://www.learncpp.com/cpp-tutorial/stdunique_ptr/" target="_blank" rel="noopener">std::unique_ptr</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:smart-pointers:std-shared-ptr"><span><a href="https://www.learncpp.com/cpp-tutorial/stdshared_ptr/" target="_blank" rel="noopener">std::shared_ptr</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:smart-pointers:std-weak-ptr"><span><a href="https://www.learncpp.com/cpp-tutorial/circular-dependency-issues-with-stdshared_ptr-and-stdweak_ptr/" target="_blank" rel="noopener">std::weak_ptr</a></span></label></li>
+</ul>
+</li>
+<li class="sec"><label><input type="checkbox" data-k="cpp:strings"><span><a href="https://www.learncpp.com/#Chapter5" target="_blank" rel="noopener">Strings</a></span></label>
+<ul>
+<li><label><input type="checkbox" data-k="cpp:strings:constant-and-constexpr-variables"><span><a href="https://www.learncpp.com/cpp-tutorial/constexpr-variables/" target="_blank" rel="noopener">Constant and Constexpr Variables</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:strings:char-const-char-and-string"><span><a href="https://www.learncpp.com/cpp-tutorial/introduction-to-stdstring/" target="_blank" rel="noopener">char, const char*, and string</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:strings:stringstream-string-view-and-from-chars"><span><a href="https://www.learncpp.com/cpp-tutorial/stream-classes-for-strings/" target="_blank" rel="noopener">stringstream, string_view, and from_chars</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:strings:small-string-optimization"><span><a href="https://en.cppreference.com/w/cpp/string/basic_string" target="_blank" rel="noopener">Small String Optimization</a></span></label></li>
+</ul>
+</li>
+<li class="sec"><label><input type="checkbox" data-k="cpp:compiler-basics"><span><a href="https://www.learncpp.com/#Chapter0" target="_blank" rel="noopener">Compiler Basics</a></span></label>
+<ul>
+<li><label><input type="checkbox" data-k="cpp:compiler-basics:steps-to-c-development"><span><a href="https://www.learncpp.com/cpp-tutorial/introduction-to-cpp-development/" target="_blank" rel="noopener">Steps to C++ Development</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:compiler-basics:installing-your-ide"><span><a href="https://www.learncpp.com/cpp-tutorial/installing-an-integrated-development-environment-ide/" target="_blank" rel="noopener">Installing your IDE</a></span></label></li>
+</ul>
+</li>
+<li class="sec"><label><input type="checkbox" data-k="cpp:basic-program-structure"><span><a href="https://www.learncpp.com/#Chapter1" target="_blank" rel="noopener">Basic Program Structure</a></span></label>
+<ul>
+<li><label><input type="checkbox" data-k="cpp:basic-program-structure:comments-whitespace-formatting-printing"><span><a href="https://www.learncpp.com/cpp-tutorial/comments/" target="_blank" rel="noopener">Comments, Whitespace, Formatting, Printing</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:basic-program-structure:variables-objects-initialization"><span><a href="https://www.learncpp.com/cpp-tutorial/introduction-to-objects-and-variables/" target="_blank" rel="noopener">Variables, Objects, Initialization</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:basic-program-structure:keywords-and-identifiers"><span><a href="https://www.learncpp.com/cpp-tutorial/keywords-and-naming-identifiers/" target="_blank" rel="noopener">Keywords and Identifiers</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:basic-program-structure:undefined-behavior"><span><a href="https://www.learncpp.com/cpp-tutorial/uninitialized-variables-and-undefined-behavior/" target="_blank" rel="noopener">Undefined Behavior</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:basic-program-structure:literals-operators-and-expressions"><span><a href="https://www.learncpp.com/cpp-tutorial/introduction-to-literals-and-operators/" target="_blank" rel="noopener">Literals, Operators and Expressions</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:basic-program-structure:the-other-behaviors"><span><a href="https://en.cppreference.com/w/cpp/language/ub" target="_blank" rel="noopener">The other behaviors.</a></span></label></li>
+</ul>
+</li>
+<li class="sec"><label><input type="checkbox" data-k="cpp:i-o"><span><a href="https://www.learncpp.com/#Chapter28" target="_blank" rel="noopener">I/O</a></span></label>
+<ul>
+<li><label><input type="checkbox" data-k="cpp:i-o:i-o-streams-console"><span><a href="https://www.learncpp.com/cpp-tutorial/input-and-output-io-streams/" target="_blank" rel="noopener">I/O Streams: Console</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:i-o:i-o-streams-file"><span><a href="https://www.learncpp.com/cpp-tutorial/basic-file-io/" target="_blank" rel="noopener">I/O Streams: File</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:i-o:std-filesystem"><span><a href="https://en.cppreference.com/w/cpp/filesystem" target="_blank" rel="noopener">std::filesystem</a></span></label></li>
+</ul>
+</li>
+<li class="sec"><label><input type="checkbox" data-k="cpp:stl-types-vector"><span><a href="https://www.learncpp.com/#Chapter16" target="_blank" rel="noopener">STL Types: Vector</a></span></label>
+<ul>
+<li><label><input type="checkbox" data-k="cpp:stl-types-vector:std-vector"><span><a href="https://www.learncpp.com/cpp-tutorial/introduction-to-stdvector-and-list-constructors/" target="_blank" rel="noopener">std::vector</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:stl-types-vector:internals"><span><a href="https://en.cppreference.com/w/cpp/container/vector" target="_blank" rel="noopener">Internals</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:stl-types-vector:special-case-std-vector-bool"><span><a href="https://www.learncpp.com/cpp-tutorial/stdvector-bool/" target="_blank" rel="noopener">Special Case: std::vector<bool></a></span></label></li>
+</ul>
+</li>
+<li class="sec"><label><input type="checkbox" data-k="cpp:stl-types-array"><span><a href="https://www.learncpp.com/#Chapter17" target="_blank" rel="noopener">STL Types: Array</a></span></label>
+<ul>
+<li><label><input type="checkbox" data-k="cpp:stl-types-array:c-style-arrays"><span><a href="https://www.learncpp.com/cpp-tutorial/introduction-to-c-style-arrays/" target="_blank" rel="noopener">C-Style Arrays</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:stl-types-array:multidimensional-c-style-arrays"><span><a href="https://www.learncpp.com/cpp-tutorial/multidimensional-c-style-arrays/" target="_blank" rel="noopener">Multidimensional C-Style Arrays</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:stl-types-array:std-array"><span><a href="https://www.learncpp.com/cpp-tutorial/introduction-to-stdarray/" target="_blank" rel="noopener">std::array</a></span></label></li>
+</ul>
+</li>
+<li class="sec"><label><input type="checkbox" data-k="cpp:stl-types-list"><span><a href="https://en.cppreference.com/w/cpp/container/list" target="_blank" rel="noopener">STL Types: List</a></span></label>
+<ul>
+<li><label><input type="checkbox" data-k="cpp:stl-types-list:std-list"><span><a href="https://en.cppreference.com/w/cpp/container/list" target="_blank" rel="noopener">std::list</a></span></label></li>
+</ul>
+</li>
+<li class="sec"><label><input type="checkbox" data-k="cpp:stl-utilities-iterators"><span><a href="https://en.cppreference.com/w/cpp/iterator" target="_blank" rel="noopener">STL Utilities: Iterators</a></span></label>
+<ul>
+<li><label><input type="checkbox" data-k="cpp:stl-utilities-iterators:iterator-categories"><span><a href="https://en.cppreference.com/w/cpp/iterator" target="_blank" rel="noopener">Iterator Categories</a></span></label></li>
+</ul>
+</li>
+<li class="sec"><label><input type="checkbox" data-k="cpp:stl-types-maps"><span><a href="https://en.cppreference.com/w/cpp/container/unordered_map" target="_blank" rel="noopener">STL Types: Maps</a></span></label>
+<ul>
+<li><label><input type="checkbox" data-k="cpp:stl-types-maps:hashing"><span><a href="https://en.cppreference.com/w/cpp/utility/hash" target="_blank" rel="noopener">Hashing</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:stl-types-maps:std-unordered-map-std-map"><span><a href="https://en.cppreference.com/w/cpp/container/unordered_map" target="_blank" rel="noopener">std::unordered_map & std::map</a></span></label></li>
+</ul>
+</li>
+<li class="sec"><label><input type="checkbox" data-k="cpp:user-defined-types"><span><a href="https://www.learncpp.com/#Chapter13" target="_blank" rel="noopener">User Defined Types</a></span></label>
+<ul>
+<li><label><input type="checkbox" data-k="cpp:user-defined-types:classes-and-structs"><span><a href="https://www.learncpp.com/cpp-tutorial/introduction-to-classes/" target="_blank" rel="noopener">Classes and Structs</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:user-defined-types:member-functions"><span><a href="https://www.learncpp.com/cpp-tutorial/member-functions/" target="_blank" rel="noopener">Member Functions</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:user-defined-types:const-classes-and-functions-access-specifiers"><span><a href="https://www.learncpp.com/cpp-tutorial/const-class-objects-and-const-member-functions/" target="_blank" rel="noopener">Const Classes and Functions & Access Specifiers</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:user-defined-types:special-member-functions"><span><a href="https://www.learncpp.com/cpp-tutorial/introduction-to-constructors/" target="_blank" rel="noopener">Special Member Functions</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:user-defined-types:friends-and-enemies"><span><a href="https://www.learncpp.com/cpp-tutorial/friend-non-member-functions/" target="_blank" rel="noopener">Friends and Enemies</a></span></label></li>
+</ul>
+</li>
+<li class="sec"><label><input type="checkbox" data-k="cpp:stl-types-sets"><span><a href="https://en.cppreference.com/w/cpp/container/set" target="_blank" rel="noopener">STL Types: Sets</a></span></label>
+<ul>
+<li><label><input type="checkbox" data-k="cpp:stl-types-sets:std-set-std-unordered-set"><span><a href="https://en.cppreference.com/w/cpp/container/set" target="_blank" rel="noopener">std::set & std::unordered_set</a></span></label></li>
+</ul>
+</li>
+<li class="sec"><label><input type="checkbox" data-k="cpp:stl-types-fifo-lifo-containers"><span><a href="https://en.cppreference.com/w/cpp/container/queue" target="_blank" rel="noopener">STL Types: FIFO & LIFO Containers</a></span></label>
+<ul>
+<li><label><input type="checkbox" data-k="cpp:stl-types-fifo-lifo-containers:std-queue-std-deque-std-priority-queue"><span><a href="https://en.cppreference.com/w/cpp/container/queue" target="_blank" rel="noopener">std::queue, std::deque & std::priority_queue</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:stl-types-fifo-lifo-containers:std-stack"><span><a href="https://en.cppreference.com/w/cpp/container/stack" target="_blank" rel="noopener">std::stack</a></span></label></li>
+</ul>
+</li>
+<li class="sec"><label><input type="checkbox" data-k="cpp:polymorphism-and-virtual-functions"><span><a href="https://www.learncpp.com/#Chapter25" target="_blank" rel="noopener">Polymorphism and Virtual Functions</a></span></label>
+<ul>
+<li><label><input type="checkbox" data-k="cpp:polymorphism-and-virtual-functions:base-class-references-pointers"><span><a href="https://www.learncpp.com/cpp-tutorial/pointers-and-references-to-the-base-class-of-derived-objects/" target="_blank" rel="noopener">Base Class References & Pointers</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:polymorphism-and-virtual-functions:override-and-final"><span><a href="https://www.learncpp.com/cpp-tutorial/the-override-and-final-specifiers-and-covariant-return-types/" target="_blank" rel="noopener">Override and Final</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:polymorphism-and-virtual-functions:covariant-return-types"><span><a href="https://www.learncpp.com/cpp-tutorial/the-override-and-final-specifiers-and-covariant-return-types/" target="_blank" rel="noopener">Covariant Return Types</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:polymorphism-and-virtual-functions:virtual-destructor"><span><a href="https://www.learncpp.com/cpp-tutorial/virtual-destructors-virtual-assignment-and-overriding-virtualization/" target="_blank" rel="noopener">Virtual Destructor</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:polymorphism-and-virtual-functions:pure-virtual-functions-and-abstract-classes"><span><a href="https://www.learncpp.com/cpp-tutorial/pure-virtual-functions-abstract-base-classes-and-interface-classes/" target="_blank" rel="noopener">Pure Virtual Functions and Abstract Classes</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:polymorphism-and-virtual-functions:dynamic-cast"><span><a href="https://www.learncpp.com/cpp-tutorial/dynamic-casting/" target="_blank" rel="noopener">Dynamic Cast</a></span></label></li>
+</ul>
+</li>
+<li class="sec"><label><input type="checkbox" data-k="cpp:inheritance"><span><a href="https://www.learncpp.com/#Chapter24" target="_blank" rel="noopener">Inheritance</a></span></label>
+<ul>
+<li><label><input type="checkbox" data-k="cpp:inheritance:access-modifiers"><span><a href="https://www.learncpp.com/cpp-tutorial/inheritance-and-access-specifiers/" target="_blank" rel="noopener">Access Modifiers</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:inheritance:construction-order"><span><a href="https://www.learncpp.com/cpp-tutorial/order-of-construction-of-derived-classes/" target="_blank" rel="noopener">Construction Order</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:inheritance:adding-hiding-functionality"><span><a href="https://www.learncpp.com/cpp-tutorial/hiding-inherited-functionality/" target="_blank" rel="noopener">Adding & Hiding Functionality</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:inheritance:multiple-inheritance-issues"><span><a href="https://www.learncpp.com/cpp-tutorial/multiple-inheritance/" target="_blank" rel="noopener">Multiple Inheritance (Issues)</a></span></label></li>
+</ul>
+</li>
+<li class="sec"><label><input type="checkbox" data-k="cpp:templates"><span><a href="https://www.learncpp.com/#Chapter26" target="_blank" rel="noopener">Templates</a></span></label>
+<ul>
+<li><label><input type="checkbox" data-k="cpp:templates:templates-functions"><span><a href="https://www.learncpp.com/cpp-tutorial/function-templates/" target="_blank" rel="noopener">Templates: Functions</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:templates:templates-classes"><span><a href="https://www.learncpp.com/cpp-tutorial/template-classes/" target="_blank" rel="noopener">Templates: Classes</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:templates:class-template-argument-deduction"><span><a href="https://www.learncpp.com/cpp-tutorial/class-template-argument-deduction-ctad-and-deduction-guides/" target="_blank" rel="noopener">Class Template Argument Deduction</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:templates:template-non-type-parameters"><span><a href="https://www.learncpp.com/cpp-tutorial/non-type-template-parameters/" target="_blank" rel="noopener">Template Non-Type Parameters</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:templates:class-template-specialization"><span><a href="https://www.learncpp.com/cpp-tutorial/class-template-specialization/" target="_blank" rel="noopener">Class Template Specialization</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:templates:partial-class-template-specialization"><span><a href="https://www.learncpp.com/cpp-tutorial/partial-template-specialization/" target="_blank" rel="noopener">Partial Class Template Specialization</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:templates:variadic-templates"><span><a href="https://en.cppreference.com/w/cpp/language/parameter_pack" target="_blank" rel="noopener">Variadic Templates</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:templates:templates-and-pointers"><span><a href="https://www.learncpp.com/cpp-tutorial/partial-template-specialization-for-pointers/" target="_blank" rel="noopener">Templates and Pointers</a></span></label></li>
+</ul>
+</li>
+<li><label><input type="checkbox" data-k="cpp:what-why-and-when"><span><a href="https://en.cppreference.com/w/cpp/language/templates" target="_blank" rel="noopener">What, Why, and When?</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:stl-algorithms"><span><a href="https://en.cppreference.com/w/cpp/algorithm" target="_blank" rel="noopener">STL Algorithms</a></span></label></li>
+<li><label><input type="checkbox" data-k="cpp:universal-references-perfect-forwarding"><span><a href="https://en.cppreference.com/w/cpp/language/reference" target="_blank" rel="noopener">Universal References & Perfect Forwarding</a></span></label></li>
+</ul>
+
+<hr>
+<p>
+<a href="index.html">Home</a> | <a href="blog/">Writing</a> | <a href="learn/">Learn</a> | <a href="intern/">Internship guide</a> | <a href="resume">Resume</a> | <a href="mailto:kapadiiy@mail.uc.edu">Email</a>
+</p>
+
+<script>
+(function () {
+  var KEY = "learn-progress-v1";
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) {}
+  var boxes = Array.prototype.slice.call(
+    document.querySelectorAll('input[type=checkbox][data-k]'));
+  boxes.forEach(function (b) { if (saved[b.dataset.k]) b.checked = true; });
+  var out = document.getElementById("progress");
+  function render() {
+    var n = boxes.filter(function (b) { return b.checked; }).length;
+    out.textContent = n + " / " + boxes.length + " done";
+  }
+  boxes.forEach(function (b) {
+    b.addEventListener("change", function () {
+      if (b.checked) { saved[b.dataset.k] = 1; } else { delete saved[b.dataset.k]; }
+      try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {}
+      render();
+    });
+  });
+  render();
+})();
+</script>
+</body>
+</html>
