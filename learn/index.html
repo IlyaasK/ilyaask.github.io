@@ -22,6 +22,10 @@
   ul.tree label:has(input:checked) > span { text-decoration: line-through; opacity: .5; }
   #progress { opacity: .6; font-variant-numeric: tabular-nums; }
   .sections { display: flex; flex-wrap: wrap; gap: .4em 1.1em; margin: 0 0 .5em; padding: 0; list-style: none; opacity: .8; }
+  ul.tree li[hidden] { display: none; }
+  .hidetoggle { margin: .1em 0 .7em; font-size: .95em; opacity: .85; }
+  .hidetoggle label { display: inline-flex; gap: .45em; align-items: baseline; cursor: pointer; }
+  .hidetoggle input { flex: none; margin: 0; }
 </style>
 </head>
 <body>
@@ -155,6 +159,7 @@ progress is saved in this browser. Titles link to the resource.
 in the order the tree is meant to be read (top&#8209;down, left&#8209;to&#8209;right).
 Every lesson links to its resource: the <b>learncpp.com</b> page it&rsquo;s named after,
 or <b>cppreference</b> where learncpp has no equivalent.</small></p>
+<p class="hidetoggle"><label><input type="checkbox" id="hide-done"><span>Hide completed lessons</span></label></p>
 <ul class="tree" id="cpp-tree">
 <li class="sec"><label><input type="checkbox" data-k="cpp:transforming-data-and-organizing-code"><span><a href="https://www.learncpp.com/#Chapter2" target="_blank" rel="noopener">Transforming Data and Organizing Code</a></span></label>
 <ul>
@@ -384,9 +389,44 @@ or <b>cppreference</b> where learncpp has no equivalent.</small></p>
       if (b.checked) { saved[b.dataset.k] = 1; } else { delete saved[b.dataset.k]; }
       try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {}
       render();
+      applyHide();
     });
   });
+
+  // "hide completed" toggle, scoped to the C++ section
+  var HIDE_KEY = "learn-hide-done-cpp";
+  var toggle = document.getElementById("hide-done");
+  var tree = document.getElementById("cpp-tree");
+  var secs = [], lessons = [];
+  Array.prototype.slice.call(tree.children).forEach(function (li) {
+    if (li.classList.contains("sec")) { secs.push(li); } else { lessons.push(li); }
+  });
+  secs.forEach(function (li) {
+    Array.prototype.slice.call(li.querySelectorAll("ul > li")).forEach(function (kid) {
+      lessons.push(kid);
+    });
+  });
+  function checked(li) {
+    var b = li.querySelector("input[data-k]");
+    return !!(b && b.checked);
+  }
+  function applyHide() {
+    var on = toggle.checked;
+    lessons.forEach(function (li) { li.hidden = on && checked(li); });
+    secs.forEach(function (li) {
+      var kids = Array.prototype.slice.call(li.querySelectorAll("ul > li"));
+      var allDone = kids.length > 0 && kids.every(checked);
+      li.hidden = on && (checked(li) || allDone);
+    });
+  }
+  try { toggle.checked = localStorage.getItem(HIDE_KEY) === "1"; } catch (e) {}
+  toggle.addEventListener("change", function () {
+    try { localStorage.setItem(HIDE_KEY, toggle.checked ? "1" : "0"); } catch (e) {}
+    applyHide();
+  });
+
   render();
+  applyHide();
 })();
 </script>
 </body>
