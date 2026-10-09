@@ -3,6 +3,18 @@
   for = "/*"
   [headers.values]
     Content-Type = "text/html; charset=utf-8"
+    Link = "</llms.txt>; rel=\"describedby\""
+
+# Plain-text resources — declared after the catch-all so they win over text/html.
+[[headers]]
+  for = "/robots.txt"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
+
+[[headers]]
+  for = "/llms.txt"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
 
 # Specific asset MIME types — declared AFTER the catch-all so they override it.
 [[headers]]

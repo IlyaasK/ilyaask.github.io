@@ -1,0 +1,122 @@
+# Ilyaas Kapadia
+
+> Personal site of Ilyaas Kapadia — computer science student at the University of Cincinnati who works on reinforcement learning systems: fast C and CUDA game environments where agents learn to play games.
+
+Ilyaas Kapadia (kapadiiy@mail.uc.edu) is an undergraduate at the University of Cincinnati (BS Computer Science + Master of Engineering, expected May 2029). His work is reinforcement learning infrastructure: self-play environments for classic games, written in C and CUDA and tuned for high simulation throughput on consumer GPUs. He interned at Kernel (YC S25) in summer 2026, working on browser infrastructure for AI agents. Before that he was a downhill mountain biker, a sales consultant for RealNZ in Queenstown, New Zealand, and the founder of Shralp Jersey, a direct-to-consumer MTB apparel brand in India.
+
+The writing archive dates to September 2022 and covers learning, systems programming, sales, fitness and self-improvement, plus book and podcast notes.
+
+Notes on this site:
+
+- Static HTML generated from a GitHub repository (https://github.com/IlyaasK/ilyaask.github.io) and served by Netlify. No JavaScript is needed to read any article; fetch the URL and strip tags. There are no separate Markdown versions of pages.
+- Blog posts are served at root-level pretty URLs such as `/death` (the underlying files are `/death.html`); the blog index is the authoritative listing and is kept in sync with the files.
+- Interactive demos under `/countdown/`, `/slither/`, `/bounce/` and `/pinball/` are WebAssembly browser apps with large `.wasm`/`.data` payloads, not articles.
+- URLs are lowercase; paths containing capital letters redirect (301) to their lowercase form.
+
+## Main pages
+
+- [Home](https://ilya.as/): short bio plus links to projects and writing
+- [Writing / blog archive](https://ilya.as/blog/): complete list of posts, newest first
+- [How to Get a Tech Internship](https://ilya.as/intern/): guide to getting software engineering internships (2026-05-18), with cold-email templates and a reading list
+- [Learn](https://ilya.as/learn/): study plan and progress tracker (Boot.dev paths, nand2tetris, Ben Eater, Karpathy's Zero to Hero, CUDA books, a C++ curriculum)
+- [Resume](https://ilya.as/resume): current resume as PDF (same file at https://ilya.as/resume.pdf)
+
+## Projects
+
+- [Countdown](https://ilya.as/countdown/): a 0.8B-parameter model trained with reinforcement learning on arithmetic puzzles, running entirely in the browser
+- [Slither](https://ilya.as/slither): self-play CUDA C Slither.io environment at roughly 3M steps per second
+- [Bounce](https://ilya.as/bounce): Nokia's 2001 Bounce rebuilt for the browser, played by a trained RL policy (speedrun policy for all 11 levels, in progress)
+- [Pinball](https://ilya.as/pinball): Space Cadet Pinball with a trained agent policy
+- [kstack](https://github.com/IlyaasK/kstack): e-ink-first Android client for driving a fleet of headless omp agents over Tailscale SSH
+- [terraform-provider-kernel](https://github.com/kernel/terraform-provider-kernel): Terraform provider for Kernel's browser infrastructure (contributed during his internship)
+
+## Work and internship
+
+- [Kernel CI speedup, kernel-images PR #299](https://github.com/kernel/kernel-images/pull/299): cut the server CI workflow from 17m33s to 7m29s
+- [Kernel image slimming, kernel-images PR #274](https://github.com/kernel/kernel-images/pull/274): reduced Chromium runtime images by up to 366 MB; headful cold build 347s to 268s
+- Software Engineer Intern at Kernel (YC S25), May-August 2026: programmatic API key generation (SDK, MCP, CLI, dashboard), Kernel's Terraform provider from scratch, Docker image size and CI cost reductions
+- Sales Consultant at RealNZ, Dec 2023 - Sept 2024: 800+ sales worth $250,000+ (Top Sales Consultant, Summer '24)
+- Founder of Shralp Jersey, Oct 2020 - March 2023: grew to the #1 downhill MTB jersey brand in India through organic traffic and word of mouth
+
+## Writing
+
+- [Death](https://ilya.as/death): 2024-07-01
+- [Dan Koe’s 2-Hour Writer](https://ilya.as/dan-koes-2-hour-writer): 2024-04-21
+- [Rage.](https://ilya.as/rage): 2024-04-19
+- [Independence](https://ilya.as/independence): 2024-04-14
+- ['You're a man-child'](https://ilya.as/youre-a-man-child): 2024-03-21
+- [Sacrifice.](https://ilya.as/sacrifice): 2024-02-28
+- [The Unleveraged Life](https://ilya.as/the-unleveraged-life): 2024-02-22
+- [Self Improvement is Masturbation](https://ilya.as/self-improvement-is-masturbation): 2024-02-21
+- [Intrinsic Motivation](https://ilya.as/intrinsic-motivation): 2024-02-19
+- [would you make this decision if women did not exist?](https://ilya.as/would-you-make-this-decision-if-women): 2024-02-19
+- [This trade is not worth it](https://ilya.as/this-trade-is-not-worth-it): 2024-02-19
+- [Dissatisfaction](https://ilya.as/dissatisfaction): 2024-02-14
+- [I Cannot Stop](https://ilya.as/i-cannot-stop): 2023-09-13
+- [I Slipped Up](https://ilya.as/i-slipped-up): 2023-09-12
+- [Why Ve Come to Nz](https://ilya.as/why-ive-come-to-nz): 2023-09-11
+- [I Found a Job](https://ilya.as/found-a-job): 2023-09-08
+- [Progress and Realisations](https://ilya.as/progress-and-realisations): 2023-09-03
+- [Bhadaas](https://ilya.as/bhadaas): 2023-09-01
+- [No Longer](https://ilya.as/no-longer): 2023-09-01
+- [Lessons I Learnt From Adonis School's Productivity Course](https://ilya.as/adonis-productivity): 2023-08-15
+- [What I've Learnt: Adonis School's Mindset Course](https://ilya.as/adonis-mindset): 2023-08-13
+- [How Hamza Shattered My Limiting Belief](https://ilya.as/adonis-1kin30mindset): 2023-08-12
+- [Lessons Learnt on the December Pashan Trip With Slade Gomes](https://ilya.as/lessons-learnt-on-the-december-pashan-trip-with-slade): 2022-12-30
+- [Alex Hormozi Young and Profiting Podcast Notes](https://ilya.as/alex-hormozi-young-and-profiting-podcast-notes): 2022-12-30
+- [Hormozis on Graham Stephan's Podcast Notes](https://ilya.as/hormozis-on-the-iced-coffee-hour): 2022-12-18
+- [Alex Hormozi Behind the Brand Podcast Notes](https://ilya.as/alex-hormozi-behind-the-brand-podcast-notes): 2022-12-05
+- [New Hill: SO MUCH POTENTIAL](https://ilya.as/26-nov-2022): 2022-11-29
+- [Getting Back on Routine](https://ilya.as/getting-back-on-routine): 2022-11-18
+- [Kashish comes to Mumbai Mainland](https://ilya.as/6-nov-2022): 2022-11-16
+- [First Pashan Trip After COVID-19](https://ilya.as/12-nov-2022): 2022-11-16
+- [Alex Hormozi and Graham Stephan Podcast Notes](https://ilya.as/alex-graham-podcast-notes): 2022-11-15
+- [Alex Hormozi's Why Old Friends Keep You Poor Notes](https://ilya.as/alex-why-old-friends-keep-you-poor-notes): 2022-11-14
+- [Alex Hormozi's Why Daily Routines Keep You Fragile and Poor Notes](https://ilya.as/alex-why-daily-routines-keep-you-fragile-and-poor-notes): 2022-11-14
+- [Hamza's Make Women Obsessed With You Notes](https://ilya.as/hamza-make-women-obsessed-notes): 2022-11-14
+- [How Alex Hormozi Grew a 1.2M Audience Notes](https://ilya.as/how-alex-gew-a-1.2m-audience-notes): 2022-11-14
+- [Alex Hormozi and Ali Abdaal Podcast Notes](https://ilya.as/alex-and-ali-podcast-notes): 2022-11-09
+- [Reducing Screentime](https://ilya.as/reducing-screentime): 2022-11-05
+- [Siddha's Happy Birthday Ride](https://ilya.as/siddhas-birthday): 2022-11-02
+- [The End of Ambernath](https://ilya.as/30-oct-2022): 2022-11-02
+- [They Broke Our Jump](https://ilya.as/23-oct-2022): 2022-10-30
+- [1STMAN's How To Be Attractive to Most Women Video Notes](https://ilya.as/attractive-to-most-women-notes): 2022-10-29
+- [Hamza's Unscripted Video Notes](https://ilya.as/hamzas-unscripted-video-notes): 2022-10-29
+- [Hamza's Masculinity Journal Prompts](https://ilya.as/hamzas-masculinity-journal-prompts): 2022-10-28
+- [Why I Found Promoting This Blog Difficult](https://ilya.as/why-no-advertise-blog): 2022-10-27
+- [Valuing My Time](https://ilya.as/valuing-my-time): 2022-10-27
+- [My One-itis](https://ilya.as/my-oneitis): 2022-10-19
+- [They Stole Our Tools](https://ilya.as/15-oct-2022): 2022-10-19
+- [Social Skills Progression](https://ilya.as/social-skills-progression): 2022-10-17
+- [The Power of Social Media](https://ilya.as/power-of-social-media): 2022-10-17
+- [Silence](https://ilya.as/silence): 2022-10-12
+- [Eid and Tribalism](https://ilya.as/eid-and-tribalism): 2022-10-12
+- [Produce](https://ilya.as/produce): 2022-10-12
+- [On Reading](https://ilya.as/on-reading): 2022-10-12
+- [Why I Don't Use Notion](https://ilya.as/why-i-dont-use-notion): 2022-10-12
+- [Desire](https://ilya.as/desire): 2022-10-12
+- [School Library](https://ilya.as/school-library): 2022-10-12
+- [On Hookups](https://ilya.as/on-hookups): 2022-10-12
+- [Trail Building In Kalyan After 3 Months](https://ilya.as/9-oct-2022): 2022-10-11
+- [Notes on Hamza Social Skills Guide](https://ilya.as/hamza-social-skills-guide-notes): 2022-10-07
+- [Notes on Hamza's Deep Work Guide](https://ilya.as/hamza-deep-work-guide-notes): 2022-10-07
+- [Flower Argument](https://ilya.as/flower-argument): 2022-09-30
+- [Commentary on The Social Dilemma](https://ilya.as/the-social-dilemma): 2022-09-29
+- [Websites for Ebook Piracy](https://ilya.as/ebook-piracy): 2022-09-27
+- [Do Epic Shit: My Takeaways](https://ilya.as/do-epic-shit): 2022-09-26
+- [The Magic of Thinking Big: My Takeaways](https://ilya.as/magic-of-thinking-big): 2022-09-26
+- [The Rudest Book Ever: My Takeaways](https://ilya.as/rudest-book-ever): 2022-09-26
+- [Homo Deus: My Notes](https://ilya.as/homo-deus): 2022-09-26
+- [Attached: My Takeaways](https://ilya.as/attached): 2022-09-26
+- [The Science of Happily Ever After: My Takeaways](https://ilya.as/science-of-happily-ever-after): 2022-09-26
+- [Sapiens: My Notes](https://ilya.as/sapiens): 2022-09-26
+- [The Setup: My Takeaways](https://ilya.as/the-setup): 2022-09-26
+- [Predictably Irrational: My Takeaways](https://ilya.as/predictably-irrational): 2022-09-26
+- [How to Not Die Alone: My Takeaways](https://ilya.as/how-to-not-die-alone): 2022-09-26
+
+## Optional
+
+- [GitHub profile](https://github.com/IlyaasK): source of most projects
+- [LinkedIn](https://linkedin.com/in/ilyaask)
+- [X / Twitter](https://x.com/ilyaaskapadia)
+- [Email](mailto:kapadiiy@mail.uc.edu): he replies to every human-written email
