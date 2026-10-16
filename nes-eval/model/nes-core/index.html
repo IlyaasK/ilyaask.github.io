@@ -15,12 +15,12 @@
 <body>
 <header class="site"><div class="wrap">
 <a class="logo" href="/nes-eval/">NES<span>·</span>EVAL</a>
-<nav class="site"><a href="/nes-eval/" class=on>Leaderboard</a><a href="/nes-eval/results/">Results</a><a href="/nes-eval/watch/">Watch</a><a href="/nes-eval/blog/">Blog</a><a href="https://github.com/IlyaasK/nes-eval">Code</a></nav>
+<nav class="site"><a href="/nes-eval/" class=on>Leaderboard</a><a href="/nes-eval/results/">Results</a><a href="/nes-eval/watch/">Watch</a><a href="/nes-eval/play/">Play</a><a href="/nes-eval/blog/">Blog</a><a href="https://github.com/IlyaasK/nes-eval">Code</a></nav>
 </div></header>
 <main class="wrap">
 <h1>nes-core</h1>
 <p class="lede">A 2,600-line emulator I wrote from the NESdev wiki without looking at any other emulator, graded once and never tuned against the corpus. The NES counterpart of GBA Eval's <code>gba-core</code>. Most of its replay loss turned out to be the same unstated first-frame convention the DeepSeek run fitted: with a one-line change it scores 0.9426 (<a href="/nes-eval/blog/reward-hacking/#nes-core">details</a>).</p>
-<table><tr><th>Candidate</th><td>nes-core</td></tr><tr><th>Code</th><td>2,600 lines of Rust, MIT</td></tr><tr><th>Source</th><td><a href="https://github.com/IlyaasK/nes-eval/tree/main/candidates/nes-core">github.com/IlyaasK/nes-eval/tree/main/candidates/nes-core</a></td></tr></table>
+<table><tr><th>Candidate</th><td>nes-core</td></tr><tr><th>Code</th><td>2,600 lines of Rust, MIT</td></tr><tr><th>Source</th><td><a href="https://github.com/IlyaasK/nes-eval/tree/main/candidates/nes-core">github.com/IlyaasK/nes-eval/tree/main/candidates/nes-core</a></td></tr><tr><th>Play</th><td><a href="/nes-eval/play/?game=nova-the-squirrel-gameplay&amp;model=nes-core&amp;mode=replay">run it next to the reference in your browser</a></td></tr></table>
 <h2>Score</h2><div class="scroll"><table><tr><th>Checkpoint</th><th class="num">Overall</th><th class="num">Procedural</th><th class="num">Replay</th><th class="num">Audio</th></tr>
 <tr><td>final</td><td class="num"><strong>0.5811</strong></td><td class="num">0.8300</td><td class="num">0.4569</td><td class="num">0.7050</td></tr>
 </table></div>

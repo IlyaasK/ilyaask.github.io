@@ -95,3 +95,24 @@
   for = "/*.mp4"
   [headers.values]
     Content-Type = "video/mp4"
+
+# NES Eval Play: game licenses are plain text, ROMs and the palette are binary.
+[[headers]]
+  for = "/nes-eval/play/licenses/*"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
+
+[[headers]]
+  for = "/nes-eval/play/roms/*"
+  [headers.values]
+    Content-Type = "application/octet-stream"
+
+[[headers]]
+  for = "/nes-eval/play/replays/*"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
+
+[[headers]]
+  for = "/nes-eval/play/nes_palette.pal"
+  [headers.values]
+    Content-Type = "application/octet-stream"
