@@ -23,6 +23,7 @@ Notes on this site:
 
 ## Projects
 
+- [NES Eval](https://ilya.as/nes-eval/): a benchmark that gives AI coding agents 24 hours to write an NES emulator and grades it frame by frame against a reference emulator; a port of Mechanize's GBA Eval, with a leaderboard, per-model results, replay clips, and two posts ([porting GBA Eval to the NES](https://ilya.as/nes-eval/blog/porting-gba-eval/), [did any model hack the grader?](https://ilya.as/nes-eval/blog/reward-hacking/))
 - [Countdown](https://ilya.as/countdown/): a 0.8B-parameter model trained with reinforcement learning on arithmetic puzzles, running entirely in the browser
 - [Slither](https://ilya.as/slither): self-play CUDA C Slither.io environment at roughly 3M steps per second
 - [Bounce](https://ilya.as/bounce): Nokia's 2001 Bounce rebuilt for the browser, played by a trained RL policy (speedrun policy for all 11 levels, in progress)

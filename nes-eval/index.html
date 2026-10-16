@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NES Eval</title>
+<meta name="description" content="A benchmark that asks AI coding agents to write an NES emulator in 24 hours, graded frame by frame against a reference emulator.">
+<meta property="og:title" content="NES Eval">
+<meta property="og:description" content="A benchmark that asks AI coding agents to write an NES emulator in 24 hours, graded frame by frame against a reference emulator.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="/nes-eval/style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<a class="logo" href="/nes-eval/">NES<span>·</span>EVAL</a>
+<nav class="site"><a href="/nes-eval/" class=on>Leaderboard</a><a href="/nes-eval/results/">Results</a><a href="/nes-eval/watch/">Watch</a><a href="/nes-eval/blog/">Blog</a><a href="https://github.com/IlyaasK/nes-eval">Code</a></nav>
+</div></header>
+<main class="wrap">
+
+<h1>NES Eval</h1>
+<p class="lede">An AI coding agent gets an empty Rust project, the NES hardware
+documentation and a black-box reference emulator, and has 24 hours to write an
+NES emulator that compiles to WebAssembly. The emulator is then run in lockstep
+with the reference on 23 test ROMs and 6 recorded homebrew
+playthroughs, and every one of 44,980 frames of picture and sound is
+compared.</p>
+<p>It is a port of Mechanize's <a href="https://gbaeval.com">GBA Eval</a> to a
+different console. The grader and metrics are theirs; the reference
+(<a href="https://github.com/doublegate/RustyNES">RustyNES</a>), the ABI, the
+corpus and the agent environment are new, and so are the problems the NES
+raised. <a href="/nes-eval/blog/porting-gba-eval/">How the port works</a> ·
+<a href="/nes-eval/blog/reward-hacking/">Did any model hack the grader?</a></p>
+
+<h2>Leaderboard</h2>
+<div class="scroll"><table>
+<tr><th class="num">#</th><th>Model</th><th class="num">Time</th><th class="num">Overall</th>
+<th class="num">Procedural</th><th class="num">Replay</th><th class="num">Audio</th></tr>
+<tr><td class="num">1</td><td><a href="/nes-eval/model/gpt-6.1-sol/">GPT-6.1 Sol</a><div class="small muted">codex 0.162.1 · high thinking</div></td><td class="num">24 h</td><td class="num"><strong>0.9860</strong><span class="bar"><i style="width:98.6%"></i></span></td><td class="num">0.9300</td><td class="num">1.0000</td><td class="num">1.0000</td></tr>
+<tr><td class="num">2</td><td><a href="/nes-eval/model/deepseek-v4.1-flash/">DeepSeek V4.1 Flash</a><div class="small muted">omp 18.11.0 · max thinking</div></td><td class="num">24 h</td><td class="num"><strong>0.9272</strong><span class="bar"><i style="width:92.7%"></i></span></td><td class="num">0.7700</td><td class="num">0.9955</td><td class="num">0.8797</td></tr>
+<tr><td class="num">3</td><td><a href="/nes-eval/model/space-bunny-free/">Space Bunny Free</a><div class="small muted">opencode 1.18.35 · medium thinking</div></td><td class="num">2 h</td><td class="num"><strong>0.0594</strong><span class="bar"><i style="width:5.9%"></i></span></td><td class="num">0.0000</td><td class="num">0.0098</td><td class="num">0.2673</td></tr>
+<tr><td class="num">—</td><td><a href="/nes-eval/model/qwen3.8-27b/">Qwen3.8 27B</a><div class="small muted">omp 18.10.1 · medium thinking</div></td><td class="num">24 h</td><td class="num"><strong>—</strong><span class="bar"><i style="width:0.0%"></i></span></td><td colspan="3" class="muted">never compiled</td></tr>
+</table></div>
+<p class="small muted">v1.0 results. Each attempt repository holds the model's
+working directory saved every 15 minutes, the full transcript and every graded
+checkpoint. The grader is deterministic: rebuilding a model's final commit and
+grading it reproduces these numbers to the last digit.</p>
+
+<h3>Reference points</h3>
+<div class="scroll"><table>
+<tr><th>Candidate</th><th class="num">Overall</th><th class="num">Procedural</th><th class="num">Replay</th><th class="num">Audio</th></tr>
+<tr><td><a href="/nes-eval/model/nes-core/">nes-core</a> baseline<div class="small muted">0.9426 once the first-call convention is matched; <a href="/nes-eval/blog/reward-hacking/#nes-core">why</a></div></td><td class="num">0.5811</td><td class="num">0.8300</td><td class="num">0.4569</td><td class="num">0.7050</td></tr>
+<tr class="dim"><td>RustyNES against itself</td><td class="num">1.0000</td><td class="num">1.0000</td><td class="num">1.0000</td><td class="num">1.0000</td></tr><tr class="dim"><td>Reference + no triangle/noise channel</td><td class="num">0.9452</td><td class="num">1.0000</td><td class="num">1.0000</td><td class="num">0.7261</td></tr><tr class="dim"><td>Reference + A and B swapped</td><td class="num">0.5389</td><td class="num">1.0000</td><td class="num">0.3282</td><td class="num">0.7100</td></tr><tr class="dim"><td>Reference + picture one scanline late</td><td class="num">0.3257</td><td class="num">0.0000</td><td class="num">0.2095</td><td class="num">1.0000</td></tr><tr class="dim"><td>Reference + all three bugs</td><td class="num">0.1948</td><td class="num">0.0000</td><td class="num">0.1500</td><td class="num">0.5241</td></tr><tr class="dim"><td>Blank screen</td><td class="num">0.0039</td><td class="num">0.0000</td><td class="num">0.0065</td><td class="num">0.0000</td></tr>
+</table></div>
+
+<figure>
+<video class="nes" src="/nes-eval/clips/sol-nova.mp4" autoplay muted loop playsinline preload="metadata"></video>
+<div class="clip-labels"><span>Reference</span><span>GPT-6.1 Sol</span><span>Difference</span></div>
+<figcaption>GPT-6.1 Sol's emulator replaying Nova the Squirrel next to the
+reference. The difference panel is black because every frame matches.
+<a href="/nes-eval/watch/">More clips</a>.</figcaption>
+</figure>
+
+<h2>How it is graded</h2>
+<p><code>overall = 0.60 × replay + 0.20 × procedural + 0.20 × audio</code>, GBA Eval's weights.</p>
+<div class="cards">
+<div class="card"><div class="w">60%</div><h3>Replay</h3><p>Six homebrew games,
+5,400–6,000 frames each, driven by recorded button presses. Every frame is
+compared with block SSIM; one frame of timing drift desynchronises the whole
+playthrough.</p></div>
+<div class="card"><div class="w">20%</div><h3>Procedural</h3><p>23 self-checking
+test ROMs (blargg, kevtris's nestest, Holy Mapperel) for the CPU, PPU, APU and
+mappers, scored on their final verdict screen.</p></div>
+<div class="card"><div class="w">20%</div><h3>Audio</h3><p>Per-frame log-mel
+spectral distance against the reference's PCM, on the four APU mixer tests and
+all six games.</p></div>
+</div>
+<p>Candidates hand over 9-bit palette indices rather than RGB, so a different
+colour palette cannot cost points, and the power-on state is pinned in the ABI
+so a correct emulator can match the reference exactly. Full rubric:
+<a href="https://github.com/IlyaasK/nes-eval#scoring-rubric">README</a>; per-testcase scores:
+<a href="/nes-eval/results/">Results</a>.</p>
+
+<h2>Blog</h2>
+<ul class="postlist"><li><span class="date">2026-10-16</span><a href="/nes-eval/blog/porting-gba-eval/">Porting GBA Eval to the NES</a><p>What changed when the method moved to a different console: palette indices instead of colours, a power-on state that has to be specified, determinism from the reference cache to the JSON output, and the grader bugs I found before any model ran.</p></li><li><span class="date">2026-10-16</span><a href="/nes-eval/blog/reward-hacking/">Did any model hack the grader?</a><p>Four models, 24 hours each. No model special-cased a test ROM, but one constant fitted to the reference is worth 0.36 of a score, one model worked out which emulator it was graded against, and the harness itself had a bug that ended a run early.</p></li></ul>
+
+</main>
+<footer class="site"><div class="wrap">
+Built by <a href="https://ilya.as/">Ilyaas Kapadia</a>, modelled on Mechanize's
+<a href="https://gbaeval.com">GBA Eval</a>. Grader, corpus and environment:
+<a href="https://github.com/IlyaasK/nes-eval">github.com/IlyaasK/nes-eval</a>.
+</div></footer>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blog · NES Eval</title>
+<meta name="description" content="A benchmark that asks AI coding agents to write an NES emulator in 24 hours, graded frame by frame against a reference emulator.">
+<meta property="og:title" content="Blog · NES Eval">
+<meta property="og:description" content="A benchmark that asks AI coding agents to write an NES emulator in 24 hours, graded frame by frame against a reference emulator.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="/nes-eval/style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<a class="logo" href="/nes-eval/">NES<span>·</span>EVAL</a>
+<nav class="site"><a href="/nes-eval/">Leaderboard</a><a href="/nes-eval/results/">Results</a><a href="/nes-eval/watch/">Watch</a><a href="/nes-eval/blog/" class=on>Blog</a><a href="https://github.com/IlyaasK/nes-eval">Code</a></nav>
+</div></header>
+<main class="wrap">
+<h1>Blog</h1><ul class="postlist"><li><span class="date">2026-10-16</span><a href="/nes-eval/blog/porting-gba-eval/">Porting GBA Eval to the NES</a><p>What changed when the method moved to a different console: palette indices instead of colours, a power-on state that has to be specified, determinism from the reference cache to the JSON output, and the grader bugs I found before any model ran.</p></li><li><span class="date">2026-10-16</span><a href="/nes-eval/blog/reward-hacking/">Did any model hack the grader?</a><p>Four models, 24 hours each. No model special-cased a test ROM, but one constant fitted to the reference is worth 0.36 of a score, one model worked out which emulator it was graded against, and the harness itself had a bug that ended a run early.</p></li></ul>
+</main>
+<footer class="site"><div class="wrap">
+Built by <a href="https://ilya.as/">Ilyaas Kapadia</a>, modelled on Mechanize's
+<a href="https://gbaeval.com">GBA Eval</a>. Grader, corpus and environment:
+<a href="https://github.com/IlyaasK/nes-eval">github.com/IlyaasK/nes-eval</a>.
+</div></footer>
+</body>
+</html>

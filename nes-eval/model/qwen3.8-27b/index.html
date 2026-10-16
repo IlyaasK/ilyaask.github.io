@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Qwen3.8 27B · NES Eval</title>
+<meta name="description" content="A benchmark that asks AI coding agents to write an NES emulator in 24 hours, graded frame by frame against a reference emulator.">
+<meta property="og:title" content="Qwen3.8 27B · NES Eval">
+<meta property="og:description" content="A benchmark that asks AI coding agents to write an NES emulator in 24 hours, graded frame by frame against a reference emulator.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="/nes-eval/style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<a class="logo" href="/nes-eval/">NES<span>·</span>EVAL</a>
+<nav class="site"><a href="/nes-eval/" class=on>Leaderboard</a><a href="/nes-eval/results/">Results</a><a href="/nes-eval/watch/">Watch</a><a href="/nes-eval/blog/">Blog</a><a href="https://github.com/IlyaasK/nes-eval">Code</a></nav>
+</div></header>
+<main class="wrap">
+<h1>Qwen3.8 27B</h1>
+<p class="lede">Never produced a binary. For the first 8 hours the crate had no <code>src/lib.rs</code>, so nothing could be built; it got down to 2 compile errors at hour 13:45, then regressed to 9.</p>
+<table><tr><th>Model</th><td>Qwen3.8 27B</td></tr><tr><th>Harness</th><td>omp 18.10.1</td></tr><tr><th>Thinking</th><td>medium</td></tr><tr><th>Time limit</th><td>24 hours</td></tr><tr><th>Environment</th><td>NES Eval <a href="https://github.com/IlyaasK/nes-eval/commit/bbfe423"><code>bbfe423</code></a></td></tr><tr><th>Code</th><td>2,677 lines of Rust; 43 saved commits, none of which compile</td></tr><tr><th>Tool calls</th><td>545: 304 reads, 76 edits, 41 writes, 75 shell commands</td></tr><tr><th>Tokens</th><td>8.2M input, 1.5M output, 27.1M cache reads; 11 compactions</td></tr><tr><th>Source</th><td><a href="https://github.com/IlyaasK/nes-eval-attempt-qwen3.8-27b-omp">github.com/IlyaasK/nes-eval-attempt-qwen3.8-27b-omp</a></td></tr></table>
+<h2>Checkpoints</h2><table><tr><th>Checkpoint</th><th>Build</th><th>Score</th></tr>
+<tr><td>4h00m</td><td>failed (<code>rc=101</code>)</td><td class="muted">not graded</td></tr>
+<tr><td>8h00m</td><td>failed (<code>rc=101</code>)</td><td class="muted">not graded</td></tr>
+<tr><td>12h00m</td><td>failed (<code>rc=101</code>)</td><td class="muted">not graded</td></tr>
+<tr><td>16h00m</td><td>failed (<code>rc=101</code>)</td><td class="muted">not graded</td></tr>
+<tr><td>20h00m</td><td>failed (<code>rc=101</code>)</td><td class="muted">not graded</td></tr>
+<tr><td>final</td><td>failed (<code>rc=101</code>)</td><td class="muted">not graded</td></tr>
+</table>
+</main>
+<footer class="site"><div class="wrap">
+Built by <a href="https://ilya.as/">Ilyaas Kapadia</a>, modelled on Mechanize's
+<a href="https://gbaeval.com">GBA Eval</a>. Grader, corpus and environment:
+<a href="https://github.com/IlyaasK/nes-eval">github.com/IlyaasK/nes-eval</a>.
+</div></footer>
+</body>
+</html>

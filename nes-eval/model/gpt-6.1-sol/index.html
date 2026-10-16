@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GPT-6.1 Sol · NES Eval</title>
+<meta name="description" content="A benchmark that asks AI coding agents to write an NES emulator in 24 hours, graded frame by frame against a reference emulator.">
+<meta property="og:title" content="GPT-6.1 Sol · NES Eval">
+<meta property="og:description" content="A benchmark that asks AI coding agents to write an NES emulator in 24 hours, graded frame by frame against a reference emulator.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="/nes-eval/style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<a class="logo" href="/nes-eval/">NES<span>·</span>EVAL</a>
+<nav class="site"><a href="/nes-eval/" class=on>Leaderboard</a><a href="/nes-eval/results/">Results</a><a href="/nes-eval/watch/">Watch</a><a href="/nes-eval/blog/">Blog</a><a href="https://github.com/IlyaasK/nes-eval">Code</a></nav>
+</div></header>
+<main class="wrap">
+<h1>GPT-6.1 Sol</h1>
+<p class="lede">Five of the six homebrew games replay identically to the reference, every pixel of every frame; in the sixth, Falling, 4 of 5,800 frames differ slightly. Audio is exact from hour 12. The one failure is <code>nmi-and-brk</code>, blargg's NMI-hijacking-BRK test, which is the entire remaining 1.4%. Its own <code>PROGRESS.md</code> ends mid-investigation: <em>"Task not complete; keep improving."</em></p>
+<table><tr><th>Model</th><td>GPT-6.1 Sol</td></tr><tr><th>Harness</th><td>codex 0.162.1</td></tr><tr><th>Thinking</th><td>high</td></tr><tr><th>Time limit</th><td>24 hours</td></tr><tr><th>Environment</th><td>NES Eval <a href="https://github.com/IlyaasK/nes-eval/commit/12af20f"><code>12af20f</code></a></td></tr><tr><th>Code</th><td>7,199 lines of Rust; 96 commits; 44 analysis tools of its own</td></tr><tr><th>Tool calls</th><td>1,250; 105 oracle runs and 17 oracle sessions</td></tr><tr><th>Tokens</th><td>227.9M input (222.9M cached), 1.88M output (1.31M reasoning)</td></tr><tr><th>Agent sessions</th><td>5 (1 exit, 3 watchdog restarts, 1 ran to the deadline)</td></tr><tr><th>Source</th><td><a href="https://github.com/IlyaasK/nes-eval-attempt-gpt-6.1-sol">github.com/IlyaasK/nes-eval-attempt-gpt-6.1-sol</a></td></tr></table>
+<h2>Score</h2><div class="scroll"><table><tr><th>Checkpoint</th><th class="num">Overall</th><th class="num">Procedural</th><th class="num">Replay</th><th class="num">Audio</th></tr>
+<tr><td>4h00m</td><td class="num"><strong>0.9776</strong></td><td class="num">0.8901</td><td class="num">1.0000</td><td class="num">0.9980</td></tr>
+<tr><td>8h00m</td><td class="num"><strong>0.9860</strong></td><td class="num">0.9300</td><td class="num">1.0000</td><td class="num">0.9999</td></tr>
+<tr><td>12h00m</td><td class="num"><strong>0.9860</strong></td><td class="num">0.9300</td><td class="num">1.0000</td><td class="num">1.0000</td></tr>
+<tr><td>16h00m</td><td class="num"><strong>0.9860</strong></td><td class="num">0.9300</td><td class="num">1.0000</td><td class="num">1.0000</td></tr>
+<tr><td>20h00m</td><td class="num"><strong>0.9860</strong></td><td class="num">0.9300</td><td class="num">1.0000</td><td class="num">1.0000</td></tr>
+<tr><td>final</td><td class="num"><strong>0.9860</strong></td><td class="num">0.9300</td><td class="num">1.0000</td><td class="num">1.0000</td></tr>
+</table></div>
+<h2>Replays</h2><p class="small muted">The strip under each game is the per-frame penalty: empty means the frame matched the reference, a full-height mark means it scored zero.</p>
+<h3>Falling <span class="small">1.0000</span></h3><p class="small muted">4 of 5,800 frames differ, the first at frame 4803 · audio 1.0000</p><svg class="strip" viewBox="0 0 600 34" preserveAspectRatio="none" role="img" aria-label="per-frame penalty"></svg>
+<h3>Thwaite <span class="small">1.0000</span></h3><p class="small muted">identical to the reference in every frame · audio 1.0000</p><svg class="strip" viewBox="0 0 600 34" preserveAspectRatio="none" role="img" aria-label="per-frame penalty"></svg>
+<h3>Double Action Blaster Guys <span class="small">1.0000</span></h3><p class="small muted">identical to the reference in every frame · audio 1.0000</p><svg class="strip" viewBox="0 0 600 34" preserveAspectRatio="none" role="img" aria-label="per-frame penalty"></svg>
+<h3>Minekart Madness <span class="small">1.0000</span></h3><p class="small muted">identical to the reference in every frame · audio 1.0000</p><svg class="strip" viewBox="0 0 600 34" preserveAspectRatio="none" role="img" aria-label="per-frame penalty"></svg>
+<h3>Nova the Squirrel <span class="small">1.0000</span></h3><p class="small muted">identical to the reference in every frame · audio 1.0000</p><svg class="strip" viewBox="0 0 600 34" preserveAspectRatio="none" role="img" aria-label="per-frame penalty"></svg>
+<h3>Concentration Room <span class="small">1.0000</span></h3><p class="small muted">identical to the reference in every frame · audio 1.0000</p><svg class="strip" viewBox="0 0 600 34" preserveAspectRatio="none" role="img" aria-label="per-frame penalty"></svg>
+<h2>Procedural</h2><div class="scroll"><table><tr><th>Test ROM</th><th>Subsystem</th><th class="num">Score</th></tr>
+<tr><td title="kevtris nestest: every official and unofficial 6502 opcode; Start runs the official-opcode tests and prints OK per group."><code>nestest</code></td><td>cpu</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg instr_test-v5 official_only: results of all 151 official opcodes, including flags and addressing modes."><code>instr-official</code></td><td>cpu</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg cpu_timing_test6: cycle count of every instruction."><code>cpu-timing</code></td><td>cpu</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg instr_misc: page-wrap, branch wrap and dummy reads."><code>instr-misc</code></td><td>cpu</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg cpu_interrupts_v2/2: NMI hijacking a BRK."><code>nmi-and-brk</code></td><td>cpu</td><td class="num c0">0.0000</td></tr>
+<tr><td title="blargg ppu_vbl_nmi/01: VBL flag set/clear and $2002 read behaviour."><code>vbl-basics</code></td><td>ppu</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg ppu_vbl_nmi/05: NMI timing relative to VBL, to the PPU clock."><code>nmi-timing</code></td><td>ppu</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg sprite_hit_tests/01: sprite-zero hit basics."><code>sprite0-basics</code></td><td>ppu</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg sprite_hit_tests/09: sprite-zero hit timing."><code>sprite0-timing</code></td><td>ppu</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg sprite_overflow_tests/1: sprite overflow flag basics."><code>sprite-overflow</code></td><td>ppu</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg oam_read: reading OAM through $2004."><code>oam-read</code></td><td>ppu</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg apu_test/1: length counter."><code>apu-len-ctr</code></td><td>apu</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg apu_test/3: frame IRQ flag."><code>apu-irq-flag</code></td><td>apu</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg apu_test/7: DMC registers and IRQ."><code>apu-dmc-basics</code></td><td>apu</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg mmc3_test_2/1: MMC3 IRQ counter clocking."><code>mmc3-clocking</code></td><td>mapper</td><td class="num c4">1.0000</td></tr>
+<tr><td title="Holy Mapperel MMC1 128K PRG / 8K CHR-RAM: banking and mirroring report."><code>holy-mapperel-mmc1</code></td><td>mapper</td><td class="num c4">1.0000</td></tr>
+<tr><td title="Holy Mapperel UxROM 128K: banking and mirroring report."><code>holy-mapperel-uxrom</code></td><td>mapper</td><td class="num c4">1.0000</td></tr>
+<tr><td title="Holy Mapperel CNROM 32K/32K: CHR banking report."><code>holy-mapperel-cnrom</code></td><td>mapper</td><td class="num c4">1.0000</td></tr>
+<tr><td title="Holy Mapperel MMC3 128K PRG / 8K CHR-RAM: banking and mirroring report."><code>holy-mapperel-mmc3</code></td><td>mapper</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg apu_mixer/square: square channels through the non-linear mixer, cancelled against DMC raw output."><code>apu-mixer-square</code></td><td>apu</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg apu_mixer/triangle: triangle through the non-linear mixer."><code>apu-mixer-triangle</code></td><td>apu</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg apu_mixer/noise: noise through the non-linear mixer."><code>apu-mixer-noise</code></td><td>apu</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg apu_mixer/dmc: DMC through the non-linear mixer."><code>apu-mixer-dmc</code></td><td>apu</td><td class="num c4">1.0000</td></tr>
+</table></div>
+<h3>Failed verdict screens</h3><p class="small muted">Reference on the left, this candidate on the right.</p>
+<p><code>nmi-and-brk</code> <span class="muted small">blargg cpu_interrupts_v2/2: NMI hijacking a BRK.</span></p><div class="pair"><figure><img class="nes" src="/nes-eval/img/gpt-6.1-sol/nmi-and-brk.ref.png" alt="reference end screen"></figure><figure><img class="nes" src="/nes-eval/img/gpt-6.1-sol/nmi-and-brk.cand.png" alt="candidate end screen"></figure></div>
+</main>
+<footer class="site"><div class="wrap">
+Built by <a href="https://ilya.as/">Ilyaas Kapadia</a>, modelled on Mechanize's
+<a href="https://gbaeval.com">GBA Eval</a>. Grader, corpus and environment:
+<a href="https://github.com/IlyaasK/nes-eval">github.com/IlyaasK/nes-eval</a>.
+</div></footer>
+</body>
+</html>

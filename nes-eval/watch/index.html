@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Watch · NES Eval</title>
+<meta name="description" content="A benchmark that asks AI coding agents to write an NES emulator in 24 hours, graded frame by frame against a reference emulator.">
+<meta property="og:title" content="Watch · NES Eval">
+<meta property="og:description" content="A benchmark that asks AI coding agents to write an NES emulator in 24 hours, graded frame by frame against a reference emulator.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="/nes-eval/style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<a class="logo" href="/nes-eval/">NES<span>·</span>EVAL</a>
+<nav class="site"><a href="/nes-eval/">Leaderboard</a><a href="/nes-eval/results/">Results</a><a href="/nes-eval/watch/" class=on>Watch</a><a href="/nes-eval/blog/">Blog</a><a href="https://github.com/IlyaasK/nes-eval">Code</a></nav>
+</div></header>
+<main class="wrap">
+<h1>Watch</h1><p>Each clip is the grader's own lockstep output: the reference on the left, the candidate in the middle, and their per-pixel difference on the right, at 60 frames per second with the same recorded inputs fed to both.</p><h2>GPT-6.1 Sol on Nova the Squirrel: frame-exact</h2>
+<figure>
+<video class="nes" src="/nes-eval/clips/sol-nova.mp4" controls muted loop playsinline preload="metadata"></video>
+<div class="clip-labels"><span>Reference</span><span>GPT-6.1 Sol</span><span>Difference</span></div>
+<figcaption>The difference panel stays black: all 5,400 frames match the reference pixel for pixel, as in five of the six games. <span class="muted">Frames 1080–1800 of <code>nova-the-squirrel-gameplay</code>.</span></figcaption>
+</figure>
+<h2>DeepSeek V4.1 Flash with one constant flipped</h2>
+<figure>
+<video class="nes" src="/nes-eval/clips/deepseek-noskip-dabg.mp4" controls muted loop playsinline preload="metadata"></video>
+<div class="clip-labels"><span>Reference</span><span>DeepSeek V4.1 Flash</span><span>Difference</span></div>
+<figcaption>The published build scores 1.0000 on this game. With <code>FIRST_FRAME_SKIPS = false</code> the emulator runs one frame ahead of the reference, every recorded button press reaches the game one frame later than when the replay was recorded, and the playthrough diverges. <span class="muted">Frames 150–870 of <code>double-action-blaster-guys-gameplay</code>.</span></figcaption>
+</figure>
+<h2>nes-core on Thwaite: one frame ahead, from the first call</h2>
+<figure>
+<video class="nes" src="/nes-eval/clips/nescore-thwaite.mp4" controls muted loop playsinline preload="metadata"></video>
+<div class="clip-labels"><span>Reference</span><span>nes-core</span><span>Difference</span></div>
+<figcaption>The baseline emulates a whole frame on its first <code>emu_run_frame</code> call; the reference emulates nothing on that call. From then on the baseline is one frame ahead, the replayed inputs land a frame late, and 5,835 of 6,000 frames differ. The same emulator with that one call skipped scores 0.9998 here. <span class="muted">Frames 120–840 of <code>thwaite-gameplay</code>.</span></figcaption>
+</figure>
+<h2>DeepSeek V4.1 Flash on Nova the Squirrel: a near-miss</h2>
+<figure>
+<video class="nes" src="/nes-eval/clips/deepseek-nova.mp4" controls muted loop playsinline preload="metadata"></video>
+<div class="clip-labels"><span>Reference</span><span>DeepSeek V4.1 Flash</span><span>Difference</span></div>
+<figcaption>4,973 of 5,400 frames differ: sprites and some background tiles are drawn with the wrong graphics or colours. Positions and game state stay in step with the reference, so the replay still scores 0.9835. Drawing errors that don't change behaviour cost little; desynchronisation costs everything. <span class="muted">Frames 1080–1800 of <code>nova-the-squirrel-gameplay</code>.</span></figcaption>
+</figure>
+<h2>Space Bunny Free on nestest: mirrored tiles</h2>
+<figure>
+<video class="nes" src="/nes-eval/clips/spacebunny-nestest.mp4" controls muted loop playsinline preload="metadata"></video>
+<div class="clip-labels"><span>Reference</span><span>Space Bunny Free</span><span>Difference</span></div>
+<figcaption>Every 8-pixel tile is drawn right to left. Text that is almost right scores about the same as a blank screen, because the metric compares edges. <span class="muted">Frames 0–120 of <code>nestest</code>.</span></figcaption>
+</figure>
+</main>
+<footer class="site"><div class="wrap">
+Built by <a href="https://ilya.as/">Ilyaas Kapadia</a>, modelled on Mechanize's
+<a href="https://gbaeval.com">GBA Eval</a>. Grader, corpus and environment:
+<a href="https://github.com/IlyaasK/nes-eval">github.com/IlyaasK/nes-eval</a>.
+</div></footer>
+</body>
+</html>

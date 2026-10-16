@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DeepSeek V4.1 Flash · NES Eval</title>
+<meta name="description" content="A benchmark that asks AI coding agents to write an NES emulator in 24 hours, graded frame by frame against a reference emulator.">
+<meta property="og:title" content="DeepSeek V4.1 Flash · NES Eval">
+<meta property="og:description" content="A benchmark that asks AI coding agents to write an NES emulator in 24 hours, graded frame by frame against a reference emulator.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="/nes-eval/style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+<a class="logo" href="/nes-eval/">NES<span>·</span>EVAL</a>
+<nav class="site"><a href="/nes-eval/" class=on>Leaderboard</a><a href="/nes-eval/results/">Results</a><a href="/nes-eval/watch/">Watch</a><a href="/nes-eval/blog/">Blog</a><a href="https://github.com/IlyaasK/nes-eval">Code</a></nav>
+</div></header>
+<main class="wrap">
+<h1>DeepSeek V4.1 Flash</h1>
+<p class="lede">Replays real games almost perfectly (four of six score 0.9998 or better) but fails five test ROMs outright: the four Holy Mapperel board tests and blargg's official-opcode suite. One constant in its frame loop, fitted to the reference, is worth 0.36 of its score; see <a href="/nes-eval/blog/reward-hacking/">the post on reward hacking</a>.</p>
+<table><tr><th>Model</th><td>DeepSeek V4.1 Flash</td></tr><tr><th>Harness</th><td>omp 18.11.0</td></tr><tr><th>Thinking</th><td>max</td></tr><tr><th>Time limit</th><td>24 hours</td></tr><tr><th>Environment</th><td>NES Eval <a href="https://github.com/IlyaasK/nes-eval/commit/77c709b"><code>77c709b</code></a></td></tr><tr><th>Code</th><td>7,329 lines of Rust; 92 commits; 59 Python tools of its own</td></tr><tr><th>Tool calls</th><td>3,422; 190 shell commands invoking the oracle directly</td></tr><tr><th>Tokens</th><td>27.7M input, 4.25M output (3.12M reasoning), 1.59B cache reads; about $9</td></tr><tr><th>Agent sessions</th><td>72 (omp -p ends each turn; median 8.8 minutes)</td></tr><tr><th>Source</th><td><a href="https://github.com/IlyaasK/nes-eval-attempt-deepseek-v4.1-flash">github.com/IlyaasK/nes-eval-attempt-deepseek-v4.1-flash</a></td></tr></table>
+<h2>Score</h2><div class="scroll"><table><tr><th>Checkpoint</th><th class="num">Overall</th><th class="num">Procedural</th><th class="num">Replay</th><th class="num">Audio</th></tr>
+<tr><td>4h00m</td><td class="num"><strong>0.5564</strong></td><td class="num">0.2200</td><td class="num">0.6027</td><td class="num">0.7543</td></tr>
+<tr><td>8h00m</td><td class="num"><strong>0.8880</strong></td><td class="num">0.7000</td><td class="num">0.9955</td><td class="num">0.7536</td></tr>
+<tr><td>12h00m</td><td class="num"><strong>0.8934</strong></td><td class="num">0.7000</td><td class="num">0.9955</td><td class="num">0.7804</td></tr>
+<tr><td>16h00m</td><td class="num"><strong>0.9132</strong></td><td class="num">0.7000</td><td class="num">0.9955</td><td class="num">0.8794</td></tr>
+<tr><td>20h00m</td><td class="num"><strong>0.9272</strong></td><td class="num">0.7700</td><td class="num">0.9955</td><td class="num">0.8799</td></tr>
+<tr><td>final</td><td class="num"><strong>0.9272</strong></td><td class="num">0.7700</td><td class="num">0.9955</td><td class="num">0.8797</td></tr>
+</table></div>
+<h2>Replays</h2><p class="small muted">The strip under each game is the per-frame penalty: empty means the frame matched the reference, a full-height mark means it scored zero.</p>
+<h3>Falling <span class="small">0.9998</span></h3><p class="small muted">46 of 5,800 frames differ, the first at frame 3 · audio 0.9206</p><svg class="strip" viewBox="0 0 600 34" preserveAspectRatio="none" role="img" aria-label="per-frame penalty"><rect x="502" y="0.0" width="1" height="34.0"/><rect x="508" y="32.5" width="1" height="1.5"/><rect x="510" y="32.5" width="1" height="1.5"/></svg>
+<h3>Thwaite <span class="small">0.9894</span></h3><p class="small muted">73 of 6,000 frames differ, the first at frame 4 · audio 0.9120</p><svg class="strip" viewBox="0 0 600 34" preserveAspectRatio="none" role="img" aria-label="per-frame penalty"><rect x="9" y="16.8" width="1" height="17.2"/><rect x="10" y="0.8" width="1" height="33.2"/><rect x="11" y="0.9" width="1" height="33.1"/><rect x="12" y="0.9" width="1" height="33.1"/><rect x="13" y="0.9" width="1" height="33.1"/><rect x="14" y="1.4" width="1" height="32.6"/><rect x="15" y="1.2" width="1" height="32.8"/><rect x="16" y="0.6" width="1" height="33.4"/></svg>
+<h3>Double Action Blaster Guys <span class="small">1.0000</span></h3><p class="small muted">167 of 5,400 frames differ, the first at frame 2 · audio 0.9988</p><svg class="strip" viewBox="0 0 600 34" preserveAspectRatio="none" role="img" aria-label="per-frame penalty"></svg>
+<h3>Minekart Madness <span class="small">1.0000</span></h3><p class="small muted">83 of 5,400 frames differ, the first at frame 2 · audio 0.9853</p><svg class="strip" viewBox="0 0 600 34" preserveAspectRatio="none" role="img" aria-label="per-frame penalty"></svg>
+<h3>Nova the Squirrel <span class="small">0.9835</span></h3><p class="small muted">4,973 of 5,400 frames differ, the first at frame 16 · audio 0.9952</p><svg class="strip" viewBox="0 0 600 34" preserveAspectRatio="none" role="img" aria-label="per-frame penalty"><rect x="4" y="0.9" width="1" height="33.1"/><rect x="5" y="0.9" width="1" height="33.1"/><rect x="6" y="0.9" width="1" height="33.1"/><rect x="7" y="0.9" width="1" height="33.1"/><rect x="12" y="1.1" width="1" height="32.9"/><rect x="13" y="1.1" width="1" height="32.9"/><rect x="14" y="1.1" width="1" height="32.9"/><rect x="15" y="1.1" width="1" height="32.9"/><rect x="16" y="1.1" width="1" height="32.9"/><rect x="17" y="1.1" width="1" height="32.9"/><rect x="18" y="1.1" width="1" height="32.9"/><rect x="19" y="1.1" width="1" height="32.9"/></svg>
+<h3>Concentration Room <span class="small">1.0000</span></h3><p class="small muted">15 of 6,000 frames differ, the first at frame 2 · audio 0.9999</p><svg class="strip" viewBox="0 0 600 34" preserveAspectRatio="none" role="img" aria-label="per-frame penalty"></svg>
+<h2>Procedural</h2><div class="scroll"><table><tr><th>Test ROM</th><th>Subsystem</th><th class="num">Score</th></tr>
+<tr><td title="kevtris nestest: every official and unofficial 6502 opcode; Start runs the official-opcode tests and prints OK per group."><code>nestest</code></td><td>cpu</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg instr_test-v5 official_only: results of all 151 official opcodes, including flags and addressing modes."><code>instr-official</code></td><td>cpu</td><td class="num c0">0.0000</td></tr>
+<tr><td title="blargg cpu_timing_test6: cycle count of every instruction."><code>cpu-timing</code></td><td>cpu</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg instr_misc: page-wrap, branch wrap and dummy reads."><code>instr-misc</code></td><td>cpu</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg cpu_interrupts_v2/2: NMI hijacking a BRK."><code>nmi-and-brk</code></td><td>cpu</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg ppu_vbl_nmi/01: VBL flag set/clear and $2002 read behaviour."><code>vbl-basics</code></td><td>ppu</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg ppu_vbl_nmi/05: NMI timing relative to VBL, to the PPU clock."><code>nmi-timing</code></td><td>ppu</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg sprite_hit_tests/01: sprite-zero hit basics."><code>sprite0-basics</code></td><td>ppu</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg sprite_hit_tests/09: sprite-zero hit timing."><code>sprite0-timing</code></td><td>ppu</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg sprite_overflow_tests/1: sprite overflow flag basics."><code>sprite-overflow</code></td><td>ppu</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg oam_read: reading OAM through $2004."><code>oam-read</code></td><td>ppu</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg apu_test/1: length counter."><code>apu-len-ctr</code></td><td>apu</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg apu_test/3: frame IRQ flag."><code>apu-irq-flag</code></td><td>apu</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg apu_test/7: DMC registers and IRQ."><code>apu-dmc-basics</code></td><td>apu</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg mmc3_test_2/1: MMC3 IRQ counter clocking."><code>mmc3-clocking</code></td><td>mapper</td><td class="num c4">1.0000</td></tr>
+<tr><td title="Holy Mapperel MMC1 128K PRG / 8K CHR-RAM: banking and mirroring report."><code>holy-mapperel-mmc1</code></td><td>mapper</td><td class="num c0">0.0000</td></tr>
+<tr><td title="Holy Mapperel UxROM 128K: banking and mirroring report."><code>holy-mapperel-uxrom</code></td><td>mapper</td><td class="num c0">0.0000</td></tr>
+<tr><td title="Holy Mapperel CNROM 32K/32K: CHR banking report."><code>holy-mapperel-cnrom</code></td><td>mapper</td><td class="num c0">0.0000</td></tr>
+<tr><td title="Holy Mapperel MMC3 128K PRG / 8K CHR-RAM: banking and mirroring report."><code>holy-mapperel-mmc3</code></td><td>mapper</td><td class="num c0">0.0000</td></tr>
+<tr><td title="blargg apu_mixer/square: square channels through the non-linear mixer, cancelled against DMC raw output."><code>apu-mixer-square</code></td><td>apu</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg apu_mixer/triangle: triangle through the non-linear mixer."><code>apu-mixer-triangle</code></td><td>apu</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg apu_mixer/noise: noise through the non-linear mixer."><code>apu-mixer-noise</code></td><td>apu</td><td class="num c4">1.0000</td></tr>
+<tr><td title="blargg apu_mixer/dmc: DMC through the non-linear mixer."><code>apu-mixer-dmc</code></td><td>apu</td><td class="num c4">1.0000</td></tr>
+</table></div>
+<h3>Failed verdict screens</h3><p class="small muted">Reference on the left, this candidate on the right.</p>
+<p><code>instr-official</code> <span class="muted small">blargg instr_test-v5 official_only: results of all 151 official opcodes, including flags and addressing modes.</span></p><div class="pair"><figure><img class="nes" src="/nes-eval/img/deepseek-v4.1-flash/instr-official.ref.png" alt="reference end screen"></figure><figure><img class="nes" src="/nes-eval/img/deepseek-v4.1-flash/instr-official.cand.png" alt="candidate end screen"></figure></div>
+<p><code>holy-mapperel-mmc1</code> <span class="muted small">Holy Mapperel MMC1 128K PRG / 8K CHR-RAM: banking and mirroring report.</span></p><div class="pair"><figure><img class="nes" src="/nes-eval/img/deepseek-v4.1-flash/holy-mapperel-mmc1.ref.png" alt="reference end screen"></figure><figure><img class="nes" src="/nes-eval/img/deepseek-v4.1-flash/holy-mapperel-mmc1.cand.png" alt="candidate end screen"></figure></div>
+<p><code>holy-mapperel-uxrom</code> <span class="muted small">Holy Mapperel UxROM 128K: banking and mirroring report.</span></p><div class="pair"><figure><img class="nes" src="/nes-eval/img/deepseek-v4.1-flash/holy-mapperel-uxrom.ref.png" alt="reference end screen"></figure><figure><img class="nes" src="/nes-eval/img/deepseek-v4.1-flash/holy-mapperel-uxrom.cand.png" alt="candidate end screen"></figure></div>
+<p><code>holy-mapperel-cnrom</code> <span class="muted small">Holy Mapperel CNROM 32K/32K: CHR banking report.</span></p><div class="pair"><figure><img class="nes" src="/nes-eval/img/deepseek-v4.1-flash/holy-mapperel-cnrom.ref.png" alt="reference end screen"></figure><figure><img class="nes" src="/nes-eval/img/deepseek-v4.1-flash/holy-mapperel-cnrom.cand.png" alt="candidate end screen"></figure></div>
+<p><code>holy-mapperel-mmc3</code> <span class="muted small">Holy Mapperel MMC3 128K PRG / 8K CHR-RAM: banking and mirroring report.</span></p><div class="pair"><figure><img class="nes" src="/nes-eval/img/deepseek-v4.1-flash/holy-mapperel-mmc3.ref.png" alt="reference end screen"></figure><figure><img class="nes" src="/nes-eval/img/deepseek-v4.1-flash/holy-mapperel-mmc3.cand.png" alt="candidate end screen"></figure></div>
+</main>
+<footer class="site"><div class="wrap">
+Built by <a href="https://ilya.as/">Ilyaas Kapadia</a>, modelled on Mechanize's
+<a href="https://gbaeval.com">GBA Eval</a>. Grader, corpus and environment:
+<a href="https://github.com/IlyaasK/nes-eval">github.com/IlyaasK/nes-eval</a>.
+</div></footer>
+</body>
+</html>
