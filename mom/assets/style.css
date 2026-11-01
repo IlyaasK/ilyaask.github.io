@@ -1,0 +1,255 @@
+/* ------------------------------------------------------------------
+   seekingjannah.wordpress.com — port of the WordPress.com "Simpla"
+   theme (wp-content/themes/pub/simpla/style.css), trimmed to the parts
+   this site actually renders. Theme assets live in assets/theme/.
+
+   Paths are relative to <base href=".../mom/"> so the identical build
+   works at /mom/ and at the domain root.
+   ------------------------------------------------------------------ */
+
+/* --- theme /global.css bits ------------------------------------- */
+a img { border: none; }
+#content img { margin: 5px; }
+
+/* --- body -------------------------------------------------------- */
+body {
+	background: #fff url(assets/theme/bg.png) repeat-x;
+	border-top: 5px solid #333;
+	color: #555;
+	font-family: Georgia, "Times New Roman", Times, serif;
+	font-size: 62.5%;
+	line-height: 1.5;
+	margin: 0;
+	padding: 0;
+	text-align: center;
+}
+
+#wrap {
+	margin: 0 auto;
+	text-align: left;
+	width: 76em;
+}
+
+#header { padding: 3em 1em; }
+
+#content {
+	clear: both;
+	font-size: 1.2em;
+	float: left;
+	padding: 1em;
+	width: 40em;
+	min-height: 30em;
+}
+
+#sidebar,
+.sidebar {
+	font-size: 1.1em;
+	float: right;
+	padding-top: 2em;
+	width: 20em;
+	margin: 0;
+	padding: 2em 0 0;
+	list-style: none;
+}
+
+#footer {
+	background: #333;
+	border-top: 1px solid #777;
+	color: #888;
+	clear: both;
+	font-size: 0.9em;
+	padding: 0.5em;
+}
+
+/* --- headings ---------------------------------------------------- */
+h1, h2, h3 {
+	font-family: Tahoma, Verdana, Arial, Helvetica, sans-serif;
+	font-weight: normal;
+	letter-spacing: -1px;
+	margin: 0;
+}
+
+#header h1 {
+	font-family: Georgia, "Times New Roman", Times, serif;
+	font-size: 3em;
+	margin: 0;
+	margin-right: 1em;
+}
+#header h1 a { color: #E87830; }
+#header h1 a:hover { color: #CC0000; }
+#header p {
+	color: #aaa;
+	font-size: 1.1em;
+	margin: 0;
+	margin-top: -0.5em;
+}
+
+/* --- entries ----------------------------------------------------- */
+.entrytitle h2 { color: #b4c24b; font-size: 2.2em; }
+.entrytitle h2 a { color: #b4c24b; }
+.entrytitle h2 a:hover { color: #58BBEB; }
+.entrytitle h3 { font-size: 1.8em; color: #6F6F6F; }
+
+.entry { margin-bottom: 3em; }
+.entrymeta { font-size: 0.9em; clear: both; }
+
+.postedby {
+	background: #fff url(assets/theme/user.gif) no-repeat;
+	padding: 3px;
+	padding-left: 20px;
+}
+.filedto {
+	background: #fff url(assets/theme/post.gif) no-repeat;
+	padding: 3px;
+	padding-left: 20px;
+}
+.commentslink {
+	background: #fff url(assets/theme/packaged.gif) no-repeat;
+	padding: 3px;
+	padding-left: 20px;
+}
+
+/* --- sidebar widgets --------------------------------------------- */
+#sidebar ul,
+.sidebar ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+#sidebar ul ul,
+.sidebar ul ul { margin-left: 10px; }
+#sidebar ul li,
+.sidebar ul li {
+	border-bottom: 1px dotted #ddd;
+	margin-bottom: 0.3em;
+	padding: 0.3em;
+}
+#sidebar li.widget { clear: both; }
+
+.widgettitle {
+	color: #555;
+	font-size: 1.5em;
+	margin: 0;
+	font-family: Tahoma, Verdana, Arial, Helvetica, sans-serif;
+	font-weight: normal;
+	letter-spacing: -1px;
+}
+
+/* Recent Comments widget: WordPress renders it as a two-column table with
+   the gravatar on the left (inline styles from the server, see render.js). */
+#sidebar .recentcommentsavatar td { vertical-align: middle; }
+#sidebar .recentcommentsavatar img { vertical-align: middle; display: block; }
+#sidebar .recentcommentsavatar td.recentcommentsavatartop,
+#sidebar .recentcommentsavatar td.recentcommentsavatarrend { padding-bottom: 1px; }
+#sidebar .recentcommentsavatar td.recentcommentstexttop,
+#sidebar .recentcommentsavatar td.recentcommentstextend {
+	padding: 0 0 0 10px;
+	font-size: 0.95em;
+	line-height: 1.3;
+}
+
+/* metadata icons: the theme draws the 16px gif as the background and keeps
+   the spans inline (no box), so the icon sits behind the left padding. */
+.postedby, .filedto, .commentslink {
+	background-repeat: no-repeat;
+	background-position: 0 0;
+	padding: 3px;
+	padding-left: 20px;
+}
+
+/* --- links ------------------------------------------------------- */
+a { color: #579; text-decoration: none; }
+a:hover { color: #CC0000; }
+
+/* --- post content images ----------------------------------------- */
+#content img.centered,
+#content img.aligncenter {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+img.alignright { padding: 4px; margin: 0 0 2px 7px; display: inline; }
+img.alignleft { padding: 4px; margin: 0 7px 2px 0; display: inline; }
+.alignright { float: right; }
+.alignleft { float: left; }
+.aligncenter, div.aligncenter { display: block; margin-left: auto; margin-right: auto; }
+
+/* WordPress.com wraps flickr imports like this; keep them tidy */
+p.flickr-frame img { max-width: 100%; height: auto; }
+p.flickr-yourcomment { margin-top: 0.4em; }
+
+/* --- navigation between entries ---------------------------------- */
+.navigation {
+	overflow: hidden;
+	margin: 1em 0 2em;
+	font-size: 0.95em;
+	clear: both;
+}
+.navigation .alignleft { float: left; }
+.navigation .alignright { float: right; }
+.navigation .nav-previous,
+.navigation .nav-next { max-width: 48%; }
+
+/* --- pages, categories, archives --------------------------------- */
+.page-title h2,
+.category-title h2 { color: #b4c24b; font-size: 2.2em; }
+
+/* --- comments ---------------------------------------------------- */
+/* Same cascade as the theme: the theme's un-prefixed `.commentlist li`
+   outranks `#content img`, but not `ol.commentlist`. Avatars float
+   right of the author line, not beside the comment body. */
+.commentsblock { margin: 0.5em; padding: 1em; }
+.commentsblock textarea { width: 100%; }
+#comments, #reply-title { font-size: 1.6em; color: #555; }
+
+.commentauthor { display: block; font-size: 1.5em; }
+
+ol.commentlist {
+	color: #777;
+	font-size: 0.9em;
+	list-style-type: none;
+	margin: 0;
+	margin-top: 1.5em;
+	padding: 0;
+}
+.commentlist li {
+	margin-bottom: 0.5em;
+	padding: 0.5em 1em;
+	list-style-type: none;
+}
+/* the list itself is unnumbered but each comment carries WordPress's row */
+.commentlist li { list-style: none; }
+ol.commentlist li { padding-left: 2.6em; position: relative; }
+ol.commentlist li::before {
+	content: counter(item) ".";
+	counter-increment: item;
+	position: absolute;
+	left: 0.9em;
+	top: 0.9em;
+	color: #777;
+}
+ol.commentlist { counter-reset: item; }
+
+/* avatar sits at the top-right of the author line */
+.commentlist li .avatar,
+.commentlist li img.avatar {
+	float: none;
+	margin: 0 0 0 8px;
+	padding: 0;
+	border: 0 none;
+	vertical-align: middle;
+}
+.comment-author .avatar { float: right; }
+.comment-author.vcard {
+	overflow: hidden;
+	border-bottom: 1px dotted #ddd;
+	padding-bottom: 0.4em;
+}
+.comment-author .avatar { float: right; margin-top: 0; }
+.comment-author.vcard:after { content: ""; display: block; clear: both; }
+.commentlist li.odd { background: #f3f5e9; border: 1px dotted #d1d1d1; }
+.comment-author { padding-right: 4.2em; min-height: 2.2em; }
+.comment-author .avatar { float: none; position: absolute; right: 1em; top: 0.9em; }
+cite.fn { font-style: normal; font-size: 1.25em; }
+.commentmetadata { color: #999; }
+.comment-body p, .commentlist li > p { margin: 0.6em 0 0; }
