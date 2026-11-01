@@ -13,6 +13,24 @@ const SRC = path.join(__dirname, 'src');
 const BUILD = path.join(__dirname, 'build');
 const R = require(path.join(SRC, 'render.js'));
 
+// The browser loads build/assets/render.js + app.js, and the prerendered HTML
+// must come from exactly the same renderer — so copy the shared sources in
+// before generating anything. Forgetting this shipped a stale router once.
+function copySharedIntoBuild() {
+  const pairs = [
+    ['render.js', 'assets/render.js'],
+    ['app.js', 'assets/app.js'],
+    ['style.mine.css', 'assets/style.css'],
+  ];
+  for (const [src, dest] of pairs) {
+    const from = path.join(SRC, src);
+    if (!fs.existsSync(from)) continue;
+    fs.mkdirSync(path.dirname(path.join(BUILD, dest)), { recursive: true });
+    fs.copyFileSync(from, path.join(BUILD, dest));
+  }
+}
+copySharedIntoBuild();
+
 const data = JSON.parse(fs.readFileSync(path.join(BUILD, 'data', 'site.json'), 'utf8'));
 const POSTS = R.postsSorted(data);
 
@@ -66,10 +84,10 @@ for (const post of POSTS) {
   page('post/' + post.ID + '/', view, post.URL, 'single single-post');
 }
 
-/* ---- pages ---- */
+/* ---- static pages (namespaced so /page/<n>/ stays pagination) ---- */
 for (const pg of data.pages) {
   const view = R.renderPage(data, pg, BASE);
-  page('page/' + pg.ID + '/', view, pg.URL, 'page');
+  page('static/' + pg.ID + '/', view, pg.URL, 'page');
 }
 
 /* ---- categories ---- */

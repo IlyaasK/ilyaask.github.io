@@ -45,7 +45,9 @@
     var m;
     if ((m = clean.match(/^page\/(\d+)$/))) return { name: 'home', page: +m[1] };
     if ((m = clean.match(/^post\/(\d+)$/))) return { name: 'single', id: +m[1] };
-    if ((m = clean.match(/^page\/(\d+)$/))) return { name: 'page', id: +m[1] };
+    // NB: page/<n>/ is home pagination; static pages live under /static/<ID>/
+    // (the About page's ID is 2, which would otherwise shadow page 2).
+    if ((m = clean.match(/^static\/(\d+)$/))) return { name: 'page', id: +m[1] };
     if ((m = clean.match(/^category\/([^/]+)$/))) return { name: 'category', slug: decodeURIComponent(m[1]) };
     if ((m = clean.match(/^date\/(\d{4})\/(\d{2})\/(\d{2})$/))) return { name: 'day', y: +m[1], m: +m[2], d: +m[3] };
     if ((m = clean.match(/^date\/(\d{4})\/(\d{2})$/))) return { name: 'month', y: +m[1], m: +m[2] };
@@ -58,7 +60,7 @@
 
   function entryPath(post, data) {
     var isPage = (data.pages || []).some(function (p) { return p.ID === post.ID; });
-    return isPage ? 'page/' + post.ID + '/'
+    return isPage ? 'static/' + post.ID + '/'
                   : 'post/' + post.ID + '/';
   }
 

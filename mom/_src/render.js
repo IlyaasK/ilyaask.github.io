@@ -107,6 +107,9 @@
       n + ' ' + pluralize(n, 'Comment', 'Comments') + ' &raquo;</a>';
   }
 
+  /** WordPress page titles are echoed raw in the widget; keep them plain. */
+  function pageLinkTitle(p) { return p.title || ''; }
+
   function entryMeta(post, base) {
     var author = (post.author && (post.author.name || post.author.display_name || post.author.nice_name)) || '';
     var cats = categoryLinks(post);
@@ -246,7 +249,7 @@
     // Pages
     var pageList = (data.pages || []).map(function (p) {
       return '\t\t\t\t<li class="page_item page-item-' + p.ID + '">' +
-        '<a href="page/' + p.ID + '/">' + (p.title || '') + '</a></li>';
+        '<a href="static/' + p.ID + '/">' + pageLinkTitle(p) + '</a></li>';
     }).join('\n');
 
     // Recent comments (5), newest first, with gravatar + author link
@@ -309,10 +312,10 @@
     var nav = '';
     if (pages.length > 1) {
       var older = page < pages.length
-        ? '<a href="' + (page + 1 === 2 ? '' : 'page/' + (page + 1) + '/') + '">&laquo; Older Entries</a>'
+        ? '<a href="page/' + (page + 1) + '/">&laquo; Older Entries</a>'
         : '';
       var newer = page > 1
-        ? '<a href="' + (page - 1 === 1 ? '' : 'page/' + (page - 1) + '/') + '">Newer Entries &raquo;</a>'
+        ? '<a href="' + (page - 1 === 1 ? './' : 'page/' + (page - 1) + '/') + '">Newer Entries &raquo;</a>'
         : '';
       nav = '\n\t\t\t<div class="navigation">\n' +
         '\t\t\t<div class="alignleft">' + older + '</div>\n' +
