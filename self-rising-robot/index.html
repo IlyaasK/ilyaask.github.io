@@ -2,36 +2,155 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Self-Rising Robot — a PufferLib PPO policy in MuJoCo, in your browser</title>
-<meta name="description" content="A 2-DoF get-up robot simulated in MuJoCo compiled to WebAssembly, driven by a PufferLib PPO policy trained for 1B steps. 4/4 deterministic full-fall get-ups in CPU MuJoCo; not hardware-validated.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Self-Rising Robot — MuJoCo + PufferLib PPO policy in WebAssembly</title>
+<meta name="description" content="A 2-servo self-rising robot simulated in MuJoCo 3.16 compiled to WebAssembly, driven by a PufferLib PPO policy trained for ~1B steps. Deterministic 4/4 full-fall get-ups in CPU MuJoCo; not hardware-validated.">
 <style>
-  body { margin: 0; background: #111; color: #eee; font-family: -apple-system, sans-serif; display: flex; flex-direction: column; align-items: center; }
-  h1 { margin: 20px 0 5px; font-size: 28px; }
-  p.sub { color: #888; margin: 0 0 15px; font-size: 14px; }
-  #game-container { position: relative; }
-  /* Keep the whole canvas (1024x640) inside the viewport: the robot stands in the
-     lower half, so a page-long canvas would hide it below the fold. */
-  canvas.emscripten { border: 2px solid #333; background: black; max-width: 95vw; max-height: 72vh; display: block; }
-  .info { max-width: 700px; padding: 20px; font-size: 14px; color: #aaa; line-height: 1.6; }
-  .info a { color: #6af; }
-  .info code { color: #cc9; }
-  #webstatus { display: none; max-width: 700px; margin: 10px; padding: 10px; background: #220; color: #fc6; font-family: monospace; font-size: 12px; white-space: pre-wrap; border: 1px solid #662; }
+  :root {
+    --panel-bg: rgba(15, 15, 15, 0.94);
+    --panel-border: #3a3a3a;
+    --title-bg: #294a7a;
+    --text: #d6d6d6;
+    --dim: #8d939a;
+    --accent: #e3a34a;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; background: #000; overflow: hidden; }
+  canvas.emscripten {
+    display: block;
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #000;
+    outline: none;
+    touch-action: none;
+  }
+  #ui {
+    position: fixed;
+    top: 0; left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px;
+    max-width: calc(100vw - 16px);
+    pointer-events: none;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "DejaVu Sans Mono", monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .panel {
+    pointer-events: auto;
+    width: 288px;
+    max-width: 100%;
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    color: var(--text);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.55);
+  }
+  .panel > .title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 6px;
+    background: var(--title-bg);
+    color: #eaeaea;
+    cursor: pointer;
+    user-select: none;
+    font-size: 12px;
+  }
+  .panel > .title .arrow { width: 10px; color: #cdd6e0; }
+  .panel > .title .name { flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .panel > .title .x { color: #c6ced8; padding: 0 2px; }
+  .panel > .title .x:hover, .panel > .title .arrow:hover { color: #fff; }
+  .panel.collapsed > .body { display: none; }
+  .panel.closed > .title { background: #23303f; color: #9aa3ad; }
+  .panel > .body { padding: 6px 8px; }
+  .row { display: flex; justify-content: space-between; gap: 10px; }
+  .row .k { color: var(--dim); }
+  .row .v { color: #fff; }
+  .note { color: var(--dim); margin-top: 5px; }
+  table { border-collapse: collapse; width: 100%; margin-top: 5px; }
+  th, td { text-align: left; font-weight: normal; padding: 1px 0; }
+  th { color: var(--dim); }
+  td.num, th.num { text-align: right; color: #fff; }
+  td.steps, th.steps { text-align: right; color: var(--dim); }
+  .keys { color: var(--dim); }
+  .keys b { color: #cfd6de; font-weight: normal; }
+  a { color: #7fb3e8; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  #webstatus {
+    display: none;
+    position: fixed;
+    left: 8px; bottom: 8px;
+    max-width: calc(100vw - 16px);
+    max-height: 40vh;
+    overflow: auto;
+    padding: 6px 8px;
+    background: rgba(30, 12, 12, 0.95);
+    border: 1px solid #7a2f2f;
+    color: #ffb4a2;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11px;
+    white-space: pre-wrap;
+    z-index: 10;
+  }
+  @media (max-width: 700px) {
+    #ui { padding: 6px; gap: 4px; }
+    .panel { width: min(288px, calc(100vw - 12px)); font-size: 11px; }
+  }
+  @media (max-height: 620px) {
+    .panel { font-size: 11px; }
+  }
 </style>
 </head>
 <body>
-<h1>Self-Rising Robot</h1>
-<p class="sub">A 2-DoF get-up robot, simulated in MuJoCo and driven by a PufferLib PPO policy — all in your browser via WebAssembly</p>
-<div id="game-container">
-  <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+<canvas class="emscripten" id="canvas" tabindex="-1" oncontextmenu="return false"></canvas>
+
+<div id="ui">
+  <div class="panel" id="p-stats">
+    <div class="title"><span class="arrow">&#9660;</span><span class="name">stats</span><span class="x">&#10005;</span></div>
+    <div class="body">
+      <div class="row"><span class="k">pose</span><span class="v" id="s-pose">–</span></div>
+      <div class="row"><span class="k">control step</span><span class="v" id="s-step">–</span></div>
+      <div class="row"><span class="k">goal hold</span><span class="v" id="s-hold">–</span></div>
+      <div class="row"><span class="k">get-ups / episodes</span><span class="v" id="s-ups">–</span></div>
+      <div class="row"><span class="k">upright</span><span class="v" id="s-upright">–</span></div>
+      <table>
+        <thead><tr><th>pose</th><th class="num">get-ups</th><th class="steps">steps</th></tr></thead>
+        <tbody id="s-table"></tbody>
+      </table>
+      <div class="note">deterministic actions (policy mean, no sampling)</div>
+    </div>
+  </div>
+
+  <div class="panel" id="p-camera">
+    <div class="title"><span class="arrow">&#9660;</span><span class="name">camera</span><span class="x">&#10005;</span></div>
+    <div class="body">
+      <div class="keys"><b>LMB + drag</b>: orbit &nbsp;&middot;&nbsp; <b>wheel</b>: zoom</div>
+      <div class="row"><span class="k">azimuth</span><span class="v" id="c-az">–</span></div>
+      <div class="row"><span class="k">elevation</span><span class="v" id="c-el">–</span></div>
+      <div class="row"><span class="k">distance</span><span class="v" id="c-dist">–</span></div>
+    </div>
+  </div>
+
+  <div class="panel" id="p-info">
+    <div class="title"><span class="arrow">&#9660;</span><span class="name">info</span><span class="x">&#10005;</span></div>
+    <div class="body">
+      <div>2-servo self-rising robot, simulated in MuJoCo 3.16 and driven by a
+      PufferLib PPO policy (~1B steps, RTX 5070) — physics and policy both run
+      live in WebAssembly, no replay.</div>
+      <div class="note">4/4 deterministic full-fall get-ups and 398/400 sampled in
+      CPU MuJoCo. Not hardware-validated.</div>
+      <div class="note"><a href="https://homemadegarbage.com/rl13" target="_blank" rel="noopener">robot design: homemadegarbage.com/rl13</a> &nbsp;&middot;&nbsp;
+      <a href="https://ilya.as" target="_blank" rel="noopener">ilya.as</a></div>
+    </div>
+  </div>
 </div>
+
 <div id="webstatus"></div>
-<div class="info">
-  <p>The robot starts in a full 90° fall — rolled or pitched onto the ground — and the policy has to stand it back up and hold the goal pose for one second. MuJoCo 3.16.0 (the same C physics library the training and evaluation use) is compiled to WebAssembly, and the policy network runs inside the same wasm module. The page simulates 50 control steps per second (20 ms each), so it runs at roughly real time. No video, no replay: every frame is the live simulation.</p>
-  <p><b>Policy</b>: MinGRU (4 observations → 2 continuous servo-delta actions, 64 hidden units, 2 layers), trained with PufferLib PPO for 999,817,216 steps (~1B) on an RTX 5070 with a sparse goal reward. Here the actions are deterministic (the policy mean, no sampling) and the four canonical fallen poses are shown in turn, so every get-up in the sequence is one the policy solves.</p>
-  <p><b>Evaluation</b> (CPU MuJoCo, independent of the GPU training port): deterministic <b>4/4</b> full-fall get-ups (105 / 110 / 113 / 145 control steps for roll-pos, roll-neg, pitch-pos, pitch-neg, including the 50-step hold), and <b>398/400</b> successes when sampling from the policy. The on-screen table should show the same step counts as the demo cycles the poses. These are simulation results for one training seed and four canonical reset states: <b>not hardware-validated</b>, and not evidence of robustness to arbitrary falls.</p>
-  <p>The robot is homemadegarbage's SelfRisingRobot "poco", an M5Atom controlling two servos: <a href="https://homemadegarbage.com/rl13">homemadegarbage.com/rl13</a>.</p>
-</div>
+
 <script>
   // Modern Chromium omits UIEvent.detail on resize/scroll, and the pinned
   // Emscripten writes it into the heap unguarded while assertions are on, which
@@ -48,23 +167,92 @@
     window.addEventListener('scroll', normalise, true);
   })();
 
-  function webstatus(msg) {
+  // The canvas is stretched to the viewport by CSS; the drawing buffer is sized
+  // at devicePixelRatio and raylib/emscripten is told about it from the module
+  // (SetWindowSize), so the render target stays crisp on HiDPI displays.
+  window.__robo1CalcSize = function () {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    return [Math.max(1, Math.round(window.innerWidth * dpr)),
+            Math.max(1, Math.round(window.innerHeight * dpr))];
+  };
+
+  // Error box: shown only for real errors, never for the module's own chatter.
+  var webstatus = (function () {
     var el = document.getElementById('webstatus');
-    el.style.display = 'block';
-    el.textContent += msg + '\n';
-  }
-  window.addEventListener('error', function (e) { webstatus('PAGE ERROR: ' + e.message); });
+    var errorish = /error|failed|failure|abort|assert|exception|undefined symbol|unreachable|out of memory/i;
+    return function (msg, force) {
+      if (!force && !errorish.test(msg)) { console.warn(msg); return; }
+      el.style.display = 'block';
+      el.textContent += msg + '\n';
+      el.scrollTop = el.scrollHeight;
+    };
+  })();
+  window.addEventListener('error', function (e) {
+    webstatus('PAGE ERROR: ' + e.message, true);
+  });
+
+  // ---- panels ------------------------------------------------------------
+  (function () {
+    var panels = ['p-stats', 'p-camera', 'p-info'];
+    panels.forEach(function (id) {
+      var p = document.getElementById(id);
+      var title = p.querySelector('.title');
+      title.addEventListener('click', function (ev) {
+        if (ev.target.classList.contains('x')) {
+          p.classList.toggle('closed');
+          p.classList.toggle('collapsed', p.classList.contains('closed'));
+          return;
+        }
+        p.classList.toggle('collapsed');
+      });
+    });
+    function narrowLayout() {
+      if (window.innerWidth < 700) {
+        document.getElementById('p-info').classList.add('collapsed');
+        document.getElementById('p-camera').classList.add('collapsed');
+      }
+    }
+    narrowLayout();
+    window.addEventListener('resize', narrowLayout);
+  })();
+
+  // Stats pushed from the wasm module (throttled there).
+  var POSE_NAMES = ['roll_pos', 'roll_neg', 'pitch_pos', 'pitch_neg'];
+  var tableBuilt = false;
+  window.robo1Stats = function (data) {
+    document.getElementById('s-pose').textContent = data.pose;
+    document.getElementById('s-step').textContent = data.step + ' / ' + data.maxstep;
+    document.getElementById('s-hold').textContent = data.hold + ' / ' + data.maxhold;
+    document.getElementById('s-ups').textContent = data.ups + '/' + data.att + '  (' + data.ep + ' ep)';
+    document.getElementById('s-upright').textContent = data.upright.toFixed(2);
+    if (!tableBuilt) {
+      var tb = document.getElementById('s-table');
+      for (var i = 0; i < 4; i++) {
+        var tr = document.createElement('tr');
+        tr.innerHTML = '<td>' + (POSE_NAMES[i] || '?') + '</td>' +
+                       '<td class="num" id="t-up-' + i + '">0/0</td>' +
+                       '<td class="steps" id="t-st-' + i + '">–</td>';
+        tb.appendChild(tr);
+      }
+      tableBuilt = true;
+    }
+    for (var j = 0; j < 4; j++) {
+      var per = data.per[j];
+      document.getElementById('t-up-' + j).textContent = per[0] + '/' + per[1];
+      document.getElementById('t-st-' + j).textContent = per[2] > 0 ? (per[2] + ' steps') : '–';
+    }
+    document.getElementById('c-az').textContent = data.az.toFixed(0) + '\u00b0';
+    document.getElementById('c-el').textContent = data.el.toFixed(0) + '\u00b0';
+    document.getElementById('c-dist').textContent = data.dist.toFixed(2) + ' m';
+  };
+
   var Module = {
     arguments: ['robo1'],
     canvas: document.getElementById('canvas'),
     print: function (text) { console.log(text); },
-    printErr: function (text) { console.error(text); webstatus(text); },
-    onRuntimeInitialized: function () { webstatus('runtime initialized'); }
+    printErr: function (text) { console.warn(text); webstatus(text); },
+    onRuntimeInitialized: function () {}
   };
-  setTimeout(function () {
-    var c = document.getElementById('canvas');
-    webstatus('canvas: ' + c.width + 'x' + c.height);
-  }, 8000);
 </script>
 <script async type="text/javascript" src="game.js"></script>
 </body>
