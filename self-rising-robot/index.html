@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Self-Rising Robot — a PufferLib PPO policy in MuJoCo, in your browser</title>
+<meta name="description" content="A 2-DoF get-up robot simulated in MuJoCo compiled to WebAssembly, driven by a PufferLib PPO policy trained for 1B steps. 4/4 deterministic full-fall get-ups in CPU MuJoCo; not hardware-validated.">
+<style>
+  body { margin: 0; background: #111; color: #eee; font-family: -apple-system, sans-serif; display: flex; flex-direction: column; align-items: center; }
+  h1 { margin: 20px 0 5px; font-size: 28px; }
+  p.sub { color: #888; margin: 0 0 15px; font-size: 14px; }
+  #game-container { position: relative; }
+  /* Keep the whole canvas (1024x640) inside the viewport: the robot stands in the
+     lower half, so a page-long canvas would hide it below the fold. */
+  canvas.emscripten { border: 2px solid #333; background: black; max-width: 95vw; max-height: 72vh; display: block; }
+  .info { max-width: 700px; padding: 20px; font-size: 14px; color: #aaa; line-height: 1.6; }
+  .info a { color: #6af; }
+  .info code { color: #cc9; }
+  #webstatus { display: none; max-width: 700px; margin: 10px; padding: 10px; background: #220; color: #fc6; font-family: monospace; font-size: 12px; white-space: pre-wrap; border: 1px solid #662; }
+</style>
+</head>
+<body>
+<h1>Self-Rising Robot</h1>
+<p class="sub">A 2-DoF get-up robot, simulated in MuJoCo and driven by a PufferLib PPO policy — all in your browser via WebAssembly</p>
+<div id="game-container">
+  <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+</div>
+<div id="webstatus"></div>
+<div class="info">
+  <p>The robot starts in a full 90° fall — rolled or pitched onto the ground — and the policy has to stand it back up and hold the goal pose for one second. MuJoCo 3.16.0 (the same C physics library the training and evaluation use) is compiled to WebAssembly, and the policy network runs inside the same wasm module. The page simulates 50 control steps per second (20 ms each), so it runs at roughly real time. No video, no replay: every frame is the live simulation.</p>
+  <p><b>Policy</b>: MinGRU (4 observations → 2 continuous servo-delta actions, 64 hidden units, 2 layers), trained with PufferLib PPO for 999,817,216 steps (~1B) on an RTX 5070 with a sparse goal reward. Here the actions are deterministic (the policy mean, no sampling) and the four canonical fallen poses are shown in turn, so every get-up in the sequence is one the policy solves.</p>
+  <p><b>Evaluation</b> (CPU MuJoCo, independent of the GPU training port): deterministic <b>4/4</b> full-fall get-ups (105 / 110 / 113 / 145 control steps for roll-pos, roll-neg, pitch-pos, pitch-neg, including the 50-step hold), and <b>398/400</b> successes when sampling from the policy. The on-screen table should show the same step counts as the demo cycles the poses. These are simulation results for one training seed and four canonical reset states: <b>not hardware-validated</b>, and not evidence of robustness to arbitrary falls.</p>
+  <p>The robot is homemadegarbage's SelfRisingRobot "poco", an M5Atom controlling two servos: <a href="https://homemadegarbage.com/rl13">homemadegarbage.com/rl13</a>.</p>
+</div>
+<script>
+  // Modern Chromium omits UIEvent.detail on resize/scroll, and the pinned
+  // Emscripten writes it into the heap unguarded while assertions are on, which
+  // aborts the whole runtime -- so merely resizing the window killed the demo.
+  // Normalise it to 0 before Emscripten's own listener runs; this script
+  // registers first, and same-target listeners fire in registration order.
+  (function () {
+    function normalise(e) {
+      if (e.detail === undefined) {
+        try { Object.defineProperty(e, 'detail', { value: 0, configurable: true }); } catch (_) {}
+      }
+    }
+    window.addEventListener('resize', normalise, true);
+    window.addEventListener('scroll', normalise, true);
+  })();
+
+  function webstatus(msg) {
+    var el = document.getElementById('webstatus');
+    el.style.display = 'block';
+    el.textContent += msg + '\n';
+  }
+  window.addEventListener('error', function (e) { webstatus('PAGE ERROR: ' + e.message); });
+  var Module = {
+    arguments: ['robo1'],
+    canvas: document.getElementById('canvas'),
+    print: function (text) { console.log(text); },
+    printErr: function (text) { console.error(text); webstatus(text); },
+    onRuntimeInitialized: function () { webstatus('runtime initialized'); }
+  };
+  setTimeout(function () {
+    var c = document.getElementById('canvas');
+    webstatus('canvas: ' + c.width + 'x' + c.height);
+  }, 8000);
+</script>
+<script async type="text/javascript" src="game.js"></script>
+</body>
+</html>
