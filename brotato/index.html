@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Brotato RL · Ilyaas Kapadia</title>
+<meta name="description" content="A bit-exact C/CUDA Brotato simulator and a reinforcement-learning policy for Demon endless, trained with PufferLib 5." />
+<style>
+body{max-width:760px;margin:40px auto;padding:0 18px;font:16px/1.55 system-ui,sans-serif;color:#222;background:#fafafa}
+h1{margin-bottom:4px}video{width:100%;border-radius:8px;background:#111}
+table{border-collapse:collapse;width:100%;margin:12px 0}td,th{border-bottom:1px solid #ddd;padding:6px 8px;text-align:left}
+code{background:#eee;padding:1px 4px;border-radius:3px}a{color:#0a58ca}
+</style>
+</head>
+<body>
+<h1>Brotato RL</h1>
+<p>A reinforcement-learning environment for <b>Brotato</b> (Demon, Danger 5, endless mode), built in a 12-hour hackathon with <a href="https://github.com/PufferAI/PufferLib">PufferLib 5</a>. Code: <a href="https://github.com/IlyaasK/brotato-rl">github.com/IlyaasK/brotato-rl</a>.</p>
+<video src="/brotato/demon_policy.mp4" controls autoplay muted loop playsinline></video>
+<p><i>A 1B-step Demon policy playing the simulator (<code>puffer eval</code>).</i></p>
+<h2>What it is</h2>
+<ul>
+<li><b>Simulator:</b> a C reimplementation of the game that runs on CPU and CUDA. GPU and CPU results are bit-identical on every state field.</li>
+<li><b>Checked against the real game:</b> a Godot mod drives the real game headless and records every frame. The simulator replays those recordings and has to match them value for value.</li>
+<li><b>Full action space:</b> 31 actions covering movement, buying weapons, items, pets and structures, reroll, lock, ban, recycle, combine, level-ups and crates, with a per-phase action mask. The observation has 203 values.</li>
+<li><b>Training speed:</b> about <b>1.8M env steps/s</b> on an RTX 5070 with 4,096 environments.</li>
+</ul>
+<h2>Results so far</h2>
+<table>
+<tr><th></th><th>Result</th></tr>
+<tr><td>Real-game recordings, matching frame for frame</td><td>up to ticks 1977 / 1551 / 1854 (of 3,600 / 3,600 / 2,799), every recorded action matching</td></tr>
+<tr><td>Policy in the simulator (1B steps)</td><td>wave 3.08 on average over 257 episodes; buys weapons, items and pets; fills 6 weapon slots</td></tr>
+<tr><td>Same policy in the real game</td><td>dies in wave 1, so transfer isn't solved yet</td></tr>
+</table>
+<p>Game files aren't included; you need your own copy of Brotato.</p>
+</body>
+</html>
