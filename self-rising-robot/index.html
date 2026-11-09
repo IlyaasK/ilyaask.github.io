@@ -104,16 +104,6 @@
     .panel { font-size: 11px; }
   }
 </style>
-<script>
-  // Embed mode (?embed=1): this page is being shown as a live preview card on
-  // the home page. The canvas already fills the frame; hide the panels.
-  if (new URLSearchParams(location.search).has('embed')) document.documentElement.classList.add('embed');
-</script>
-<style>
-  /* !important: #webstatus sets an inline display when the module has something
-     to say, and a preview card never wants it. */
-  html.embed #ui, html.embed #webstatus { display: none !important; }
-</style>
 </head>
 <body>
 <canvas class="emscripten" id="canvas" tabindex="-1" oncontextmenu="return false"></canvas>

@@ -1,295 +1,57 @@
 <!doctype html>
-<html lang="en">
+<html>
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ilyaas Kapadia</title>
-<meta name="description" content="Reinforcement learning systems — fast C and CUDA environments where agents learn to play games, running live beside the write-up.">
-<link rel="canonical" href="https://ilya.as/">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="style.css">
-<style>
-  /* Three columns: the text column as it was in the middle, and a live policy
-     display either side of it. Everything is sized off the viewport height, so
-     the page is exactly one screen; the displays are as wide as they are tall
-     enough to be. */
-  :root {
-    --gap-card: clamp(8px, 1.2vh, 14px);
-    --line: rgba(128, 128, 128, .34);
-    --dim: rgba(128, 128, 128, .95);
-  }
-  body { margin: 0; padding: 0; max-width: none; }
-  .page, .side, .card, .center { box-sizing: border-box; }
-
-  .page {
-    height: 100vh;
-    height: 100dvh;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    gap: clamp(10px, 1.5vw, 28px);
-    padding: clamp(10px, 1.7vh, 22px) clamp(12px, 1.8vw, 30px);
-  }
-
-  /* ---- the text column: same words and type as before, spaced a little
-     tighter so the write-up clears one screen. --center-w is the column
-     measure; 650px is the old measure, which no longer fits a 900px-tall
-     window. ---- */
-  :root { --center-w: 760px; }
-  .center { width: var(--center-w); max-width: 100%; line-height: 1.5; min-height: 0; }
-  .center > :first-child { margin-top: 0; }
-  .center > :last-child { margin-bottom: 0; }
-  .center h1 { margin: 0 0 .3em; line-height: 1.15; }
-  .center h3 { margin: 1.1em 0 .25em; }
-  .center p { margin: .55em 0; }
-  .center ul { margin: .35em 0 .8em; padding-left: 1.3em; }
-  .center hr { margin: 1em 0 .7em; }
-
-  /* ---- a column of live policy displays ---- */
-  .side {
-    container-type: size;
-    display: grid;
-    grid-template-columns: 100%;
-    grid-template-rows: repeat(3, 1fr);
-    gap: var(--gap-card);
-    align-items: center;
-    justify-items: center;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    min-height: 0;
-  }
-  .card {
-    position: relative;
-    display: block;
-    /* 4:3, and never taller than a third of the column (minus the gaps) */
-    width: min(100%, calc(((100cqh - 2 * var(--gap-card)) / 3) * 4 / 3));
-    aspect-ratio: 4 / 3;
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    overflow: hidden;
-    background: #000;
-    color: inherit;
-  }
-  .card > a { position: absolute; inset: 0; display: block; }
-  .card:hover { border-color: rgba(150, 190, 235, .75); }
-  .card iframe, .card img, .card video {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    border: 0;
-    background: #000;
-    /* a display, not a control surface: the click belongs to the card, which
-       opens the full demo */
-    pointer-events: none;
-  }
-  .card img, .card video { object-fit: cover; }
-  .plate {
-    position: absolute;
-    left: 0; right: 0; bottom: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-    padding: 20px 11px 8px;
-    background: linear-gradient(to top, rgba(0,0,0,.88), rgba(0,0,0,.5) 55%, transparent);
-    font-size: clamp(10px, 1.15vh, 12px);
-    line-height: 1.3;
-    color: #a9b3bf;
-  }
-  .plate b { font-size: clamp(12px, 1.5vh, 14.5px); font-weight: 600; color: #fff; }
-  .open {
-    position: absolute;
-    top: 7px; right: 7px;
-    padding: 2px 6px;
-    border: 1px solid rgba(255,255,255,.16);
-    border-radius: 6px;
-    background: rgba(8,10,12,.72);
-    color: #dce4ed;
-    font-size: 11px;
-    opacity: 0;
-    transition: opacity .15s;
-  }
-  .card:hover .open { opacity: 1; }
-
-  /* ---- narrow or short windows: one column, normal flow ---- */
-  @media (max-width: 1080px), (max-height: 700px) {
-    .page {
-      height: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 22px;
-      padding: 18px 16px 30px;
-    }
-    .center { width: 100%; max-width: 650px; }
-    .side { container-type: normal; grid-template-rows: none; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
-    .card { width: 100%; }
-  }
-</style>
 </head>
 <body>
-<div class="page">
+<h1>Ilyaas Kapadia</h1>
 
-  <ul class="side" aria-label="Trained policies, running live">
-    <li class="card" data-embed="/bounce/index.html?embed=1">
-      <a href="/bounce/" aria-label="Bounce — open the live demo">
-        <iframe title="Bounce — a trained PPO policy playing the 2001 Nokia game" scrolling="no" tabindex="-1" allow="autoplay"></iframe>
-        <span class="plate">
-          <b>Bounce</b>
-          <span>PPO &middot; 998M + 524M steps &middot; 99.9% clear on levels 1&ndash;2</span>
-        </span>
-        <span class="open">open &#8599;</span>
-      </a>
-    </li>
-    <li class="card" data-embed="/slither/index.html?embed=1">
-      <a href="/slither/" aria-label="Slither — open the live demo">
-        <iframe title="Slither — 15 trained agents in the arena" scrolling="no" tabindex="-1" allow="autoplay"></iframe>
-        <span class="plate">
-          <b>Slither</b>
-          <span>self-play PPO &middot; 15 trained agents, one arena</span>
-        </span>
-        <span class="open">open &#8599;</span>
-      </a>
-    </li>
-    <li class="card" data-embed="/monocopter/index.html?embed=1">
-      <a href="/monocopter/" aria-label="Monocopter — open the live demo">
-        <iframe title="Monocopter — a PPO policy hovering a single-propeller drone" scrolling="no" tabindex="-1" allow="autoplay"></iframe>
-        <span class="plate">
-          <b>Monocopter</b>
-          <span>MinGRU PPO &middot; 200M steps, best of 100 sweeps &middot; 0.68 hover score</span>
-        </span>
-        <span class="open">open &#8599;</span>
-      </a>
-    </li>
-  </ul>
+<p>
+I work on reinforcement learning systems &mdash; fast C and CUDA environments where
+agents learn to play games. Current obsessions: a speedrun policy for all 11 levels
+of the 2001 Nokia game Bounce, and squeezing every step per second out of a single
+RTX 5070.
+</p>
 
-  <main class="center">
-    <h1>Ilyaas Kapadia</h1>
+<p>
+I interned at Kernel (YC S25), working on browser infrastructure for AI agents.
+</p>
 
-    <p>
-    I work on reinforcement learning systems &mdash; fast C and CUDA environments where
-    agents learn to play games. Current obsessions: a speedrun policy for all 11 levels
-    of the 2001 Nokia game Bounce, and squeezing every step per second out of a single
-    RTX 5070.
-    </p>
+<p>
+Before this, I was a mountain biker, a salesperson, and a businessperson. I write
+about what I'm learning.
+</p>
 
-    <p>
-    I interned at Kernel (YC S25), working on browser infrastructure for AI agents.
-    </p>
+<h3>Projects</h3>
+<ul>
+<li><a href="https://ilya.as/nes-eval/">NES Eval</a> &mdash; a benchmark that gives AI coding agents 24 hours to write an NES emulator, graded frame by frame against a reference; a port of Mechanize&rsquo;s GBA Eval</li>
+<li><a href="https://ilya.as/countdown/">Countdown</a> &mdash; try a 0.8B model trained with reinforcement learning on arithmetic puzzles, running in your browser</li>
+<li><a href="https://ilya.as/slither">Slither</a></li>
+<li><a href="https://ilya.as/bounce">Bounce</a> &mdash; Nokia&rsquo;s 2001 classic, rebuilt for the browser and played by a trained policy</li>
+<li><a href="https://ilya.as/monocopter/">Monocopter</a> &mdash; a reinforcement-learning policy flying a simulated single-propeller drone, live in your browser</li>
+<li><a href="https://ilya.as/self-rising-robot/">Self-rising robot</a> &mdash; a two-servo robot that learned to stand up from any fall, simulated in MuJoCo in your browser</li>
+<li><a href="https://github.com/IlyaasK/kstack">kstack</a> &mdash; E-ink-first Android client for driving a fleet of headless omp agents over Tailscale SSH</li>
+</ul>
 
-    <p>
-    Before this, I was a mountain biker, a salesperson, and a businessperson. I write
-    about what I'm learning.
-    </p>
+<h3>Internship @Kernel (YC S25)</h3>
+<ul>
+<li>Cut the server CI workflow from <strong>17m33s to 7m29s</strong> &mdash; <a href="https://github.com/kernel/kernel-images/pull/299">PR #299</a></li>
+<li>Slimmed the Chromium runtime images by up to <strong>366 MB</strong>; headful cold build 347s to 268s &mdash; <a href="https://github.com/kernel/kernel-images/pull/274">PR #274</a></li>
+<li><a href="https://github.com/kernel/terraform-provider-kernel">terraform-provider-kernel</a> &mdash; Terraform provider for Kernel&rsquo;s browser infrastructure</li>
+</ul>
 
-    <h3>Projects</h3>
-    <ul>
-    <li><a href="https://ilya.as/nes-eval/">NES Eval</a> &mdash; a benchmark that gives AI coding agents 24 hours to write an NES emulator, graded frame by frame against a reference; a port of Mechanize&rsquo;s GBA Eval</li>
-    <li><a href="https://ilya.as/countdown/">Countdown</a> &mdash; try a 0.8B model trained with reinforcement learning on arithmetic puzzles, running in your browser</li>
-    <li><a href="https://ilya.as/slither">Slither</a></li>
-    <li><a href="https://ilya.as/bounce">Bounce</a> &mdash; Nokia&rsquo;s 2001 classic, rebuilt for the browser and played by a trained policy</li>
-    <li><a href="https://ilya.as/monocopter/">Monocopter</a> &mdash; a reinforcement-learning policy flying a simulated single-propeller drone, live in your browser</li>
-    <li><a href="https://ilya.as/self-rising-robot/">Self-rising robot</a> &mdash; a two-servo robot that learned to stand up from any fall, simulated in MuJoCo in your browser</li>
-    <li><a href="https://ilya.as/brotato/">Brotato</a> &mdash; a bit-exact C/CUDA simulator and a 1B-step policy for Demon, danger 5, endless</li>
-    <li><a href="https://ilya.as/pinball/">Space Cadet Pinball</a> &mdash; a trained PPO agent playing the original C++ engine, live in WebAssembly</li>
-    <li><a href="https://github.com/IlyaasK/kstack">kstack</a> &mdash; E-ink-first Android client for driving a fleet of headless omp agents over Tailscale SSH</li>
-    </ul>
+<h3>Contact</h3>
+<p>
+I love meeting new people, and reply to every human-written email.
+Say <a href="mailto:kapadiiy@mail.uc.edu">hello</a>.
+</p>
 
-    <h3>Internship @Kernel (YC S25)</h3>
-    <ul>
-    <li>Cut the server CI workflow from <strong>17m33s to 7m29s</strong> &mdash; <a href="https://github.com/kernel/kernel-images/pull/299">PR #299</a></li>
-    <li>Slimmed the Chromium runtime images by up to <strong>366 MB</strong>; headful cold build 347s to 268s &mdash; <a href="https://github.com/kernel/kernel-images/pull/274">PR #274</a></li>
-    <li><a href="https://github.com/kernel/terraform-provider-kernel">terraform-provider-kernel</a> &mdash; Terraform provider for Kernel&rsquo;s browser infrastructure</li>
-    </ul>
-
-    <h3>Contact</h3>
-    <p>
-    I love meeting new people, and reply to every human-written email.
-    Say <a href="mailto:kapadiiy@mail.uc.edu">hello</a>.
-    </p>
-
-    <hr>
-    <p>
-    <a href="index.html">Home</a> | <a href="blog/">Writing</a> | <a href="intern/">Internship guide</a> | <a href="resume">Resume</a> | <a href="mailto:kapadiiy@mail.uc.edu">Email</a>
-    </p>
-  </main>
-
-  <ul class="side" aria-label="Trained policies, running live">
-    <li class="card" data-embed="/self-rising-robot/index.html?embed=1">
-      <a href="/self-rising-robot/" aria-label="Self-rising robot — open the live demo">
-        <iframe title="Self-rising robot — a PPO policy getting up from a fall in MuJoCo" scrolling="no" tabindex="-1" allow="autoplay"></iframe>
-        <span class="plate">
-          <b>Self-rising robot</b>
-          <span>PPO &middot; ~1B steps &middot; MuJoCo in WASM, 4/4 deterministic get-ups</span>
-        </span>
-        <span class="open">open &#8599;</span>
-      </a>
-    </li>
-    <li class="card" data-embed="/brotato/index.html?embed=1">
-      <a href="/brotato/" aria-label="Brotato — open the write-up">
-        <iframe title="Brotato — a 1B-step PufferLib policy playing Demon endless" scrolling="no" tabindex="-1" allow="autoplay"></iframe>
-        <span class="plate">
-          <b>Brotato</b>
-          <span>PufferLib 5 &middot; 1B steps &middot; Demon, danger 5, endless (recorded in-sim run)</span>
-        </span>
-        <span class="open">open &#8599;</span>
-      </a>
-    </li>
-    <li class="card">
-      <a href="/pinball/" aria-label="Space Cadet Pinball — open the live demo">
-        <video src="/pinball/eval_og_seed11.mp4" autoplay muted loop playsinline title="Space Cadet Pinball — a recorded run of the trained PPO agent"></video>
-        <span class="plate">
-          <b>Space Cadet Pinball</b>
-          <span>PPO &middot; 30-float observation &rarr; 8 actions &middot; recorded eval run of the original engine</span>
-        </span>
-        <span class="open">open &#8599;</span>
-      </a>
-    </li>
-  </ul>
-
-</div>
-
-<script>
-/* Each display is a live same-origin iframe of the policy's own demo page in its
- * `?embed=1` mode. They are 3-14 MB of WebAssembly each, so they load one at a
- * time, and only once the display is on screen. */
-(function () {
-  var cards = Array.prototype.slice.call(document.querySelectorAll('.card'));
-  var queue = [], pump = null;
-
-  function load(card) {
-    var frame = card.querySelector('iframe');
-    if (!frame || frame.getAttribute('src')) return;
-    frame.src = card.dataset.embed;
-  }
-
-  function tick() {
-    var card = queue.shift();
-    if (!card) { pump = null; return; }
-    load(card);
-    pump = setTimeout(tick, 400);
-  }
-
-  function enqueue(card) {
-    if (card.dataset.queued) return;
-    card.dataset.queued = '1';
-    queue.push(card);
-    if (!pump) tick();
-  }
-
-  if (!('IntersectionObserver' in window)) {
-    cards.forEach(load);
-    return;
-  }
-
-  var io = new IntersectionObserver(function (entries) {
-    entries.forEach(function (entry) {
-      if (!entry.isIntersecting) return;
-      io.unobserve(entry.target);
-      enqueue(entry.target);
-    });
-  }, { rootMargin: '200px' });
-
-  cards.forEach(function (card) { io.observe(card); });
-})();
-</script>
+<hr>
+<p>
+<a href="index.html">Home</a> | <a href="blog/">Writing</a> | <a href="intern/">Internship guide</a> | <a href="resume">Resume</a> | <a href="mailto:kapadiiy@mail.uc.edu">Email</a>
+</p>
 </body>
 </html>

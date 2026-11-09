@@ -11,17 +11,6 @@ h1{margin-bottom:4px}video{width:100%;border-radius:8px;background:#111}
 table{border-collapse:collapse;width:100%;margin:12px 0}td,th{border-bottom:1px solid #ddd;padding:6px 8px;text-align:left}
 code{background:#eee;padding:1px 4px;border-radius:3px}a{color:#0a58ca}
 </style>
-<script>
-  // Embed mode (?embed=1): shown as a live preview card on the home page.
-  // Keep only the run of the trained policy, full-bleed and autoplaying.
-  if (new URLSearchParams(location.search).has('embed')) document.documentElement.classList.add('embed');
-</script>
-<style>
-html.embed, html.embed body { height: 100%; overflow: hidden; }
-html.embed body{display:flex;align-items:center;justify-content:center;margin:0;padding:0;max-width:none;background:#000}
-html.embed h1, html.embed p, html.embed h2, html.embed ul, html.embed table { display: none; }
-html.embed video{width:100%;height:100%;max-height:100vh;border-radius:0;object-fit:contain;background:#000}
-</style>
 </head>
 <body>
 <h1>Brotato RL</h1>
