@@ -15,6 +15,20 @@
   .info a { color: #6af; }
   #webstatus { display: none; max-width: 700px; margin: 10px; padding: 10px; background: #220; color: #fc6; font-family: monospace; font-size: 12px; white-space: pre-wrap; border: 1px solid #662; }
 </style>
+<script>
+  // Embed mode (?embed=1): this page is being shown as a live preview card on
+  // the home page. Drop the chrome and let the canvas fill the frame.
+  if (new URLSearchParams(location.search).has('embed')) document.documentElement.classList.add('embed');
+</script>
+<style>
+  html.embed, html.embed body { height: 100%; overflow: hidden; }
+  html.embed body { justify-content: center; }
+  /* !important: the page's own status box sets an inline display when it has
+     something to say, and a preview card never wants it. */
+  html.embed h1, html.embed p.sub, html.embed .info, html.embed #webstatus { display: none !important; }
+  html.embed #game-container { flex: 1 1 auto; min-height: 0; display: flex; align-items: center; justify-content: center; }
+  html.embed canvas.emscripten { max-width: 100vw; max-height: 100vh; width: auto; height: auto; border: 0; }
+</style>
 </head>
 <body>
 <h1>Bounce</h1>

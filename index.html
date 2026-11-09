@@ -1,57 +1,333 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ilyaas Kapadia</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="style.css">
+<meta name="description" content="Reinforcement learning systems — fast C and CUDA environments where agents learn to play games. Six trained policies, running live in the page.">
+<link rel="canonical" href="https://ilya.as/">
+<style>
+  :root {
+    --bg: #0b0c0e;
+    --fg: #e8ebef;
+    --dim: #8a94a1;
+    --line: #242a33;
+    --link: #8fc0f0;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--link); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* One screen: the page is a flex column exactly one viewport tall, with the
+     hero at the top, the policy strip in the middle and the footer at the
+     bottom. The strip spends its width sideways rather than its height down.
+     --card-h is the one knob for how big the previews are (and so how many of
+     them are on screen at once): 4:3 cards, so a card is 1.33 * --card-h wide. */
+  :root { --card-h: min(30dvh, 38vw); }
+  .page {
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1.7vh;
+    padding: 2.6vh clamp(16px, 2.6vw, 44px) 1.8vh;
+  }
+
+  .hero h1 {
+    margin: 0 0 .25em;
+    font-size: clamp(21px, 2.7vh + .4vw, 31px);
+    letter-spacing: -.012em;
+  }
+  .hero p {
+    margin: 0 0 .45em;
+    max-width: 96ch;
+    font-size: clamp(13px, 1.68vh, 17px);
+  }
+  .dim { color: var(--dim); }
+
+  .projects {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .sec-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 1.1vh;
+  }
+  .sec-head h2 {
+    margin: 0;
+    font-size: clamp(14px, 1.9vh, 19px);
+    text-transform: uppercase;
+    letter-spacing: .15em;
+  }
+  .hint { margin: 0; color: var(--dim); font-size: clamp(11px, 1.35vh, 13px); }
+
+  .strip { display: flex; min-width: 0; }
+  .rail {
+    height: var(--card-h);
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    gap: clamp(10px, 1vw, 18px);
+    list-style: none;
+    margin: 0;
+    padding: 0 2px 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+    scrollbar-color: #2b323c transparent;
+  }
+  .rail::-webkit-scrollbar { height: 6px; }
+  .rail::-webkit-scrollbar-thumb { background: #2b323c; border-radius: 3px; }
+
+  .card {
+    flex: 0 0 auto;
+    height: var(--card-h);
+    aspect-ratio: 4 / 3;
+    scroll-snap-align: start;
+  }
+  .card > a {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    background: #000;
+    color: inherit;
+    transition: border-color .15s, transform .15s;
+  }
+  .card > a:hover { text-decoration: none; border-color: #46525f; transform: translateY(-2px); }
+  .card iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #000;
+    /* The preview is a live spectate view, not a control surface: the click
+       belongs to the card, which opens the full demo. */
+    pointer-events: none;
+  }
+  .plate {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 18px 12px 9px;
+    background: linear-gradient(to top, rgba(0,0,0,.88), rgba(0,0,0,.5) 55%, transparent);
+    font-size: clamp(10px, 1.2vh, 12px);
+    line-height: 1.35;
+    color: #a9b3bf;
+  }
+  .plate b { font-size: clamp(12px, 1.6vh, 15px); font-weight: 600; color: #fff; }
+  .open {
+    position: absolute;
+    top: 8px; right: 8px;
+    padding: 3px 7px;
+    border: 1px solid rgba(255,255,255,.16);
+    border-radius: 6px;
+    background: rgba(8,10,12,.74);
+    color: #dce4ed;
+    font-size: 11px;
+    opacity: 0;
+    transition: opacity .15s;
+  }
+  .card > a:hover .open { opacity: 1; }
+
+  .more { margin: 1.2vh 0 0; color: var(--dim); font-size: clamp(11px, 1.42vh, 13.5px); }
+
+  footer {
+    display: flex;
+    flex-direction: column;
+    gap: .35em;
+    color: var(--dim);
+    font-size: clamp(11px, 1.45vh, 13.5px);
+  }
+  footer p { margin: 0; }
+  footer b { color: var(--fg); font-weight: 600; }
+
+  /* Short or narrow screens: drop the one-screen lock and let the strip be a
+     normal scroller rather than squeezing the cards into a sliver. */
+  @media (max-width: 760px), (max-height: 540px) {
+    :root { --card-h: auto; }
+    .page { height: auto; min-height: 0; gap: 18px; padding: 20px 16px 28px; }
+    .rail { align-items: stretch; overflow-y: visible; }
+    .card { height: auto; width: min(80vw, 440px); }
+  }
+</style>
 </head>
 <body>
-<h1>Ilyaas Kapadia</h1>
+<div class="page">
 
-<p>
-I work on reinforcement learning systems &mdash; fast C and CUDA environments where
-agents learn to play games. Current obsessions: a speedrun policy for all 11 levels
-of the 2001 Nokia game Bounce, and squeezing every step per second out of a single
-RTX 5070.
-</p>
+  <header class="hero">
+    <h1>Ilyaas Kapadia</h1>
+    <p>
+      I work on reinforcement learning systems &mdash; fast C and CUDA environments where
+      agents learn to play games. Current obsessions: a speedrun policy for all 11 levels
+      of the 2001 Nokia game Bounce, and squeezing every step per second out of a single
+      RTX 5070.
+    </p>
+    <p class="dim">
+      I interned at <a href="https://www.kernel.ai/">Kernel</a> (YC S25), building browser
+      infrastructure for AI agents. Before that I was a mountain biker, a salesperson, and a
+      businessperson; I write about <a href="blog/">what I'm learning</a>.
+    </p>
+  </header>
 
-<p>
-I interned at Kernel (YC S25), working on browser infrastructure for AI agents.
-</p>
+  <section class="projects" aria-labelledby="projects-h">
+    <div class="sec-head">
+      <h2 id="projects-h">Projects</h2>
+      <p class="hint">
+        trained policies, playing in this page &middot;
+        click any card for the full write-up and controls &middot; scroll the row sideways
+      </p>
+    </div>
 
-<p>
-Before this, I was a mountain biker, a salesperson, and a businessperson. I write
-about what I'm learning.
-</p>
+    <div class="strip">
+      <ul class="rail" id="rail">
+        <li class="card" data-embed="/bounce/index.html?embed=1">
+          <a href="/bounce/">
+            <iframe title="Bounce — a trained PPO policy playing the 2001 Nokia game" scrolling="no" tabindex="-1" allow="autoplay"></iframe>
+            <span class="plate">
+              <b>Bounce</b>
+              <span>PPO &middot; 998M + 524M steps &middot; 99.9% clear on levels 1&ndash;2</span>
+            </span>
+            <span class="open">open &#8599;</span>
+          </a>
+        </li>
+        <li class="card" data-embed="/slither/index.html?embed=1">
+          <a href="/slither/">
+            <iframe title="Slither — 15 trained agents in the arena" scrolling="no" tabindex="-1" allow="autoplay"></iframe>
+            <span class="plate">
+              <b>Slither</b>
+              <span>self-play PPO &middot; 15 trained agents, one arena</span>
+            </span>
+            <span class="open">open &#8599;</span>
+          </a>
+        </li>
+        <li class="card" data-embed="/monocopter/index.html?embed=1">
+          <a href="/monocopter/">
+            <iframe title="Monocopter — a PPO policy hovering a single-propeller drone" scrolling="no" tabindex="-1" allow="autoplay"></iframe>
+            <span class="plate">
+              <b>Monocopter</b>
+              <span>MinGRU PPO &middot; 200M steps, best of 100 sweeps &middot; 0.68 hover score</span>
+            </span>
+            <span class="open">open &#8599;</span>
+          </a>
+        </li>
+        <li class="card" data-embed="/self-rising-robot/index.html?embed=1">
+          <a href="/self-rising-robot/">
+            <iframe title="Self-rising robot — a PPO policy getting up from a fall in MuJoCo" scrolling="no" tabindex="-1" allow="autoplay"></iframe>
+            <span class="plate">
+              <b>Self-rising robot</b>
+              <span>PPO &middot; ~1B steps &middot; MuJoCo 3.16 in WASM, 4/4 deterministic get-ups</span>
+            </span>
+            <span class="open">open &#8599;</span>
+          </a>
+        </li>
+        <li class="card" data-embed="/brotato/index.html?embed=1">
+          <a href="/brotato/">
+            <iframe title="Brotato — a 1B-step PufferLib policy playing Demon endless" scrolling="no" tabindex="-1" allow="autoplay"></iframe>
+            <span class="plate">
+              <b>Brotato</b>
+              <span>PufferLib 5 &middot; 1B steps &middot; Demon, danger 5, endless (recorded in-sim run)</span>
+            </span>
+            <span class="open">open &#8599;</span>
+          </a>
+        </li>
+      </ul>
+    </div>
 
-<h3>Projects</h3>
-<ul>
-<li><a href="https://ilya.as/nes-eval/">NES Eval</a> &mdash; a benchmark that gives AI coding agents 24 hours to write an NES emulator, graded frame by frame against a reference; a port of Mechanize&rsquo;s GBA Eval</li>
-<li><a href="https://ilya.as/countdown/">Countdown</a> &mdash; try a 0.8B model trained with reinforcement learning on arithmetic puzzles, running in your browser</li>
-<li><a href="https://ilya.as/slither">Slither</a></li>
-<li><a href="https://ilya.as/bounce">Bounce</a> &mdash; Nokia&rsquo;s 2001 classic, rebuilt for the browser and played by a trained policy</li>
-<li><a href="https://ilya.as/monocopter/">Monocopter</a> &mdash; a reinforcement-learning policy flying a simulated single-propeller drone, live in your browser</li>
-<li><a href="https://ilya.as/self-rising-robot/">Self-rising robot</a> &mdash; a two-servo robot that learned to stand up from any fall, simulated in MuJoCo in your browser</li>
-<li><a href="https://github.com/IlyaasK/kstack">kstack</a> &mdash; E-ink-first Android client for driving a fleet of headless omp agents over Tailscale SSH</li>
-</ul>
+    <p class="more">
+      Also: <a href="/pinball/">Space Cadet Pinball</a> &mdash; a trained PPO agent playing the
+      original C++ engine, live in WebAssembly &middot;
+      <a href="/countdown/">Countdown</a> &mdash; a 0.8B model trained with reinforcement
+      learning on arithmetic puzzles, running in your browser &middot;
+      <a href="/nes-eval/">NES Eval</a> &mdash; a benchmark that gives coding agents 24 hours to
+      write an NES emulator &middot;
+      <a href="https://github.com/IlyaasK/kstack">kstack</a> &mdash; an e-ink Android client for a
+      fleet of headless agents over Tailscale SSH
+    </p>
+  </section>
 
-<h3>Internship @Kernel (YC S25)</h3>
-<ul>
-<li>Cut the server CI workflow from <strong>17m33s to 7m29s</strong> &mdash; <a href="https://github.com/kernel/kernel-images/pull/299">PR #299</a></li>
-<li>Slimmed the Chromium runtime images by up to <strong>366 MB</strong>; headful cold build 347s to 268s &mdash; <a href="https://github.com/kernel/kernel-images/pull/274">PR #274</a></li>
-<li><a href="https://github.com/kernel/terraform-provider-kernel">terraform-provider-kernel</a> &mdash; Terraform provider for Kernel&rsquo;s browser infrastructure</li>
-</ul>
+  <footer>
+    <p>
+      Internship @Kernel (YC S25): server CI <b>17m33s &rarr; 7m29s</b>
+      (<a href="https://github.com/kernel/kernel-images/pull/299">PR #299</a>) &middot;
+      Chromium runtime images slimmed by up to <b>366 MB</b>, headful cold build 347s &rarr; 268s
+      (<a href="https://github.com/kernel/kernel-images/pull/274">PR #274</a>) &middot;
+      <a href="https://github.com/kernel/terraform-provider-kernel">terraform-provider-kernel</a>
+    </p>
+    <p>
+      I love meeting new people, and reply to every human-written email.
+      Say <a href="mailto:kapadiiy@mail.uc.edu">hello</a>.
+    </p>
+    <nav><a href="index.html">Home</a> | <a href="blog/">Writing</a> | <a href="intern/">Internship guide</a> | <a href="resume">Resume</a> | <a href="mailto:kapadiiy@mail.uc.edu">Email</a></nav>
+  </footer>
 
-<h3>Contact</h3>
-<p>
-I love meeting new people, and reply to every human-written email.
-Say <a href="mailto:kapadiiy@mail.uc.edu">hello</a>.
-</p>
+</div>
 
-<hr>
-<p>
-<a href="index.html">Home</a> | <a href="blog/">Writing</a> | <a href="intern/">Internship guide</a> | <a href="resume">Resume</a> | <a href="mailto:kapadiiy@mail.uc.edu">Email</a>
-</p>
+<script>
+/* Each card is a live same-origin iframe of the policy's own demo page in
+ * `?embed=1` mode. They are ~10-30 MB of WebAssembly each, so they are loaded
+ * one at a time, only once the card is (or is about to be) on screen: the
+ * first card starts immediately, the rest trickle in one per 400 ms. */
+(function () {
+  var rail = document.getElementById('rail');
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.card'));
+  var queue = [], pump = null;
+
+  function load(card) {
+    var frame = card.querySelector('iframe');
+    if (frame.getAttribute('src')) return;
+    frame.src = card.dataset.embed;
+  }
+
+  function tick() {
+    var card = queue.shift();
+    if (!card) { pump = null; return; }
+    load(card);
+    pump = setTimeout(tick, 400);
+  }
+
+  function enqueue(card) {
+    if (card.dataset.queued) return;
+    card.dataset.queued = '1';
+    queue.push(card);
+    if (!pump) tick();
+  }
+
+  if (!rail || !('IntersectionObserver' in window)) {
+    cards.forEach(load);
+    return;
+  }
+
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      io.unobserve(entry.target);
+      enqueue(entry.target);
+    });
+  }, { root: rail, rootMargin: '0px 260px' });
+
+  cards.forEach(function (card) { io.observe(card); });
+})();
+</script>
 </body>
 </html>
