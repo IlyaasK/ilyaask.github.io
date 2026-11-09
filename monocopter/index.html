@@ -2,51 +2,146 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Monocopter — RL hover control for a single-propeller drone</title>
-<meta name="description" content="A PPO policy trained in PufferLib flies a simulated single-propeller drone (jyjblrd/single-propeller-drone) live in your browser via WebAssembly.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Monocopter — PufferLib PPO policy flying a single-propeller drone in WebAssembly</title>
+<meta name="description" content="A PufferLib PPO policy flying a simulated single-propeller drone (jyjblrd/single-propeller-drone) live in the browser. Simulation with randomized, unmeasured physics; not flight-tested.">
 <style>
-  body { margin: 0; background: #111; color: #eee; font-family: -apple-system, sans-serif; display: flex; flex-direction: column; align-items: center; }
-  h1 { margin: 20px 0 5px; font-size: 28px; }
-  p.sub { color: #888; margin: 0 0 15px; font-size: 14px; }
-  #game-container { position: relative; }
-  canvas.emscripten { border: 2px solid #333; background: black; max-width: 95vw; height: auto; }
-  .info { max-width: 700px; padding: 20px; font-size: 14px; color: #aaa; line-height: 1.6; }
-  .info a { color: #6af; }
-  #webstatus { display: none; max-width: 700px; margin: 10px; padding: 10px; background: #220; color: #fc6; font-family: monospace; font-size: 12px; white-space: pre-wrap; border: 1px solid #662; }
-</style>
-<script>
-  // Embed mode (?embed=1): this page is being shown as a live preview card on
-  // the home page. Drop the chrome and let the canvas fill the frame.
-  if (new URLSearchParams(location.search).has('embed')) document.documentElement.classList.add('embed');
-</script>
-<style>
-  html.embed, html.embed body { height: 100%; overflow: hidden; }
-  html.embed body { justify-content: center; }
-  /* !important: the page's own status box sets an inline display when it has
-     something to say, and a preview card never wants it. */
-  html.embed h1, html.embed p.sub, html.embed .info, html.embed #webstatus { display: none !important; }
-  html.embed #game-container { flex: 1 1 auto; min-height: 0; display: flex; align-items: center; justify-content: center; }
-  html.embed canvas.emscripten { max-width: 100vw; max-height: 100vh; width: auto; height: auto; border: 0; }
+  :root {
+    --panel-bg: rgba(15, 15, 15, 0.94);
+    --panel-border: #3a3a3a;
+    --title-bg: #294a7a;
+    --text: #d6d6d6;
+    --dim: #8d939a;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; background: #000; overflow: hidden; }
+  canvas.emscripten {
+    display: block; position: fixed; inset: 0; width: 100vw; height: 100vh;
+    background: #000; outline: none; touch-action: none;
+  }
+  #ui {
+    position: fixed; top: 0; left: 0; display: flex; flex-direction: column; gap: 6px;
+    padding: 8px; max-width: calc(100vw - 16px); max-height: 100vh; overflow-y: auto;
+    pointer-events: none;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "DejaVu Sans Mono", monospace;
+    font-size: 12px; line-height: 1.5; -webkit-font-smoothing: antialiased;
+  }
+  .panel {
+    pointer-events: auto; width: 300px; max-width: 100%;
+    background: var(--panel-bg); border: 1px solid var(--panel-border); color: var(--text);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.55);
+  }
+  .panel > .title {
+    display: flex; align-items: center; gap: 6px; padding: 3px 6px;
+    background: var(--title-bg); color: #eaeaea; cursor: pointer; user-select: none;
+  }
+  .panel > .title .arrow { display: inline-block; width: 10px; color: #cdd6e0; transition: transform 0.12s; }
+  .panel.collapsed > .title .arrow { transform: rotate(-90deg); }
+  .panel > .title .name { flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .panel > .title .x { color: #c6ced8; padding: 0 2px; }
+  .panel > .title .x:hover, .panel > .title .arrow:hover { color: #fff; }
+  .panel.collapsed > .body { display: none; }
+  .panel.closed > .title { background: #23303f; color: #9aa3ad; }
+  .panel > .body { padding: 6px 8px; }
+  .row { display: flex; justify-content: space-between; gap: 10px; }
+  .row .k { color: var(--dim); }
+  .row .v { color: #fff; }
+  .sep { border-top: 1px solid #2a2a2a; margin: 5px 0; }
+  .note { color: var(--dim); margin-top: 5px; }
+  .keys { color: var(--dim); }
+  .keys b { color: #cfd6de; font-weight: normal; }
+  .ctl { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; }
+  .ctl button {
+    font: inherit; color: #e6e6e6; background: #22344f; border: 1px solid #3d5a85;
+    padding: 0 8px; cursor: pointer;
+  }
+  .ctl button:hover { background: #2d4569; }
+  a { color: #7fb3e8; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  #webstatus {
+    display: none; position: fixed; left: 8px; bottom: 8px; max-width: calc(100vw - 16px);
+    max-height: 40vh; overflow: auto; padding: 6px 8px; background: rgba(30, 12, 12, 0.95);
+    border: 1px solid #7a2f2f; color: #ffb4a2; font-family: ui-monospace, monospace;
+    font-size: 11px; white-space: pre-wrap; z-index: 10;
+  }
+  @media (max-width: 700px) {
+    #ui { padding: 6px; gap: 4px; }
+    .panel { width: min(300px, calc(100vw - 12px)); font-size: 11px; }
+  }
 </style>
 </head>
 <body>
-<h1>Monocopter</h1>
-<p class="sub">A neural network policy flying a simulated single-propeller drone, live in your browser</p>
-<div id="game-container">
-  <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+<canvas class="emscripten" id="canvas" tabindex="-1" oncontextmenu="return false"></canvas>
+
+<div id="ui">
+  <div class="panel" id="p-flight">
+    <div class="title"><span class="arrow">&#9660;</span><span class="name">flight</span><span class="x">&#10005;</span></div>
+    <div class="body">
+      <div class="ctl"><span class="k" style="color:var(--dim)">following</span>
+        <span><button id="prev">&lsaquo;</button> <span class="v" id="f-drone">–</span> <button id="next">&rsaquo;</button></span></div>
+      <div class="row"><span class="k">time</span><span class="v" id="f-time">–</span></div>
+      <div class="row"><span class="k">distance to target</span><span class="v" id="f-dist">–</span></div>
+      <div class="row"><span class="k">tilt</span><span class="v" id="f-tilt">–</span></div>
+      <div class="row"><span class="k">speed</span><span class="v" id="f-speed">–</span></div>
+      <div class="row"><span class="k">rotor</span><span class="v" id="f-rotor">–</span></div>
+      <div class="row"><span class="k">body spin</span><span class="v" id="f-spin">–</span></div>
+    </div>
+  </div>
+
+  <div class="panel" id="p-vehicle">
+    <div class="title"><span class="arrow">&#9660;</span><span class="name">this episode's vehicle (randomized)</span><span class="x">&#10005;</span></div>
+    <div class="body">
+      <div class="row"><span class="k">mass</span><span class="v" id="v-mass">–</span></div>
+      <div class="row"><span class="k">hover rotor speed</span><span class="v" id="v-hover">–</span></div>
+      <div class="row"><span class="k">cyclic gain</span><span class="v" id="v-cyc">–</span></div>
+      <div class="row"><span class="k">cyclic phase error</span><span class="v" id="v-phase">–</span></div>
+      <div class="row"><span class="k">command latency</span><span class="v" id="v-lat">–</span></div>
+      <div class="row"><span class="k">battery</span><span class="v" id="v-vbus">–</span></div>
+      <div class="note">resampled every episode; the real vehicle's values are not measured yet</div>
+    </div>
+  </div>
+
+  <div class="panel" id="p-stats">
+    <div class="title"><span class="arrow">&#9660;</span><span class="name">stats (all drones)</span><span class="x">&#10005;</span></div>
+    <div class="body">
+      <div class="row"><span class="k">episodes finished</span><span class="v" id="s-eps">–</span></div>
+      <div class="row"><span class="k">full 8 s hovers</span><span class="v" id="s-surv">–</span></div>
+      <div class="row"><span class="k">drift-outs / tips</span><span class="v" id="s-crash">–</span></div>
+      <div class="row"><span class="k">final distance</span><span class="v" id="s-fdist">–</span></div>
+      <div class="row"><span class="k">hover score</span><span class="v" id="s-perf">–</span></div>
+      <div class="note">trained-policy eval, 3,000 episodes: hover score 0.68</div>
+    </div>
+  </div>
+
+  <div class="panel" id="p-camera">
+    <div class="title"><span class="arrow">&#9660;</span><span class="name">camera</span><span class="x">&#10005;</span></div>
+    <div class="body">
+      <div class="keys"><b>LMB + drag</b>: orbit &nbsp;&middot;&nbsp; <b>wheel</b>: zoom</div>
+      <div class="row"><span class="k">azimuth</span><span class="v" id="c-az">–</span></div>
+      <div class="row"><span class="k">elevation</span><span class="v" id="c-el">–</span></div>
+      <div class="row"><span class="k">distance</span><span class="v" id="c-dist">–</span></div>
+    </div>
+  </div>
+
+  <div class="panel" id="p-info">
+    <div class="title"><span class="arrow">&#9660;</span><span class="name">info</span><span class="x">&#10005;</span></div>
+    <div class="body">
+      <div>Joshua Bird's single-propeller drone flies on one hinged rotor, tilting by
+      pulsing motor torque once per revolution. A PufferLib PPO policy (2-layer MinGRU,
+      64 units, ~200M steps, RTX 5070) replaces the flight controller's attitude PIDs
+      and holds it over the cyan target. Physics and policy run live in WebAssembly.</div>
+      <div class="note">Simulation with randomized, unmeasured physics. Not flight-tested.</div>
+      <div class="note"><a href="https://github.com/jyjblrd/single-propeller-drone" target="_blank" rel="noopener">vehicle &amp; CAD: jyjblrd/single-propeller-drone</a></div>
+      <div class="note"><a href="https://github.com/PufferAI/PufferLib" target="_blank" rel="noopener">PufferLib</a> &nbsp;&middot;&nbsp; <a href="https://ilya.as">ilya.as</a></div>
+    </div>
+  </div>
 </div>
+
 <div id="webstatus"></div>
-<div class="info">
-  <p>Joshua Bird's <a href="https://github.com/jyjblrd/single-propeller-drone">single-propeller drone</a> flies on one hinged rotor: it tilts by pulsing motor torque once per revolution, so the blades change pitch around the disc. Here a PPO policy replaces the flight controller's attitude PIDs. It outputs the same throttle/roll/pitch commands ArduPilot sends to the moteus motor controller and must hold the drone over the cyan target.</p>
-  <p>Every episode is a different randomized drone: mass, inertia, thrust, blade response, phase error, battery voltage and command latency are sampled from wide ranges, because the real vehicle's values have not been measured yet. This is a simulator result, not a flight-tested controller.</p>
-  <p>Drag to orbit, scroll to zoom. The camera follows one drone; the red dots are 15 others.</p>
-  <p>Policy: 2-layer MinGRU, 64 hidden units, about 200M steps of PPO in <a href="https://github.com/PufferAI/PufferLib">PufferLib</a> 5.0, best of a 100-trial hyperparameter sweep; trained on an RTX 5070. Over 3,000 evaluation episodes it scores 0.68 on a 0–1 hover-quality metric (the untuned 1B-step baseline: 0.65).</p>
-</div>
+
 <script>
-  // Modern Chromium omits UIEvent.detail on resize/scroll, and Emscripten's
-  // assertion build writes it into the heap unguarded, aborting the runtime
-  // on window resize. Normalise it before Emscripten's listener runs.
+  // Modern Chromium omits UIEvent.detail on resize/scroll and Emscripten's
+  // assertion build writes it into the heap unguarded, aborting on resize.
   (function () {
     function normalise(e) {
       if (e.detail === undefined) {
@@ -57,17 +152,91 @@
     window.addEventListener('scroll', normalise, true);
   })();
 
-  function webstatus(msg) {
+  // Drawing buffer at devicePixelRatio; CSS stretches the canvas to the viewport.
+  window.__monoCalcSize = function () {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    return [Math.max(1, Math.round(window.innerWidth * dpr)),
+            Math.max(1, Math.round(window.innerHeight * dpr))];
+  };
+
+  var webstatus = (function () {
     var el = document.getElementById('webstatus');
-    el.style.display = 'block';
-    el.textContent += msg + '\n';
-  }
-  window.addEventListener('error', function (e) { webstatus('PAGE ERROR: ' + e.message); });
+    var errorish = /error|failed|failure|abort|assert|exception|undefined symbol|unreachable|out of memory|missing|bad binary/i;
+    return function (msg, force) {
+      if (!force && !errorish.test(msg)) { console.warn(msg); return; }
+      el.style.display = 'block';
+      el.textContent += msg + '\n';
+      el.scrollTop = el.scrollHeight;
+    };
+  })();
+  window.addEventListener('error', function (e) { webstatus('PAGE ERROR: ' + e.message, true); });
+
+  (function () {
+    ['p-flight', 'p-vehicle', 'p-stats', 'p-camera', 'p-info'].forEach(function (id) {
+      var p = document.getElementById(id);
+      p.querySelector('.title').addEventListener('click', function (ev) {
+        if (ev.target.classList.contains('x')) {
+          p.classList.toggle('closed');
+          p.classList.toggle('collapsed', p.classList.contains('closed'));
+          return;
+        }
+        p.classList.toggle('collapsed');
+      });
+    });
+    function narrowLayout() {
+      if (window.innerWidth < 700) {
+        ['p-vehicle', 'p-stats', 'p-camera', 'p-info'].forEach(function (id) {
+          document.getElementById(id).classList.add('collapsed');
+        });
+      }
+    }
+    narrowLayout();
+    var wasNarrow = window.innerWidth < 700;
+    window.addEventListener('resize', function () {
+      var narrow = window.innerWidth < 700;
+      if (narrow && !wasNarrow) narrowLayout();
+      wasNarrow = narrow;
+    });
+  })();
+
+  window.__monoFollow = 0;
+  var droneCount = 1;
+  document.getElementById('prev').onclick = function () { window.__monoFollow = (window.__monoFollow - 1 + droneCount) % droneCount; };
+  document.getElementById('next').onclick = function () { window.__monoFollow = (window.__monoFollow + 1) % droneCount; };
+
+  function set(id, text) { document.getElementById(id).textContent = text; }
+  window.monoStats = function (d) {
+    droneCount = d.drones;
+    set('f-drone', (d.drone + 1) + ' / ' + d.drones);
+    set('f-time', (d.step / 125).toFixed(1) + ' / ' + (d.horizon / 125).toFixed(0) + ' s');
+    set('f-dist', (d.dist * 100).toFixed(1) + ' cm');
+    set('f-tilt', d.tilt.toFixed(1) + '\u00b0');
+    set('f-speed', d.speed.toFixed(2) + ' m/s');
+    set('f-rotor', (d.rotor * 60).toFixed(0) + ' rpm');
+    set('f-spin', d.spin.toFixed(2) + ' rev/s');
+    set('v-mass', (d.mass * 1000).toFixed(0) + ' g');
+    set('v-hover', (d.hover * 60).toFixed(0) + ' rpm');
+    set('v-cyc', d.cyc.toFixed(2));
+    set('v-phase', d.phase.toFixed(1) + '\u00b0');
+    set('v-lat', d.lat + ' × 8 ms');
+    set('v-vbus', d.vbus.toFixed(1) + ' V');
+    set('s-eps', d.eps.toFixed(0));
+    if (d.eps > 0) {
+      set('s-surv', (d.survive * 100).toFixed(0) + '%');
+      set('s-crash', (d.crash * 100).toFixed(0) + '%');
+      set('s-fdist', (d.fdist * 100).toFixed(0) + ' cm');
+      set('s-perf', d.perf.toFixed(2));
+    }
+    set('c-az', d.az.toFixed(0) + '\u00b0');
+    set('c-el', d.el.toFixed(0) + '\u00b0');
+    set('c-dist', d.cdist.toFixed(2) + ' m');
+  };
+
   var Module = {
     arguments: [],
     canvas: document.getElementById('canvas'),
     print: function (text) { console.log(text); },
-    printErr: function (text) { console.error(text); if (!/^(INFO|WARNING):/.test(text)) webstatus(text); },
+    printErr: function (text) { console.warn(text); webstatus(text); },
   };
 </script>
 <script async type="text/javascript" src="game.js"></script>
