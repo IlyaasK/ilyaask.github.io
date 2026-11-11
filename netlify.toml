@@ -77,7 +77,7 @@
   for = "/resume"
   [headers.values]
     Content-Type = "application/pdf"
-    Content-Disposition = "inline; filename=\"Ilyaas_Kapadia_Resume_Sept2026.pdf\""
+    Content-Disposition = "inline; filename=\"Ilyaas_Kapadia_Resume_Nov2026.pdf\""
 
 [[redirects]]
   from = "/resume"
