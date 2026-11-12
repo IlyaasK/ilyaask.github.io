@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Owning Inference — Ilyaas Kapadia, Spring 2027 application to Deepshard</title>
+<meta name="description" content="A Spring 2027 software engineering internship application to Deepshard: why I want to build the local AI computer, what I have shipped so far, and what I am still bad at.">
+<link rel="canonical" href="https://ilya.as/truffle/">
+<meta name="theme-color" content="#000000">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Owning Inference">
+<meta property="og:description" content="A Spring 2027 software engineering internship application to Deepshard.">
+<meta property="og:url" content="https://ilya.as/truffle/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Owning Inference">
+<meta name="twitter:description" content="A Spring 2027 software engineering internship application to Deepshard.">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,200..1000;1,200..1000&display=swap">
+<style>
+:root{
+  --paper:#FFFFFF;
+  --titlepage-bg:#000000;
+  --titlepage-ink:#ffffff;
+  --titlepage-ink-soft:rgba(255,255,255,.58);
+  --titlepage-rule:rgba(255,255,255,.22);
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#e34948;
+  --ink:#1F2122;
+  --ink-soft:#5c6164;
+  --rule:rgba(31,33,34,.28);
+  --wash:rgba(31,33,34,.06);
+  --sans:"Nunito Sans","ABC Diatype Rounded","Helvetica Neue",Arial,sans-serif;
+  --display:"Nunito Sans","ABC Diatype Rounded",sans-serif;
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box;}
+html{background:var(--paper); scrollbar-gutter:stable; overflow-x:hidden;}
+html.on-dark{background:var(--titlepage-bg);}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--sans); font-weight:400; font-size:16px; line-height:1.7;
+  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+.book{max-width:44em; width:100%; margin:0 auto; padding-left:max(40px, env(safe-area-inset-left,0px)); padding-right:max(40px, env(safe-area-inset-right,0px));}
+p{margin:0 0 1em; text-align:left;}
+a{color:inherit; text-decoration:none;}
+.prose a{text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:3px; text-decoration-color:var(--ink-soft); transition:text-decoration-color .2s ease;}
+.prose a:hover{text-decoration-color:var(--ink);}
+.sc{text-transform:uppercase; letter-spacing:.14em; font-size:.82em;}
+strong,b{font-weight:500;}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.88em; background:var(--wash); padding:.1em .35em; border-radius:3px;}
+sup.fn{font-size:.6em; line-height:0; vertical-align:super;}
+sup.fn a{text-decoration:none; color:var(--ink-soft);}
+
+/* ---- reading progress + header ---- */
+#progress{position:fixed; inset:0 0 auto 0; height:2px; z-index:12; transform:scaleX(0); transform-origin:0 50%; background:var(--ink); transition:background-color .2s ease;}
+html.on-dark #progress{background:var(--titlepage-ink);}
+header#book-nav{
+  position:fixed; inset:0 0 auto 0; z-index:11;
+  display:flex; align-items:baseline; gap:18px;
+  padding:11px max(24px, env(safe-area-inset-left,0px)) 10px;
+  font-size:13px; color:var(--ink); background:var(--paper);
+  border-bottom:1px solid var(--rule);
+  transition:color .2s ease, border-color .2s ease, background-color .2s ease;
+}
+html.on-dark header#book-nav{color:var(--titlepage-ink); background:var(--titlepage-bg); border-bottom-color:var(--titlepage-rule);}
+.book-nav-home{flex:0 0 auto; letter-spacing:.02em; font-weight:500; white-space:nowrap;}
+.book-nav-links{flex:1 1 auto; min-width:0; display:flex; gap:16px; overflow-x:auto; scrollbar-width:none; white-space:nowrap; color:var(--ink-soft);}
+html.on-dark .book-nav-links{color:var(--titlepage-ink-soft);}
+.book-nav-links::-webkit-scrollbar{display:none;}
+.book-nav-links a{border-bottom:1px solid transparent; padding-bottom:2px; transition:border-color .2s ease, color .2s ease;}
+.book-nav-links a:hover{border-bottom-color:currentColor;}
+.book-nav-cta{flex:0 0 auto; white-space:nowrap; text-transform:uppercase; letter-spacing:.16em; font-size:11px; padding-bottom:2px; border-bottom:1px solid var(--rule);}
+html.on-dark .book-nav-cta{border-bottom-color:var(--titlepage-rule);}
+@media (max-width:640px){
+  header#book-nav{padding-inline:20px; font-size:12px; gap:12px;}
+  .book-nav-links{gap:12px; -webkit-mask-image:linear-gradient(to right,#000 88%,transparent); mask-image:linear-gradient(to right,#000 88%,transparent);}
+}
+
+main [id]{scroll-margin-top:64px;}
+
+/* ---- left rail ---- */
+#rail{
+  position:fixed; left:max(22px, env(safe-area-inset-left,0px)); top:50%; transform:translateY(-50%);
+  z-index:8; width:44px; padding:12px 0;
+  opacity:0; pointer-events:none; transition:opacity .18s ease;
+}
+#rail.show{opacity:1; pointer-events:auto;}
+#rail ol{list-style:none; margin:0; padding:0; position:relative;}
+#rail ol::before{content:""; position:absolute; left:8px; top:6px; bottom:6px; width:1px; background:var(--rule);}
+#rail li{position:relative; height:15px; font-size:12px; line-height:1.35; white-space:nowrap;}
+#rail li::before{content:""; position:absolute; left:6px; top:5px; width:5px; height:5px; border-radius:50%; background:var(--paper); box-shadow:inset 0 0 0 1px var(--rule); transition:background-color .18s ease, transform .18s ease;}
+#rail li.here::before{background:var(--ink); box-shadow:none; transform:scale(1.35);}
+#rail li a{display:block; width:44px; height:15px; color:inherit;}
+#rail .rail-title{
+  position:absolute; left:52px; top:50%; padding:7px 12px;
+  background:rgba(255,255,255,.72); border:1px solid var(--wash); border-radius:999px;
+  box-shadow:0 4px 20px rgba(31,33,34,.09), 0 1px 3px rgba(31,33,34,.05);
+  color:var(--ink); font-size:12px; line-height:1.35;
+  opacity:0; visibility:hidden; pointer-events:none;
+  transform:translate(4px,-50%) scale(.98); transform-origin:left center;
+  transition:opacity .12s ease, transform .18s ease, visibility 0s linear .18s;
+}
+#rail li:hover .rail-title,#rail li:has(a:focus-visible) .rail-title,#rail li.here .rail-title{
+  opacity:1; visibility:visible; transform:translate(0,-50%) scale(1); transition-delay:0s;
+}
+@media (max-width:1099px){ #rail{display:none;} }
+
+/* ---- title pages ---- */
+section.titlepage{
+  position:relative; z-index:1; color:var(--titlepage-ink);
+  background:var(--titlepage-bg); overflow:hidden;
+  min-height:100vh; min-height:100svh;
+  display:flex; flex-direction:column; justify-content:space-between; align-items:center;
+  text-align:center; padding-block:9vh;
+}
+section.titlepage.chapter-title{margin-top:clamp(6rem, 20vh, 12rem);}
+.titlepage-hero{
+  width:100%; max-width:44em; margin:0 auto;
+  padding-left:max(40px, env(safe-area-inset-left,0px)); padding-right:max(40px, env(safe-area-inset-right,0px));
+  display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1; min-height:0;
+}
+.titlepage .eyebrow{text-transform:uppercase; letter-spacing:.26em; font-size:13px; color:var(--titlepage-ink-soft); margin:0 0 1.35em;}
+.titlepage h1{
+  font-family:var(--display); font-weight:200; font-size:clamp(1.6em, 4.4vw, 2.3em);
+  line-height:1.2; letter-spacing:.04em; margin:.15em 0 0; color:var(--titlepage-ink);
+  text-wrap:balance;
+}
+.titlepage .thesis{margin:1.25em auto 0; max-width:34em; font-size:1.02em; line-height:1.6; color:var(--titlepage-ink-soft); text-align:center; text-wrap:balance;}
+.titlepage .thesis em{font-style:normal; color:var(--titlepage-ink);}
+.titlepage .dateline{margin:0 0 2.4em; font-size:.9em; color:var(--titlepage-ink-soft); letter-spacing:.02em;}
+.titlepage .byline{margin-top:3em; line-height:1.5; color:var(--titlepage-ink-soft); font-size:.94em;}
+.titlepage .byline a{color:var(--titlepage-ink-soft); border-bottom:1px solid var(--titlepage-rule);}
+.titlepage .byline a:hover{color:var(--titlepage-ink);}
+.titlepage .readline{margin-top:2.5em; text-transform:uppercase; letter-spacing:.22em; font-size:12px; color:var(--titlepage-ink-soft); border-bottom:1px solid var(--titlepage-rule); padding-bottom:3px;}
+.titlepage .readline:hover{color:var(--titlepage-ink);}
+
+/* ---- parts ---- */
+section.part{margin-top:clamp(5rem, 13vh, 9rem); padding-top:clamp(2rem, 5vh, 3.5rem);}
+.part > header{text-align:center; margin-bottom:2.6em;}
+.part > header .kicker{display:block; text-transform:uppercase; letter-spacing:.24em; font-size:12px; color:var(--ink-soft); margin-bottom:.9em;}
+.part > header h2{font-weight:400; font-size:.82em; letter-spacing:.18em; text-transform:uppercase; line-height:1.35; margin:0; text-wrap:balance;}
+.sect{margin-top:3.2em;}
+.sect > h3,.sect > h4{
+  font-weight:500; font-size:1.02em; letter-spacing:.03em; line-height:1.35;
+  margin:0 0 1em; padding-top:1.5em; border-top:1px solid var(--rule);
+}
+.part .sect:not(:first-of-type) > h3,.part .sect:not(:first-of-type) > h4{margin-top:3.8em;}
+.prose > p.callline:first-child{font-weight:500; font-size:1.02em; letter-spacing:.03em; padding-top:1.5em; border-top:1px solid var(--rule);}
+.part .sect:not(:first-of-type) .prose > p.callline:first-child{margin-top:3.8em;}
+.asterism{text-align:center; letter-spacing:1.1em; padding-left:1.1em; margin:2.6em 0; color:var(--ink-soft);}
+.prose > *:last-child{margin-bottom:0;}
+.lead{font-size:1.06em;}
+
+/* ---- pull quote ---- */
+blockquote.bigquote{
+  margin:2.1em 0; padding-left:1em; border-left:1px solid var(--ink);
+  font-style:italic; font-size:1.02em; line-height:1.65;
+}
+blockquote.bigquote .attr{display:block; margin-top:.8em; font-style:normal; font-size:.72em; text-transform:uppercase; letter-spacing:.16em; color:var(--ink-soft);}
+
+/* ---- figures ---- */
+figure{margin:3.1em 0 2.8em;}
+.fighead{margin:0 0 .95em;}
+.figtitle{font-weight:500; font-size:.8125rem; line-height:1.3;}
+.figsubtitle{margin-top:.22em; font-size:.65625rem; font-style:italic; line-height:1.35; color:var(--ink-soft);}
+figcaption{margin-top:1.05em; font-size:.72em; line-height:1.5; color:var(--ink-soft);}
+figcaption b{font-weight:500; color:var(--ink);}
+.chart{position:relative; --name-w:11.5em; --gap:12px; font-size:13px;}
+.chart-row{display:flex; align-items:center; margin-bottom:12px;}
+.chart-name{flex:0 0 var(--name-w); width:var(--name-w); text-align:right; padding-right:var(--gap); color:var(--ink-soft);}
+.chart-row-accent .chart-name{color:var(--ink);}
+.chart-track{position:relative; flex:1 1 auto; min-width:0; height:26px;}
+.chart-bar{position:absolute; left:0; top:0; height:100%; width:var(--end); background:var(--s1); display:flex; align-items:center; justify-content:flex-end; padding-right:9px;}
+.chart-row-muted .chart-bar{background:var(--ink-soft); opacity:.38;}
+.chart-value{white-space:nowrap; color:var(--ink-soft);}
+.chart-value-out{position:absolute; top:50%; transform:translateY(-50%); left:calc(var(--end) + 8px);}
+.chart-value-in{color:#fff;}
+.chart-callout{margin:0 0 8px; text-align:right; color:var(--ink-soft);}
+.chart-axis{position:relative; height:1px; margin:0 calc(0px) 24px calc(var(--name-w) + var(--gap)); border-top:1px solid var(--rule);}
+.chart-axis span{position:absolute; left:var(--p); top:0; transform:translateX(-50%); font-size:11px; color:var(--ink-soft);}
+.chart-axis span::before{content:""; position:absolute; left:50%; top:0; width:1px; height:5px; background:var(--rule);}
+.chart-axis span i{position:absolute; top:7px; left:50%; transform:translateX(-50%); font-style:normal;}
+.chart-axis-title{margin:0 0 0 calc(var(--name-w) + var(--gap)); font-size:11px; color:var(--ink-soft);}
+@media (max-width:640px){
+  .chart{--name-w:0em;}
+  .chart-row{display:block; margin-bottom:20px;}
+  .chart-name{display:block; width:auto; text-align:left; padding:0 0 6px; color:var(--ink);}
+  .chart-callout{text-align:left; margin:0 0 14px;}
+  .chart-bar{padding-right:7px;}
+}
+.fig-video video{display:block; width:100%; height:auto; background:#111; border-radius:6px;}
+
+/* ---- worked tables ---- */
+.table-scroll{overflow-x:auto;}
+table.worked{width:100%; border-collapse:collapse; margin:2.2em 0; font-size:.9em; line-height:1.5; font-variant-numeric:tabular-nums;}
+table.worked th{font-weight:400; font-size:.72em; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft); text-align:left; padding:.6em .2em .5em; border-bottom:1px solid var(--rule);}
+table.worked td{padding:.6em .2em; vertical-align:baseline; border-bottom:1px solid var(--rule);}
+table.worked tr:first-child td,table.worked tr:first-child th{border-top:1px solid var(--rule);}
+table.worked th+th,table.worked td+td,table.worked td:last-child{text-align:right;}
+table.worked td:first-child{padding-right:1.4em;}
+table.worked td:last-child{white-space:nowrap;}
+table.worked td a{border-bottom:1px solid var(--rule);}
+table.worked td a:hover{border-bottom-color:var(--ink);}
+@media (max-width:560px){table.worked td:last-child{white-space:normal;}}
+
+/* ---- letter note ---- */
+figure.note-paper{
+  width:min(36rem,100%); margin:3.2em auto 3.6em;
+  background:#fff; color:var(--ink);
+  border:1px solid var(--wash);
+  box-shadow:0 1px 1px rgba(0,0,0,.03), 0 10px 28px rgba(0,0,0,.055), 0 24px 60px rgba(0,0,0,.04);
+  padding:3rem 2rem 2.4rem; position:relative; overflow:hidden;
+}
+figure.note-paper::before{
+  content:""; position:absolute; inset:0; pointer-events:none; opacity:.32; mix-blend-mode:multiply;
+  background-image:repeating-linear-gradient(0deg, rgba(20,20,20,.045) 0 1px, transparent 1px 3px),
+                   repeating-linear-gradient(90deg, rgba(20,20,20,.03) 0 1px, transparent 1px 4px);
+}
+figure.note-paper > *{position:relative;}
+figure.note-paper .note-head{text-align:center; margin-bottom:1.8em;}
+figure.note-paper .note-date{font-size:13px; color:var(--ink-soft);}
+figure.note-paper .note-title{margin:.5em 0 0; font-family:var(--display); font-weight:300; font-size:1.35rem; letter-spacing:.03em; line-height:1.25;}
+figure.note-paper p{font-size:.95em; line-height:1.75;}
+figure.note-paper .note-sign{margin:1.6em 0 0; text-align:left; font-size:.95em;}
+figure.note-paper figcaption{margin-top:1.4em; text-align:center;}
+
+/* ---- cards ---- */
+.cards{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:clamp(8px,1.5vw,14px); margin:2.6em 0 0; padding:0;}
+.card{
+  display:flex; flex-direction:column; gap:10px; padding:18px 18px 20px;
+  background:var(--paper); border-radius:8px;
+  box-shadow:0 6px 22px rgba(0,0,0,.075), 0 2px 8px rgba(0,0,0,.04);
+  transition:box-shadow .18s ease, transform .18s ease;
+}
+.card:hover{box-shadow:0 10px 30px rgba(0,0,0,.1), 0 4px 12px rgba(0,0,0,.055);}
+.card h3{margin:0; font-family:var(--display); font-weight:400; font-size:1.125rem; line-height:1.25; letter-spacing:.02em;}
+.card .card-sub{margin:0; font-size:.875rem; line-height:1.5; color:var(--ink-soft);}
+.card .card-who{margin:0; text-transform:uppercase; letter-spacing:.16em; font-size:10.5px; color:var(--ink-soft);}
+@media (max-width:640px){.cards{grid-template-columns:1fr;}}
+
+/* ---- endnotes ---- */
+.endnotes{margin-top:7em; border-top:1px solid var(--rule); padding-top:2.4em; font-size:.8em; line-height:1.6; color:var(--ink-soft);}
+.endnotes .label{text-transform:uppercase; letter-spacing:.2em; font-size:11px; margin-bottom:2em;}
+.endnotes ol{margin:0; padding-left:1.6em;}
+.endnotes li{margin-bottom:.9em;}
+.endnotes a{text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:2px; text-decoration-color:var(--ink-soft);}
+.endnotes a:hover{text-decoration-color:var(--ink); color:var(--ink);}
+
+/* ---- endmark ---- */
+.endmark{margin:5em 0 6em; color:var(--ink-soft); font-size:.9em;}
+.endmark .endmark-nav{display:flex; justify-content:space-between; gap:1.5em; flex-wrap:wrap; align-items:baseline; padding-top:1.6em; border-top:1px solid var(--rule);}
+.endmark .endmark-nav a{border-bottom:1px solid var(--rule); padding-bottom:3px;}
+.endmark .endmark-nav a:hover{border-bottom-color:var(--ink); color:var(--ink);}
+@media (max-width:480px){
+  body{font-size:15.5px;}
+  .book{padding-left:20px; padding-right:20px;}
+  .titlepage-hero{padding-left:20px; padding-right:20px;}
+  figure.note-paper{padding:2.2rem 1.3rem 1.8rem;}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;}
+}
+</style>
+</head>
+<body>
+
+<div id="progress" aria-hidden="true"></div>
+
+<header id="book-nav">
+  <a class="book-nav-home" href="#top">Owning Inference</a>
+  <nav class="book-nav-links" aria-label="Sections">
+    <a href="#introduction">Introduction</a>
+    <a href="#evidence">Evidence</a>
+    <a href="#work">Where I&rsquo;d plug in</a>
+    <a href="#limits">What I don&rsquo;t know</a>
+    <a href="#ask">The ask</a>
+  </nav>
+  <a class="book-nav-cta" href="mailto:kapadiiy@mail.uc.edu">Email me</a>
+</header>
+
+<nav id="rail" aria-label="Contents">
+  <ol>
+    <li><a href="#introduction" aria-label="Introduction"><span class="rail-title">Introduction</span></a></li>
+    <li><a href="#evidence" aria-label="The evidence"><span class="rail-title">The evidence</span></a></li>
+    <li><a href="#work" aria-label="Where I would plug in"><span class="rail-title">Where I&rsquo;d plug in</span></a></li>
+    <li><a href="#limits" aria-label="What I do not know yet"><span class="rail-title">What I don&rsquo;t know yet</span></a></li>
+    <li><a href="#ask" aria-label="The ask"><span class="rail-title">The ask</span></a></li>
+  </ol>
+</nav>
+
+<main>
+
+  <!-- ============ TITLE PAGE ============ -->
+  <section class="titlepage" id="top">
+    <div class="titlepage-hero">
+      <div class="dateline">November 12, 2026</div>
+      <div class="eyebrow">Internship application &middot; Spring 2027</div>
+      <h1>Owning Inference</h1>
+      <p class="thesis">A software engineering internship application to <em>Deepshard</em>, from a sophomore who would rather be useful than ready.</p>
+      <div class="byline">
+        <div>Ilyaas Kapadia &mdash; Computer Science, University of Cincinnati</div>
+        <div><a href="mailto:kapadiiy@mail.uc.edu">kapadiiy@mail.uc.edu</a> &middot; <a href="https://github.com/IlyaasK">github.com/IlyaasK</a></div>
+      </div>
+    </div>
+    <a class="readline" href="#introduction">Read the case</a>
+  </section>
+
+  <!-- ============ PART ONE ============ -->
+  <section class="part book" id="introduction" data-title="Introduction">
+    <header>
+      <span class="kicker">Part One</span>
+      <h2>Why I am writing this</h2>
+    </header>
+
+    <blockquote class="bigquote">
+      &ldquo;The Von Neumann bottleneck stops being a diagram in a textbook and becomes the thing standing between me and my next experiment.&rdquo;
+      <span class="attr">Why I keep coming back to this problem</span>
+    </blockquote>
+
+    <div class="prose">
+      <p class="lead">Hey Truffle Team,</p>
+      <p>I&rsquo;m Ilyaas Kapadia, a sophomore in computer science at the University of Cincinnati. I want to intern as a software engineer at Deepshard for Spring 2027. I want to learn, and I want to be useful.</p>
+      <p>Why Deepshard? Because when I train small RL policies I am often memory bound, and I feel the Von Neumann bottleneck every day &mdash; not as a lecture slide, but as the wall between me and the next run. Because I abuse ChatGPT&rsquo;s Browser Use. Because the agentic future is clear. Because models are getting smaller and more parallel, and the local future is clear. Truffle is the next step forward.</p>
+      <p>Because my grandparents got to see the transformation from vacuum tubes to the personal computer, and I get to see the same thing happen a second time, and it makes me so excited. I want to contribute to it. To get from time sharing to owning inference, <em>for all</em>. From the Nvidia Jetson on my desk to the Truffle Chip.</p>
+      <p>While my technical abilities may not be up to scratch yet: what I don&rsquo;t have in experience, I will make up for in hustle.</p>
+      <p>What follows is the evidence for that last sentence, then where I would plug in, then the parts of this I am still bad at. If you only read one of them, read the last one.</p>
+    </div>
+
+    <div class="sect">
+      <h3>The shape of the thing I want</h3>
+      <div class="prose">
+        <p>A computer in my house that runs an agent all night, on my electricity, with my weights, at a marginal cost near zero &mdash; and a chip underneath it that was designed for that job instead of borrowed from a datacenter. That is not a product pitch. It is the reason I read about KV caches and rooflines instead of watching television, and the reason I want to spend a spring semester in Los Angeles instead of applying to ten places with the same cover letter.</p>
+      </div>
+      <div class="asterism" aria-hidden="true">&lowast;&lowast;&lowast;</div>
+    </div>
+  </section>
+
+  <!-- ============ CHAPTER: THE EVIDENCE ============ -->
+  <section class="titlepage chapter-title">
+    <div class="titlepage-hero">
+      <div class="eyebrow">Part Two</div>
+      <h1>The Evidence</h1>
+      <p class="thesis">R&eacute;sum&eacute;s claim. This is a list of things that happened, with the numbers attached.</p>
+    </div>
+  </section>
+
+  <section class="part book" id="evidence" data-title="The Evidence">
+    <header>
+      <span class="kicker">Part Two</span>
+      <h2>What I have already done</h2>
+    </header>
+
+    <div class="prose">
+      <p>For an opportunity like this you will have a lot of candidates, and every one of them will tell you they work hard. So here is what I have shipped instead.</p>
+    </div>
+
+    <div class="sect">
+      <h3>$250,000, and the first line of code I ever wrote</h3>
+      <div class="prose">
+        <p>My first job ever was as a sales consultant, and I did not know how to sell. I still generated <strong>$250,000</strong> for that employer and was the top sales consultant for summer 2024&ndash;25. Then I got tired of doing their data analysis by hand, so I wrote code to make it faster. That is where the CS journey started &mdash; not with a class, with an irritation.</p>
+      </div>
+    </div>
+
+    <div class="sect">
+      <h3>Kernel: API keys, Terraform, and smaller Chromium images</h3>
+      <div class="prose">
+        <p>My first software internship was at Kernel (YC S25), which runs browser infrastructure for agents. My first project there was implementing programmatic API key generation. From there I owned Kernel&rsquo;s Terraform provider, made their Chromium images smaller and faster to build, and worked on Kernel&rsquo;s MCP.</p>
+        <p>I also built a demo where I made an MCP server more efficient &mdash; which I could only do by reverse-engineering the API underneath it. That was the most fun I had all summer, and it is why I would love to help Abdullah build DevEx.</p>
+      </div>
+
+      <div class="table-scroll">
+        <table class="worked">
+          <thead>
+            <tr><th scope="col">Kernel, measured</th><th scope="col">Before &rarr; after</th><th scope="col">Source</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Server CI workflow</td><td>17m33s &rarr; 7m29s</td><td><a href="https://github.com/kernel/kernel-images/pull/299">PR&nbsp;#299</a></td></tr>
+            <tr><td>Chromium runtime images</td><td>&minus;366&nbsp;MB</td><td><a href="https://github.com/kernel/kernel-images/pull/274">PR&nbsp;#274</a></td></tr>
+            <tr><td>Headful cold build</td><td>347s &rarr; 268s</td><td><a href="https://github.com/kernel/kernel-images/pull/274">PR&nbsp;#274</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="sect">
+      <h3>Environments: training faster than the game it trains on</h3>
+      <div class="prose">
+        <p>After Kernel I wanted to understand pretraining, but RL pulled me in instead. I started with <a href="https://github.com/PufferAI/PufferLib">Pufferlib</a> and environment creation, and I fell in love with building environments and simulations &mdash; with making them fast enough that you train a policy in seconds instead of days. I built an LLM eval (<a href="https://ilya.as/nes-eval/">NES Eval</a>)<sup class="fn"><a href="#note-neseval">4</a></sup>. I am learning CUDA to push the training loops further.</p>
+      </div>
+    </div>
+
+    <div class="sect">
+      <h3>Brotato, in twelve hours</h3>
+      <div class="prose">
+        <p>Yesterday I joined a hackathon and reverse-engineered Brotato, a game my friends play, so I could build a policy for it. I took a game running on the Godot engine, stripped the engine out, reimplemented the simulation in C, and parallelized the physics and the contact solving in CUDA. Then I wrote a Godot mod that drives the real game headless and records it, so my simulator&rsquo;s frames can be checked against the game&rsquo;s frames.</p>
+        <p>Game training went from about 1,200 steps per second to roughly 1.8 million in my environment. The policy transfers into the simulator; getting it to survive in the real game is the part I have not solved, and frame exactness is still in progress.</p>
+      </div>
+
+      <figure class="fig-chart">
+        <div class="fighead">
+          <div class="figtitle">Steps per second, before and after</div>
+          <div class="figsubtitle">Brotato, log scale: the shipped game engine against the simulator I wrote for it</div>
+        </div>
+<div class="chart" role="img" aria-label="Log-scale bar chart. The Brotato game engine runs at about 1,200 steps per second; my C and CUDA simulator runs at about 1,800,000 environment steps per second, roughly 1,500 times faster.">
+          <div class="chart-row chart-row-muted">
+            <span class="chart-name">Brotato, as shipped</span>
+            <div class="chart-track" style="--end:2.3%">
+              <div class="chart-bar"></div>
+              <span class="chart-value chart-value-out">&#8776;1,200 steps/s</span>
+            </div>
+          </div>
+          <div class="chart-callout">&#8776;1,500&#215; faster</div>
+          <div class="chart-row chart-row-accent">
+            <span class="chart-name">My C + CUDA simulator</span>
+            <div class="chart-track" style="--end:93%">
+              <div class="chart-bar"><span class="chart-value chart-value-in">&#8776;1,800,000 env steps/s</span></div>
+            </div>
+          </div>
+          <div class="chart-axis" aria-hidden="true">
+            <span style="--p:0%"><i>1k</i></span>
+            <span style="--p:28.6%"><i>10k</i></span>
+            <span style="--p:57.1%"><i>100k</i></span>
+            <span style="--p:85.7%"><i>1M</i></span>
+          </div>
+          <div class="chart-axis-title">environment steps per second (logarithmic)</div>
+        </div>
+        <figcaption><b>Fig.&nbsp;1.</b> The retail game runs its Godot physics and scripting loop at roughly 1,200 steps/s. My reimplementation runs 4,096 environments on a single RTX 5070 at about 1.8M env steps/s.<sup class="fn"><a href="#note-brotato">1</a></sup> The CPU and CUDA builds of the simulator are bit-identical on every state field.</figcaption>
+      </figure>
+
+      <figure class="fig-video">
+        <video src="/brotato/demon_policy.mp4" controls muted loop playsinline preload="metadata"></video>
+        <figcaption><b>Fig.&nbsp;2.</b> A 1B-step Demon policy playing the simulator (<code>puffer eval</code>). It averages wave 3.08 and fills six weapon slots. The same weights die in wave 1 of the real game &mdash; which is the problem I am still on.</figcaption>
+      </figure>
+
+      <div class="prose">
+        <p>What I am proud of and what I have not solved, side by side, because both halves are the point:</p>
+      </div>
+
+      <div class="table-scroll">
+        <table class="worked">
+          <thead>
+            <tr><th scope="col">Brotato, measured</th><th scope="col">Result</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Action space and observation</td><td>31 actions, 203 values</td></tr>
+            <tr><td>CPU vs CUDA</td><td>bit-identical on every state field</td></tr>
+            <tr><td>Replayed game recording</td><td>matches frame for frame to tick 1,977 of 3,600</td></tr>
+            <tr><td>Policy, in the simulator</td><td>wave 3.08 over 257 episodes</td></tr>
+            <tr><td>Same policy, in the real game</td><td>dies in wave 1</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="sect">
+      <h3>Inference, on my own hardware</h3>
+      <div class="prose">
+        <p>I read <em>Inference Engineering</em> and helped create recipes for omarchy&rsquo;s local AI plugin based on my own GPU, because I wanted to know what my card can actually hold and how fast it can actually go.</p>
+        <p>On Thursday I am building a small robot with an upperclassman friend to validate my RL policy in the real world &mdash; partly because the policy in the original project was imitating a scripted bot and I knew pure RL could solve it, and partly because I want MechE and EE skills so I can learn from and help Dylan with firmware and inference, and Hy with embedded systems.</p>
+        <p>Which is why I would really like to speak to Matt about his work with what seems like post-training small LLMs. I am so curious to see what Truffle&rsquo;s dreaming is.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CHAPTER: WHERE I WOULD PLUG IN ============ -->
+  <section class="titlepage chapter-title">
+    <div class="titlepage-hero">
+      <div class="eyebrow">Part Three</div>
+      <h1>Where I Would Plug In</h1>
+      <p class="thesis">Four places I could be useful in week one, and who I would want to learn from while I am there.</p>
+    </div>
+  </section>
+
+  <section class="part book" id="work" data-title="Where I would plug in">
+    <header>
+      <span class="kicker">Part Three</span>
+      <h2>What I would take on</h2>
+    </header>
+
+    <div class="prose">
+      <p>I am not going to pretend I know your roadmap. Here is where my last year maps onto the parts of it that are visible from outside, and who I would want to learn from.</p>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <p class="card-who">With Abdullah</p>
+        <h3>DevEx and infrastructure</h3>
+        <p class="card-sub">I have owned a Terraform provider, cut a CI workflow in half, and shrunk container images. Give me the builds that make your team wait.</p>
+      </div>
+      <div class="card">
+        <p class="card-who">With Matt</p>
+        <h3>Post-training small models</h3>
+        <p class="card-sub">I build environments, run evals, and read my own losses for a living. I want to learn what post-training at this scale actually looks like.</p>
+      </div>
+      <div class="card">
+        <p class="card-who">With Dylan</p>
+        <h3>Firmware and inference</h3>
+        <p class="card-sub">I am learning CUDA and MechE for exactly this, and I will take the unglamorous half of it without being asked twice.</p>
+      </div>
+      <div class="card">
+        <p class="card-who">With Hy</p>
+        <h3>Embedded systems</h3>
+        <p class="card-sub">I got pulled into all of this by trying to run policies on an Nvidia Jetson. I am happy to live at the bottom of the stack.</p>
+      </div>
+    </div>
+
+    <div class="prose" style="margin-top:2.6em">
+      <p>And if there is space on the chip itself: I want to see what &ldquo;from the Jetson to the Truffle Chip&rdquo; looks like in silicon, up close.</p>
+    </div>
+  </section>
+
+  <!-- ============ CHAPTER: WHAT I DON'T KNOW ============ -->
+  <section class="titlepage chapter-title">
+    <div class="titlepage-hero">
+      <div class="eyebrow">Part Four</div>
+      <h1>What I Don&rsquo;t Know Yet</h1>
+      <p class="thesis">Read this part before the rest. I would rather hand you this list myself than have you find out in an interview.</p>
+    </div>
+  </section>
+
+  <section class="part book" id="limits" data-title="What I do not know yet">
+    <header>
+      <span class="kicker">Part Four</span>
+      <h2>Where I am weak</h2>
+    </header>
+
+    <div class="prose">
+      <p>None of this is a reason to hire me. It is the list of things I intend to be better at in twelve months, and I would rather get better at them at Deepshard than anywhere else.</p>
+    </div>
+
+    <div class="sect" style="margin-top:2.4em">
+      <h3>CUDA</h3>
+      <div class="prose">
+        <p>I have started. Parallel physics in a game simulator is the most complicated thing I have written, and I got there by reading and breaking things rather than by being taught. I cannot yet look at a kernel and tell you why it is slow without a profiler open.</p>
+      </div>
+    </div>
+
+    <div class="sect">
+      <h3>Frame exactness</h3>
+      <div class="prose">
+        <p>In progress. My simulator matches the recordings I have for a few thousand ticks; it does not match everything, and until it does I cannot fully trust the training signal.</p>
+      </div>
+    </div>
+
+    <div class="sect">
+      <h3>Sim to real</h3>
+      <div class="prose">
+        <p>Not solved. My Brotato policy averages wave 3.08 in my simulator and dies in wave 1 of the real game. The robot project is partly me forcing myself to face that gap with hardware instead of more evaluation runs.</p>
+      </div>
+    </div>
+
+    <div class="sect">
+      <h3>Pretraining, and scale</h3>
+      <div class="prose">
+        <p>I have never pretrained a model. I have read a lot about it and I have opinions, which is not the same thing. I have worked on one production codebase, Kernel&rsquo;s, for a few months. I have never carried a system through years of change.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CHAPTER: THE ASK ============ -->
+  <section class="titlepage chapter-title">
+    <div class="titlepage-hero">
+      <div class="eyebrow">Part Five</div>
+      <h1>Los Angeles, Spring 2027</h1>
+      <p class="thesis">I am ready to relocate. I would rather build this than apply anywhere else.</p>
+    </div>
+  </section>
+
+  <section class="part book" id="ask" data-title="The ask">
+    <header>
+      <span class="kicker">Part Five</span>
+      <h2>The ask</h2>
+    </header>
+
+    <figure class="note-paper">
+      <div class="note-head">
+        <div class="note-date">November 12, 2026</div>
+        <p class="note-title">For the Truffle Team</p>
+      </div>
+      <p>For an opportunity as good as this, I know you have multiple candidates. If you just give me a shot, I promise I will work harder than any other candidate to learn and be useful to you.</p>
+      <p>I am ready to relocate to Los Angeles for the internship. I would love your feedback even if you don&rsquo;t think I am internship ready just yet &mdash; a list of what to fix is worth more to me than a no.</p>
+      <p class="note-sign">Best,<br>Ilyaas</p>
+    </figure>
+
+    <div class="prose">
+      <p>I have attached my r&eacute;sum&eacute; and my GitHub below. If it would help, I am happy to reproduce any of the numbers on this page in front of you, from a clean checkout, on my own machine or yours.</p>
+    </div>
+
+    <div class="asterism" aria-hidden="true">&lowast;&lowast;&lowast;</div>
+
+    <div class="prose">
+      <p>
+        <strong>Email</strong> <a href="mailto:kapadiiy@mail.uc.edu">kapadiiy@mail.uc.edu</a><br>
+        <strong>GitHub</strong> <a href="https://github.com/IlyaasK">github.com/IlyaasK</a><br>
+        <strong>R&eacute;sum&eacute;</strong> <a href="/resume">ilya.as/resume</a><br>
+        <strong>Everything else</strong> <a href="/">ilya.as</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ ENDNOTES ============ -->
+  <section class="endnotes book" id="endnotes">
+    <div class="label">Endnotes</div>
+    <ol>
+      <li id="note-brotato">Brotato RL: the simulator, the Godot recording mod, and these numbers are documented at <a href="https://ilya.as/brotato/">ilya.as/brotato</a>, and the code is at <a href="https://github.com/IlyaasK/brotato-rl">github.com/IlyaasK/brotato-rl</a>. Training used <a href="https://github.com/PufferAI/PufferLib">PufferLib 5</a>.</li>
+      <li id="note-ci">The CI and image numbers are guarded by Kernel&rsquo;s own pull requests: <a href="https://github.com/kernel/kernel-images/pull/299">kernel-images#299</a> and <a href="https://github.com/kernel/kernel-images/pull/274">kernel-images#274</a>.</li>
+      <li id="note-terraform">Kernel&rsquo;s browser infrastructure as code: <a href="https://github.com/kernel/terraform-provider-kernel">github.com/kernel/terraform-provider-kernel</a>.</li>
+      <li id="note-neseval">NES Eval, a benchmark that gives coding agents 24 hours to write an NES emulator, graded frame by frame: <a href="https://ilya.as/nes-eval/">ilya.as/nes-eval</a>.</li>
+      <li id="note-resume">R&eacute;sum&eacute;: <a href="/resume">ilya.as/resume</a>. Code: <a href="https://github.com/IlyaasK">github.com/IlyaasK</a>.</li>
+    </ol>
+  </section>
+
+  <div class="endmark book">
+    <div class="endmark-nav">
+      <a href="#top">Back to the top</a>
+      <a href="mailto:kapadiiy@mail.uc.edu">kapadiiy@mail.uc.edu</a>
+      <a href="/">ilya.as</a>
+    </div>
+  </div>
+
+</main>
+
+<script>
+(function(){
+  var bar=document.getElementById('progress'),
+      rail=document.getElementById('rail'),
+      parts=[].slice.call(document.querySelectorAll('section[data-title]')),
+      items=[].slice.call(document.querySelectorAll('#rail li')),
+      titlepages=[].slice.call(document.querySelectorAll('section.titlepage')),
+      root=document.documentElement,
+      queued=false;
+
+  function update(){
+    queued=false;
+    var y=window.scrollY||root.scrollTop||0,
+        max=root.scrollHeight-window.innerHeight,
+        mid=window.innerHeight*0.42,
+        active=-1, i, r;
+
+    bar.style.transform='scaleX('+(max>0?Math.min(y/max,1):0)+')';
+
+    for(i=0;i<parts.length;i++){
+      r=parts[i].getBoundingClientRect();
+      if(r.top<=mid&&r.bottom>mid){active=i;}
+    }
+    for(i=0;i<items.length;i++){
+      items[i].classList.toggle('here',i===active);
+    }
+
+    var dark=false;
+    for(i=0;i<titlepages.length;i++){
+      r=titlepages[i].getBoundingClientRect();
+      if(r.top<=22&&r.bottom>=22){dark=true;break;}
+    }
+    root.classList.toggle('on-dark',dark);
+    rail.classList.toggle('show',y>window.innerHeight*0.6);
+  }
+
+  function onScroll(){
+    if(!queued){queued=true;requestAnimationFrame(update);}
+  }
+
+  window.addEventListener('scroll',onScroll,{passive:true});
+  window.addEventListener('resize',onScroll);
+  update();
+})();
+</script>
+</body>
+</html>
