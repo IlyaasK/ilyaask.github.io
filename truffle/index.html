@@ -2,16 +2,16 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Owning Inference — Ilyaas Kapadia, Spring 2027 application to Deepshard</title>
+<title>Ilyaas Kapadia — Spring 2027 application to Deepshard</title>
 <meta name="description" content="A Spring 2027 software engineering internship application to Deepshard: why I want to build the local AI computer, what I have shipped so far, and what I am still bad at.">
 <link rel="canonical" href="https://ilya.as/truffle/">
 <meta name="theme-color" content="#000000">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Owning Inference">
+<meta property="og:title" content="Ilyaas Kapadia — Spring 2027 application to Deepshard">
 <meta property="og:description" content="A Spring 2027 software engineering internship application to Deepshard.">
 <meta property="og:url" content="https://ilya.as/truffle/">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Owning Inference">
+<meta name="twitter:title" content="Ilyaas Kapadia — Spring 2027 application to Deepshard">
 <meta name="twitter:description" content="A Spring 2027 software engineering internship application to Deepshard.">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -46,7 +46,6 @@ p{margin:0 0 1em; text-align:left;}
 a{color:inherit; text-decoration:none;}
 .prose a{text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:3px; text-decoration-color:var(--ink-soft); transition:text-decoration-color .2s ease;}
 .prose a:hover{text-decoration-color:var(--ink);}
-.sc{text-transform:uppercase; letter-spacing:.14em; font-size:.82em;}
 strong,b{font-weight:500;}
 code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.88em; background:var(--wash); padding:.1em .35em; border-radius:3px;}
 sup.fn{font-size:.6em; line-height:0; vertical-align:super;}
@@ -120,7 +119,7 @@ section.titlepage.chapter-title{margin-top:clamp(6rem, 20vh, 12rem);}
   padding-left:max(40px, env(safe-area-inset-left,0px)); padding-right:max(40px, env(safe-area-inset-right,0px));
   display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1; min-height:0;
 }
-.titlepage .eyebrow{text-transform:uppercase; letter-spacing:.26em; font-size:13px; color:var(--titlepage-ink-soft); margin:0 0 1.35em;}
+.titlepage .eyebrow{font-family:var(--sans); font-weight:400; text-transform:uppercase; letter-spacing:.26em; font-size:13px; line-height:1.4; color:var(--titlepage-ink-soft); margin:0 0 1.35em;}
 .titlepage h1{
   font-family:var(--display); font-weight:200; font-size:clamp(1.6em, 4.4vw, 2.3em);
   line-height:1.2; letter-spacing:.04em; margin:.15em 0 0; color:var(--titlepage-ink);
@@ -141,23 +140,13 @@ section.part{margin-top:clamp(5rem, 13vh, 9rem); padding-top:clamp(2rem, 5vh, 3.
 .part > header .kicker{display:block; text-transform:uppercase; letter-spacing:.24em; font-size:12px; color:var(--ink-soft); margin-bottom:.9em;}
 .part > header h2{font-weight:400; font-size:.82em; letter-spacing:.18em; text-transform:uppercase; line-height:1.35; margin:0; text-wrap:balance;}
 .sect{margin-top:3.2em;}
-.sect > h3,.sect > h4{
+.sect > h3{
   font-weight:500; font-size:1.02em; letter-spacing:.03em; line-height:1.35;
   margin:0 0 1em; padding-top:1.5em; border-top:1px solid var(--rule);
 }
-.part .sect:not(:first-of-type) > h3,.part .sect:not(:first-of-type) > h4{margin-top:3.8em;}
-.prose > p.callline:first-child{font-weight:500; font-size:1.02em; letter-spacing:.03em; padding-top:1.5em; border-top:1px solid var(--rule);}
-.part .sect:not(:first-of-type) .prose > p.callline:first-child{margin-top:3.8em;}
+.part .sect:not(:first-of-type) > h3{margin-top:3.8em;}
 .asterism{text-align:center; letter-spacing:1.1em; padding-left:1.1em; margin:2.6em 0; color:var(--ink-soft);}
 .prose > *:last-child{margin-bottom:0;}
-.lead{font-size:1.06em;}
-
-/* ---- pull quote ---- */
-blockquote.bigquote{
-  margin:2.1em 0; padding-left:1em; border-left:1px solid var(--ink);
-  font-style:italic; font-size:1.02em; line-height:1.65;
-}
-blockquote.bigquote .attr{display:block; margin-top:.8em; font-style:normal; font-size:.72em; text-transform:uppercase; letter-spacing:.16em; color:var(--ink-soft);}
 
 /* ---- figures ---- */
 figure{margin:3.1em 0 2.8em;}
@@ -268,12 +257,11 @@ figure.note-paper figcaption{margin-top:1.4em; text-align:center;}
 <div id="progress" aria-hidden="true"></div>
 
 <header id="book-nav">
-  <a class="book-nav-home" href="#top">Owning Inference</a>
+  <a class="book-nav-home" href="#top">Ilyaas Kapadia</a>
   <nav class="book-nav-links" aria-label="Sections">
     <a href="#introduction">Introduction</a>
     <a href="#evidence">Evidence</a>
     <a href="#work">Where I&rsquo;d plug in</a>
-    <a href="#limits">What I don&rsquo;t know</a>
     <a href="#ask">The ask</a>
   </nav>
   <a class="book-nav-cta" href="mailto:kapadiiy@mail.uc.edu">Email me</a>
@@ -284,7 +272,6 @@ figure.note-paper figcaption{margin-top:1.4em; text-align:center;}
     <li><a href="#introduction" aria-label="Introduction"><span class="rail-title">Introduction</span></a></li>
     <li><a href="#evidence" aria-label="The evidence"><span class="rail-title">The evidence</span></a></li>
     <li><a href="#work" aria-label="Where I would plug in"><span class="rail-title">Where I&rsquo;d plug in</span></a></li>
-    <li><a href="#limits" aria-label="What I do not know yet"><span class="rail-title">What I don&rsquo;t know yet</span></a></li>
     <li><a href="#ask" aria-label="The ask"><span class="rail-title">The ask</span></a></li>
   </ol>
 </nav>
@@ -295,8 +282,7 @@ figure.note-paper figcaption{margin-top:1.4em; text-align:center;}
   <section class="titlepage" id="top">
     <div class="titlepage-hero">
       <div class="dateline">November 12, 2026</div>
-      <div class="eyebrow">Internship application &middot; Spring 2027</div>
-      <h1>Owning Inference</h1>
+      <h1 class="eyebrow">Deepshard &middot; Spring 2027</h1>
       <p class="thesis">A software engineering internship application to <em>Deepshard</em>, from a sophomore who would rather be useful than ready.</p>
       <div class="byline">
         <div>Ilyaas Kapadia &mdash; Computer Science, University of Cincinnati</div>
@@ -313,26 +299,12 @@ figure.note-paper figcaption{margin-top:1.4em; text-align:center;}
       <h2>Why I am writing this</h2>
     </header>
 
-    <blockquote class="bigquote">
-      &ldquo;The Von Neumann bottleneck stops being a diagram in a textbook and becomes the thing standing between me and my next experiment.&rdquo;
-      <span class="attr">Why I keep coming back to this problem</span>
-    </blockquote>
-
     <div class="prose">
-      <p class="lead">Hey Truffle Team,</p>
       <p>I&rsquo;m Ilyaas Kapadia, a sophomore in computer science at the University of Cincinnati. I want to intern as a software engineer at Deepshard for Spring 2027. I want to learn, and I want to be useful.</p>
       <p>Why Deepshard? Because when I train small RL policies I am often memory bound, and I feel the Von Neumann bottleneck every day &mdash; not as a lecture slide, but as the wall between me and the next run. Because I abuse ChatGPT&rsquo;s Browser Use. Because the agentic future is clear. Because models are getting smaller and more parallel, and the local future is clear. Truffle is the next step forward.</p>
       <p>Because my grandparents got to see the transformation from vacuum tubes to the personal computer, and I get to see the same thing happen a second time, and it makes me so excited. I want to contribute to it. To get from time sharing to owning inference, <em>for all</em>. From the Nvidia Jetson on my desk to the Truffle Chip.</p>
       <p>While my technical abilities may not be up to scratch yet: what I don&rsquo;t have in experience, I will make up for in hustle.</p>
-      <p>What follows is the evidence for that last sentence, then where I would plug in, then the parts of this I am still bad at. If you only read one of them, read the last one.</p>
-    </div>
-
-    <div class="sect">
-      <h3>The shape of the thing I want</h3>
-      <div class="prose">
-        <p>A computer in my house that runs an agent all night, on my electricity, with my weights, at a marginal cost near zero &mdash; and a chip underneath it that was designed for that job instead of borrowed from a datacenter. That is not a product pitch. It is the reason I read about KV caches and rooflines instead of watching television, and the reason I want to spend a spring semester in Los Angeles instead of applying to ten places with the same cover letter.</p>
-      </div>
-      <div class="asterism" aria-hidden="true">&lowast;&lowast;&lowast;</div>
+      <p>What follows is the evidence for that last sentence, then where I would plug in, then the ask.</p>
     </div>
   </section>
 
@@ -393,7 +365,7 @@ figure.note-paper figcaption{margin-top:1.4em; text-align:center;}
     <div class="sect">
       <h3>Brotato, in twelve hours</h3>
       <div class="prose">
-        <p>Yesterday I joined a hackathon and reverse-engineered Brotato, a game my friends play, so I could build a policy for it. I took a game running on the Godot engine, stripped the engine out, reimplemented the simulation in C, and parallelized the physics and the contact solving in CUDA. Then I wrote a Godot mod that drives the real game headless and records it, so my simulator&rsquo;s frames can be checked against the game&rsquo;s frames.</p>
+        <p>Last week I joined a hackathon and reverse-engineered Brotato, a game my friends play, so I could build a policy for it. I took a game running on the Godot engine, stripped the engine out, reimplemented the simulation in C, and parallelized the physics and the contact solving in CUDA. Then I wrote a Godot mod that drives the real game headless and records it, so my simulator&rsquo;s frames can be checked against the game&rsquo;s frames.</p>
         <p>Game training went from about 1,200 steps per second to roughly 1.8 million in my environment. The policy transfers into the simulator; getting it to survive in the real game is the part I have not solved, and frame exactness is still in progress.</p>
       </div>
 
@@ -501,7 +473,7 @@ figure.note-paper figcaption{margin-top:1.4em; text-align:center;}
       <div class="card">
         <p class="card-who">With Hy</p>
         <h3>Embedded systems</h3>
-        <p class="card-sub">I got pulled into all of this by trying to run policies on an Nvidia Jetson. I am happy to live at the bottom of the stack.</p>
+        <p class="card-sub">I am happy to live at the bottom of the stack.</p>
       </div>
     </div>
 
@@ -510,58 +482,10 @@ figure.note-paper figcaption{margin-top:1.4em; text-align:center;}
     </div>
   </section>
 
-  <!-- ============ CHAPTER: WHAT I DON'T KNOW ============ -->
-  <section class="titlepage chapter-title">
-    <div class="titlepage-hero">
-      <div class="eyebrow">Part Four</div>
-      <h1>What I Don&rsquo;t Know Yet</h1>
-      <p class="thesis">Read this part before the rest. I would rather hand you this list myself than have you find out in an interview.</p>
-    </div>
-  </section>
-
-  <section class="part book" id="limits" data-title="What I do not know yet">
-    <header>
-      <span class="kicker">Part Four</span>
-      <h2>Where I am weak</h2>
-    </header>
-
-    <div class="prose">
-      <p>None of this is a reason to hire me. It is the list of things I intend to be better at in twelve months, and I would rather get better at them at Deepshard than anywhere else.</p>
-    </div>
-
-    <div class="sect" style="margin-top:2.4em">
-      <h3>CUDA</h3>
-      <div class="prose">
-        <p>I have started. Parallel physics in a game simulator is the most complicated thing I have written, and I got there by reading and breaking things rather than by being taught. I cannot yet look at a kernel and tell you why it is slow without a profiler open.</p>
-      </div>
-    </div>
-
-    <div class="sect">
-      <h3>Frame exactness</h3>
-      <div class="prose">
-        <p>In progress. My simulator matches the recordings I have for a few thousand ticks; it does not match everything, and until it does I cannot fully trust the training signal.</p>
-      </div>
-    </div>
-
-    <div class="sect">
-      <h3>Sim to real</h3>
-      <div class="prose">
-        <p>Not solved. My Brotato policy averages wave 3.08 in my simulator and dies in wave 1 of the real game. The robot project is partly me forcing myself to face that gap with hardware instead of more evaluation runs.</p>
-      </div>
-    </div>
-
-    <div class="sect">
-      <h3>Pretraining, and scale</h3>
-      <div class="prose">
-        <p>I have never pretrained a model. I have read a lot about it and I have opinions, which is not the same thing. I have worked on one production codebase, Kernel&rsquo;s, for a few months. I have never carried a system through years of change.</p>
-      </div>
-    </div>
-  </section>
-
   <!-- ============ CHAPTER: THE ASK ============ -->
   <section class="titlepage chapter-title">
     <div class="titlepage-hero">
-      <div class="eyebrow">Part Five</div>
+      <div class="eyebrow">Part Four</div>
       <h1>Los Angeles, Spring 2027</h1>
       <p class="thesis">I am ready to relocate. I would rather build this than apply anywhere else.</p>
     </div>
@@ -569,7 +493,7 @@ figure.note-paper figcaption{margin-top:1.4em; text-align:center;}
 
   <section class="part book" id="ask" data-title="The ask">
     <header>
-      <span class="kicker">Part Five</span>
+      <span class="kicker">Part Four</span>
       <h2>The ask</h2>
     </header>
 
