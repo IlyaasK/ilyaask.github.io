@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>FPV — a scroll-driven flight | Ilyaas Kapadia</title>
+<meta name="description" content="Prototype: a first-person camera flying a heightfield, banking with your scroll velocity. Roll, dolly and speed warp, no dependencies.">
+<link rel="canonical" href="https://ilya.as/fpv/">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<style>
+:root{
+  --speed: 0;      /* 0..1 throttle, written by the render loop */
+  --roll: 0deg;    /* signed bank angle */
+  --ink: #eef1f8;
+  --dim: rgba(238,241,248,.62);
+  --line: rgba(238,241,248,.16);
+}
+*,*::before,*::after{box-sizing:border-box;}
+html{background:#07080f; scrollbar-gutter:stable;}
+body{
+  margin:0; color:var(--ink); background:transparent;
+  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:16px; line-height:1.7; -webkit-font-smoothing:antialiased;
+}
+#world{position:fixed; inset:0; z-index:0; display:block; width:100%; height:100%;}
+
+/* FPV lens: dark, streaked edges. Both sit above the world, below the text. */
+.vignette{
+  position:fixed; inset:0; z-index:1; pointer-events:none;
+  background:radial-gradient(130% 80% at 50% 44%, rgba(4,6,14,0) 32%, rgba(4,6,14,.2) 64%, rgba(4,6,14,.58) 100%);
+}
+.warp{
+  position:fixed; inset:0; z-index:1; pointer-events:none;
+  opacity:calc(var(--speed) * .3);
+  background:repeating-conic-gradient(from 0deg at 50% 46%,
+    rgba(255,255,255,0) 0 2.5deg, rgba(255,255,255,.42) 2.5deg 2.8deg);
+  -webkit-mask-image:radial-gradient(closest-side at 50% 46%, transparent 40%, #000 82%);
+  mask-image:radial-gradient(closest-side at 50% 46%, transparent 40%, #000 82%);
+  transform:scale(calc(1 + var(--speed) * .09));
+}
+/* keeps the words readable without hiding the fact that you are moving */
+.scrim{
+  position:fixed; inset:0; z-index:2; pointer-events:none;
+  background:radial-gradient(44% 38% at 50% 50%, rgba(6,8,16,.72) 0%, rgba(6,8,16,.42) 62%, rgba(6,8,16,0) 100%);
+}
+
+.hud{
+  position:fixed; left:max(18px, env(safe-area-inset-left,0px)); bottom:16px; z-index:3;
+  display:flex; gap:14px; pointer-events:none;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:11px;
+  letter-spacing:.12em; text-transform:uppercase;
+  color:rgba(238,241,248,.5);
+  opacity:calc(.45 + var(--speed) * .55);
+}
+.hud b{font-weight:400; color:var(--ink);}
+/* on a phone the readout would sit on top of the words */
+@media (max-width:700px){ .hud{display:none;} }
+
+.book{
+  position:relative; z-index:3;
+  max-width:34em; margin:0 auto;
+  padding:max(60px,9vh) max(20px, env(safe-area-inset-right,0px)) 30vh max(20px, env(safe-area-inset-left,0px));
+}
+section{min-height:78vh; display:flex; flex-direction:column; justify-content:center;}
+h1{
+  font-size:clamp(2.6em,9vw,4.4em); font-weight:200; letter-spacing:-.01em;
+  line-height:1; margin:0 0 .5em;
+}
+h2{font-size:.8em; font-weight:400; text-transform:uppercase; letter-spacing:.2em; color:var(--dim); margin:0 0 1.2em;}
+p{margin:0 0 1.1em;}
+a{color:inherit; text-decoration:underline; text-decoration-color:var(--line); text-underline-offset:4px;}
+a:hover{text-decoration-color:var(--ink);}
+.lede{font-size:1.12em; color:var(--dim);}
+.hint{
+  position:absolute; left:0; right:0; bottom:0; text-align:center;
+  font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:rgba(238,241,248,.45);
+}
+.tail{font-size:.86em; color:var(--dim); border-top:1px solid var(--line); padding-top:1.4em;}
+@media (prefers-reduced-motion: reduce){
+  .warp{display:none;}
+  .hud{opacity:.45;}
+}
+</style>
+</head>
+<body>
+
+<canvas id="world" aria-hidden="true"></canvas>
+<div class="vignette" aria-hidden="true"></div>
+<div class="warp" aria-hidden="true"></div>
+<div class="scrim" aria-hidden="true"></div>
+<div class="hud" aria-hidden="true"><span>roll <b id="hud-roll">0.0&deg;</b></span><span>throttle <b id="hud-speed">0%</b></span></div>
+
+<main class="book">
+
+  <section>
+    <h1>FPV</h1>
+    <p class="lede">A first-person camera flying a heightfield, banking with your scroll velocity. Roll, dolly, and warp &mdash; no dependencies, no assets, all of it arithmetic in one canvas.</p>
+    <p class="hint">Scroll to fly</p>
+  </section>
+
+  <section>
+    <h2>What you are inside of</h2>
+    <p>A heightfield, a camera seven units above it, and a line that winds through the hills. Scroll position is distance travelled. Scroll velocity is bank angle, throttle, and the length of the streaks.</p>
+    <p>The grid runs from three units in front of the lens to four hundred and sixty out, spaced logarithmically, so the ground keeps detail as it rushes past instead of collapsing into one flat band near the horizon.</p>
+  </section>
+
+  <section>
+    <h2>Why the horizon is the whole trick</h2>
+    <p>Roll is what a body reads as flight. A camera leaning around its own forward axis drags the horizon with it, and everything else follows: yaw tracks the line, pitch stays level, and the sky gradient tilts at half the roll so it never looks painted onto the screen.</p>
+    <p>The shake is in the camera, not the page. Yaw and altitude take a small random walk proportional to throttle &mdash; the vibration you feel in your hands on a real descent.</p>
+  </section>
+
+  <section>
+    <h2>What the last attempt got wrong</h2>
+    <p>It sheared the text column sideways with a skew. Horizontal lines stayed perfectly level, so the page read as warped paper rather than motion &mdash; you cannot bank a paragraph. A camera has to be inside a scene, and text does not have an inside.</p>
+    <p>So the words stay absolutely still here, and the world moves behind them.</p>
+  </section>
+
+  <section>
+    <h2>Where this could go</h2>
+    <p>Behind the homepage as a hero, as the backdrop of a project page with a live demo, or as the whole site with the text riding in front of it. The terrain, the line, and the palette are one function each, so a different hill is one edit.</p>
+    <p class="tail">
+      <a href="/">ilya.as</a> &middot;
+      <a href="mailto:kapadiiy@mail.uc.edu">kapadiiy@mail.uc.edu</a> &middot;
+      <a href="https://github.com/IlyaasK">github.com/IlyaasK</a>
+    </p>
+  </section>
+
+</main>
+
+<script>
+(function () {
+  var cv = document.getElementById('world');
+  var ctx = cv.getContext('2d', { alpha: false });
+  var root = document.documentElement;
+  var hudRoll = document.getElementById('hud-roll');
+  var hudSpeed = document.getElementById('hud-speed');
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  /* ---- the world ---- */
+  var SPAN = 3000;                 // world units travelled across the whole page
+  var NEAR = 3, FAR = 460;         // row spacing in depth
+  var CULL = 2.5;                  // draw plane: closer than this, quads project to garbage
+  var ROWS = 30, COLS = 15;        // resolution of the ground mesh
+  var LEVEL = 7;                   // how high the camera floats over the floor
+  var IDLE = 4;                    // units/s of hover when you are not scrolling
+  var MAXROLL = 24;                // degrees of bank at full throttle
+  var MAXSHAKE = 0.9;              // camera vibration in world units
+
+  var W = 0, H = 0, F = 0, sky = null;
+  var camZ = 0, hover = 0;
+  var x = 0, vx = 0;               // suspension state, in px per nominal frame
+
+  /* the walls: hills that only exist away from the line, so the valley floor
+     stays open in front of the lens and there is always somewhere to fly */
+  function wall(px, pz) {
+    return 26 * Math.sin(px * 0.0058 + 0.7)
+         + 15 * Math.sin(pz * 0.0061 + 1.9)
+         + 11 * Math.sin((px * 0.5 + pz * 0.9) * 0.014);
+  }
+  function blend(px, pz) {
+    var lat = Math.abs(px - lineX(pz));
+    var m = Math.min(Math.max((lat - 26) / 120, 0), 1);
+    return m * m * (3 - 2 * m);            // 0 on the floor, 1 out on the walls
+  }
+  function ripples(px, pz) {
+    return 5.5 * Math.cos(px * 0.026 - pz * 0.02)
+         + 3.2 * Math.sin(px * 0.071 + pz * 0.055)
+         + 1.7 * Math.sin(pz * 0.14 + 1.1)
+         + 1.1 * Math.sin(px * 0.19 - pz * 0.11);
+  }
+  function ground(px, pz) {
+    var m = blend(px, pz);
+    return wall(px, pz) * m + ripples(px, pz) * (0.3 + 0.7 * m);
+  }
+  function floorY(pz) { return ground(lineX(pz), pz); }
+  function lineX(pz)  { return 95 * Math.sin(pz * 0.0011) + 38 * Math.sin(pz * 0.0037 + 0.4); }
+  function lineDX(pz) { return 95 * 0.0011 * Math.cos(pz * 0.0011) + 38 * 0.0037 * Math.cos(pz * 0.0037 + 0.4); }
+
+  /* ---- camera ---- */
+  var cam = { x: 0, y: 0, z: 0, cs: 1, ss: 0, cr: 1, sr: 0 };
+
+  function resize() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = cv.clientWidth; H = cv.clientHeight;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    F = H * 1.25;
+    sky = null;
+  }
+
+  /* world point -> screen. returns false when the point is behind the lens */
+  var out = { x: 0, y: 0, z: 0 };
+  function project(px, py, pz) {
+    var dx = px - cam.x, dy = py - cam.y, dz = pz - cam.z;
+    var X1 = dx * cam.cs - dz * cam.ss;
+    var Z1 = dx * cam.ss + dz * cam.cs;
+    if (Z1 < CULL) return false;   // a quad straddling the lens fills the whole screen
+    var Y1 = dy;
+    var X2 = X1 * cam.cr - Y1 * cam.sr;
+    var Y2 = X1 * cam.sr + Y1 * cam.cr;
+    out.x = W * 0.5 + (X2 / Z1) * F;
+    out.y = H * 0.56 - (Y2 / Z1) * F;
+    out.z = Z1;
+    return true;
+  }
+
+  function drawSky(roll) {
+    if (!sky) {
+      sky = ctx.createLinearGradient(0, -H * 0.3, 0, H * 0.82);
+      sky.addColorStop(0, '#070a18');
+      sky.addColorStop(0.46, '#131a38');
+      sky.addColorStop(0.66, '#31295c');
+      sky.addColorStop(0.82, '#6d4468');
+      sky.addColorStop(1, '#9a5a5c');
+    }
+    ctx.save();
+    // the sky band tilts at half the roll: the horizon stops looking painted on
+    ctx.translate(W * 0.5, H * 0.5); ctx.rotate(-roll * 0.5); ctx.translate(-W * 0.5, -H * 0.5);
+    ctx.fillStyle = sky;
+    ctx.fillRect(-W * 0.4, -H * 0.4, W * 1.8, H * 1.9);
+    ctx.restore();
+  }
+
+  function drawGround() {
+    var pts = new Array(ROWS * COLS);
+    var ok = new Array(ROWS * COLS);
+    var i, j, d, z, bx, u, px, py, k;
+
+    for (i = 0; i < ROWS; i++) {
+      d = NEAR * Math.pow(FAR / NEAR, i / (ROWS - 1));
+      z = camZ + d;
+      // the strip widens with depth so the far ground always reaches both edges
+      var half = (d + 8) * 0.85;
+      bx = cam.x;
+      for (j = 0; j < COLS; j++) {
+        u = -half + (2 * half) * (j / (COLS - 1));
+        px = bx + u; py = ground(px, z);
+        k = i * COLS + j;
+        ok[k] = project(px, py, z);
+        pts[k] = { x: out.x, y: out.y, z: out.z, h: py, w: px };
+      }
+    }
+
+    // far to near: the near ground paints over the far ground
+    for (i = ROWS - 2; i >= 0; i--) {
+      for (j = 0; j < COLS - 1; j++) {
+        var a = i * COLS + j, b = a + 1, c = a + COLS + 1, e = a + COLS;
+        if (!ok[a] || !ok[b] || !ok[c] || !ok[e]) continue;
+        if (pts[a].y > H + 24 && pts[b].y > H + 24 && pts[c].y > H + 24 && pts[e].y > H + 24) continue;
+        var depth = (pts[a].z + pts[b].z + pts[c].z + pts[e].z) * 0.25;
+        var t = Math.min(depth / FAR, 1);
+        // a light hanging to the left and behind: the flank of every hill shows
+        var dz = Math.max(pts[e].z - pts[a].z, 0.5);
+        var dxw = pts[b].w - pts[a].w;
+        var gx = dxw !== 0 ? (pts[b].h - pts[a].h) / dxw : 0;
+        var gz = (pts[e].h - pts[a].h) / dz;
+        var shade = Math.max(0, Math.min(1, 0.5 - gx * 1.5 - gz * 0.7));
+        var height = (pts[a].h + pts[b].h + pts[c].h + pts[e].h) * 0.25;
+        var lit = Math.max(0, Math.min(1, (height + 14) / 48)) * 0.55 + shade * 0.45;
+        var r = 21 + lit * 96, g = 22 + lit * 88, bl = 27 + lit * 74;
+        var f = Math.pow(t, 1.3);
+        r = r + (74 - r) * f; g = g + (56 - g) * f; bl = bl + (94 - bl) * f;
+
+        ctx.beginPath();
+        ctx.moveTo(pts[a].x, pts[a].y);
+        ctx.lineTo(pts[b].x, pts[b].y);
+        ctx.lineTo(pts[c].x, pts[c].y);
+        ctx.lineTo(pts[e].x, pts[e].y);
+        ctx.closePath();
+        ctx.fillStyle = ctx.strokeStyle = 'rgb(' + (r | 0) + ',' + (g | 0) + ',' + (bl | 0) + ')';
+        ctx.fill();
+        ctx.stroke();   // seals the anti-aliasing seams between quads
+      }
+    }
+  }
+
+  /* fence posts pinned to the world: the visceral part of the speed */
+  function drawPosts() {
+    var step = 24, first = Math.floor((camZ + 5) / step), last = Math.floor((camZ + FAR) / step);
+    ctx.lineWidth = 1;
+    for (var i = first; i <= last; i++) {
+      var z = i * step;
+      var side = (i % 2) ? 1 : -1;
+      var lateral = side * (30 + ((i * 37) % 48));
+      var px = lineX(z) + lateral;
+      var gy = ground(px, z);
+      var hgt = 4 + ((i * 13) % 9) * 1.2;
+      if (!project(px, gy, z)) continue;
+      var x1 = out.x, y1 = out.y, t = Math.min(out.z / FAR, 1);
+      if (!project(px, gy + hgt, z)) continue;
+      var alpha = (1 - t) * 0.75;
+      if (alpha < 0.02) continue;
+      ctx.strokeStyle = 'rgba(9,11,17,' + alpha.toFixed(3) + ')';
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(out.x, out.y);
+      ctx.stroke();
+    }
+  }
+
+  var motes = null;
+  function seedMotes() {
+    motes = [];
+    for (var i = 0; i < 90; i++) {
+      motes.push({
+        o: Math.random() * FAR,
+        u: (Math.random() - 0.5) * 420,
+        up: Math.random() * 26 + 2
+      });
+    }
+  }
+
+  function drawMotes(throttle) {
+    if (throttle < 0.03 || !motes) return;
+    var stretch = throttle * 0.55;
+    var cx = W * 0.5, cy = H * 0.56;
+    ctx.strokeStyle = 'rgba(255,255,255,' + (throttle * 0.6).toFixed(3) + ')';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (var i = 0; i < motes.length; i++) {
+      var m = motes[i];
+      var z = camZ + ((camZ + m.o) % FAR) + NEAR;
+      var px = lineX(z) + m.u;
+      var py = ground(px, z) + m.up;
+      if (!project(px, py, z)) continue;
+      var t = Math.min(out.z / FAR, 1);
+      var dxp = out.x - cx, dyp = out.y - cy;
+      var len = stretch * (1 - t);
+      ctx.moveTo(out.x, out.y);
+      ctx.lineTo(out.x + dxp * len, out.y + dyp * len);
+    }
+    ctx.stroke();
+  }
+
+  function render(throttle, rollDeg) {
+    camZ = progress() * SPAN + hover;
+    var yaw = Math.atan(lineDX(camZ));
+    // the shake lives in the camera, so the page never wobbles
+    var shake = MAXSHAKE * throttle;
+    cam.cs = Math.cos(yaw); cam.ss = Math.sin(yaw);
+    cam.cr = Math.cos(-rollRad); cam.sr = Math.sin(-rollRad);
+    cam.x = lineX(camZ) + (Math.random() - 0.5) * shake;
+    cam.y = floorY(camZ) + LEVEL + (Math.random() - 0.5) * shake;
+    cam.z = camZ;
+
+    ctx.save();
+    ctx.rotate(0);
+    drawSky(rollRad);
+    drawGround();
+    drawPosts();
+    drawMotes(throttle);
+    ctx.restore();
+  }
+
+  var rollRad = 0;
+  function progress() {
+    var max = root.scrollHeight - window.innerHeight;
+    return max > 0 ? Math.min(Math.max(window.scrollY / max, 0), 1) : 0;
+  }
+
+  function show(throttle, rollDeg) {
+    root.style.setProperty('--speed', throttle.toFixed(3));
+    root.style.setProperty('--roll', rollDeg.toFixed(1) + 'deg');
+    var r1 = Math.abs(rollDeg) < 0.05 ? 0 : rollDeg;
+    hudRoll.innerHTML = (r1 >= 0 ? '+' : '\u2212') + Math.abs(r1).toFixed(1) + '&deg;';
+    hudSpeed.textContent = Math.round(throttle * 100) + '%';
+  }
+
+  /* ---- the loop ---- */
+  var lastY = window.scrollY, lastT = 0, acc = 0, running = false;
+
+  function frame(now) {
+    var dt = Math.min(Math.max(now - lastT, 1), 50); lastT = now;
+    var dy = (window.scrollY - lastY) * (16.7 / dt);
+    lastY = window.scrollY;
+
+    vx += (dy - x) * 0.30;      // same suspension as the page-wide experiment:
+    vx *= 1 - 0.46;             // 6% rebound, settles in about 5 frames
+    x += vx;
+
+    // reduced motion still flies the line, it just never banks or shakes
+    var throttle = reduced.matches ? 0 : Math.min(Math.abs(x) / 50, 1);
+    rollRad = (x < 0 ? -1 : 1) * throttle * MAXROLL * Math.PI / 180;
+    if (!reduced.matches) hover += IDLE * dt / 1000;
+
+    render(throttle, rollRad * 180 / Math.PI);
+    show(throttle, rollRad * 180 / Math.PI);
+
+    var live = throttle > 0.004 || Math.abs(vx) > 0.02 || (!reduced.matches && !document.hidden);
+    if (live && !document.hidden) {
+      requestAnimationFrame(frame);
+    } else {
+      x = 0; vx = 0;
+      render(0, 0); show(0, 0);
+      running = false;
+    }
+  }
+
+  function start() {
+    if (running) return;
+    running = true;
+    lastY = window.scrollY;
+    lastT = performance.now();
+    requestAnimationFrame(frame);
+  }
+
+  window.addEventListener('scroll', start, { passive: true });
+  window.addEventListener('resize', function () { resize(); seedMotes(); render(0, 0); show(0, 0); });
+  if (reduced.addEventListener) reduced.addEventListener('change', start);
+
+  seedMotes();
+  resize();
+  show(0, 0);
+  render(0, 0);
+  start();
+})();
+</script>
+</body>
+</html>
