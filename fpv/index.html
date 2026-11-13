@@ -2,20 +2,25 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>FPV — a scroll-driven flight | Ilyaas Kapadia</title>
-<meta name="description" content="Prototype: a first-person camera flying a heightfield, banking with your scroll velocity. Roll, dolly and speed warp, no dependencies.">
+<title>Ilyaas Kapadia — RL policies you can fly through</title>
+<meta name="description" content="Portfolio: reinforcement-learning policies running live in the browser, flown through a first-person valley. Scroll is distance, scroll velocity is bank angle, and speed earns you tricks.">
 <link rel="canonical" href="https://ilya.as/fpv/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Ilyaas Kapadia — RL policies you can fly through">
+<meta property="og:description" content="Policies running live in your browser, behind a first-person valley that banks with your scroll.">
+<meta property="og:url" content="https://ilya.as/fpv/">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <style>
 :root{
-  --speed: 0;      /* 0..1 throttle, written by the render loop */
-  --roll: 0deg;    /* signed bank angle */
+  --speed: 0;
+  --roll: 0deg;
   --ink: #eef1f8;
-  --dim: rgba(238,241,248,.62);
+  --dim: rgba(238,241,248,.6);
   --line: rgba(238,241,248,.16);
+  --card: rgba(8,10,18,.55);
 }
 *,*::before,*::after{box-sizing:border-box;}
-html{background:#07080f; scrollbar-gutter:stable;}
+html{background:#07080f; scrollbar-gutter:stable; overflow-x:hidden;}
 body{
   margin:0; color:var(--ink); background:transparent;
   font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
@@ -23,7 +28,6 @@ body{
 }
 #world{position:fixed; inset:0; z-index:0; display:block; width:100%; height:100%;}
 
-/* FPV lens: dark, streaked edges. Both sit above the world, below the text. */
 .vignette{
   position:fixed; inset:0; z-index:1; pointer-events:none;
   background:radial-gradient(130% 80% at 50% 44%, rgba(4,6,14,0) 32%, rgba(4,6,14,.2) 64%, rgba(4,6,14,.58) 100%);
@@ -37,47 +41,108 @@ body{
   mask-image:radial-gradient(closest-side at 50% 46%, transparent 40%, #000 82%);
   transform:scale(calc(1 + var(--speed) * .09));
 }
-/* keeps the words readable without hiding the fact that you are moving */
-.scrim{
-  position:fixed; inset:0; z-index:2; pointer-events:none;
-  background:radial-gradient(44% 38% at 50% 50%, rgba(6,8,16,.72) 0%, rgba(6,8,16,.42) 62%, rgba(6,8,16,0) 100%);
-}
 
 .hud{
-  position:fixed; left:max(18px, env(safe-area-inset-left,0px)); bottom:16px; z-index:3;
-  display:flex; gap:14px; pointer-events:none;
+  position:fixed; left:max(18px, env(safe-area-inset-left,0px)); bottom:16px; z-index:4;
+  display:flex; gap:14px; white-space:nowrap; pointer-events:none;
   font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:11px;
-  letter-spacing:.12em; text-transform:uppercase;
-  color:rgba(238,241,248,.5);
-  opacity:calc(.45 + var(--speed) * .55);
+  letter-spacing:.12em; text-transform:uppercase; color:rgba(238,241,248,.5);
+  opacity:calc(.4 + var(--speed) * .6);
 }
 .hud b{font-weight:400; color:var(--ink);}
-/* on a phone the readout would sit on top of the words */
-@media (max-width:700px){ .hud{display:none;} }
+.hud .trick{opacity:0;}
+.hud.tricking .trick{opacity:1; color:#ffb27a;}
 
 .book{
   position:relative; z-index:3;
-  max-width:34em; margin:0 auto;
-  padding:max(60px,9vh) max(20px, env(safe-area-inset-right,0px)) 30vh max(20px, env(safe-area-inset-left,0px));
+  max-width:46rem; margin:0 auto;
+  padding:max(56px,9vh) max(20px, env(safe-area-inset-right,0px)) 20vh max(20px, env(safe-area-inset-left,0px));
 }
-section{min-height:78vh; display:flex; flex-direction:column; justify-content:center;}
-h1{
-  font-size:clamp(2.6em,9vw,4.4em); font-weight:200; letter-spacing:-.01em;
-  line-height:1; margin:0 0 .5em;
+section{margin:0 0 clamp(3rem,10vh,7rem);}
+.hero{min-height:72vh; display:flex; flex-direction:column; justify-content:center;}
+.hero h1{font-size:clamp(2.4em,8vw,4em); font-weight:200; letter-spacing:-.015em; line-height:1; margin:0 0 .5em;}
+.hero .lede{font-size:1.15em; color:var(--ink); max-width:34em;}
+.hero .meta{color:var(--dim); font-size:.9em; margin-top:1.6em;}
+h2{
+  font-size:.78em; font-weight:400; text-transform:uppercase; letter-spacing:.2em;
+  color:var(--dim); margin:0 0 1.6em; padding-bottom:.9em; border-bottom:1px solid var(--line);
 }
-h2{font-size:.8em; font-weight:400; text-transform:uppercase; letter-spacing:.2em; color:var(--dim); margin:0 0 1.2em;}
 p{margin:0 0 1.1em;}
 a{color:inherit; text-decoration:underline; text-decoration-color:var(--line); text-underline-offset:4px;}
 a:hover{text-decoration-color:var(--ink);}
-.lede{font-size:1.12em; color:var(--dim);}
 .hint{
-  position:absolute; left:0; right:0; bottom:0; text-align:center;
-  font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:rgba(238,241,248,.45);
+  font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:rgba(238,241,248,.45); margin-top:2em;
 }
-.tail{font-size:.86em; color:var(--dim); border-top:1px solid var(--line); padding-top:1.4em;}
+.tag{
+  display:inline-block; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:10px;
+  letter-spacing:.16em; text-transform:uppercase; color:#7fe0b0;
+  border:1px solid rgba(127,224,176,.35); border-radius:999px; padding:1px 8px 2px; margin-left:.6em;
+  vertical-align:middle;
+}
+.tag.off{color:var(--dim); border-color:var(--line);}
+
+/* project cards: glass so the valley keeps moving behind the work */
+.card{
+  margin:0 0 clamp(2rem,6vh,3.4rem);
+  padding:clamp(16px,2.6vw,26px);
+  background:var(--card); border:1px solid var(--line); border-radius:14px;
+  -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+}
+.card-head{display:flex; align-items:baseline; justify-content:space-between; gap:1em; flex-wrap:wrap;}
+.card h3{margin:0; font-size:1.15em; font-weight:500; letter-spacing:-.005em;}
+.card .for{color:var(--dim); font-size:.8em; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing:.08em;}
+.card p{margin:.9em 0 0; color:var(--dim); font-size:.95em;}
+.card .links{margin:1.1em 0 0; font-size:.85em; color:var(--dim);}
+.frame{
+  position:relative; margin-top:1.2em; border-radius:10px; overflow:hidden;
+  background:#04060c; border:1px solid var(--line); aspect-ratio:16/10;
+}
+.frame iframe,.frame video{position:absolute; inset:0; width:100%; height:100%; border:0; display:block;}
+.play{
+  position:absolute; inset:0; width:100%; height:100%; border:0; cursor:pointer;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.7em;
+  background:
+    radial-gradient(70% 60% at 50% 110%, rgba(120,80,190,.28), transparent 70%),
+    linear-gradient(160deg, rgba(16,20,38,.9), rgba(8,10,20,.95));
+  color:var(--ink); font:inherit; text-align:center; padding:1.2em;
+  transition:background .25s ease;
+}
+.play:hover{background:
+    radial-gradient(70% 60% at 50% 110%, rgba(150,100,220,.4), transparent 70%),
+    linear-gradient(160deg, rgba(22,28,52,.9), rgba(8,10,20,.95));}
+.play .glyph{
+  width:46px; height:46px; border-radius:50%; border:1px solid rgba(238,241,248,.35);
+  position:relative; flex:0 0 auto;
+}
+.play .glyph::after{
+  content:""; position:absolute; left:52%; top:50%; transform:translate(-50%,-50%);
+  border-left:13px solid var(--ink); border-top:8px solid transparent; border-bottom:8px solid transparent;
+}
+.play .label{font-size:12px; letter-spacing:.2em; text-transform:uppercase; color:var(--ink);}
+.play .sub{font-size:11px; color:var(--dim); max-width:24em; line-height:1.5;}
+.stop{
+  position:absolute; top:8px; right:8px; z-index:2; cursor:pointer;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:10px;
+  letter-spacing:.14em; text-transform:uppercase;
+  color:rgba(238,241,248,.75); background:rgba(4,6,12,.7);
+  border:1px solid var(--line); border-radius:999px; padding:3px 10px;
+}
+.frame.running .play{display:none;}
+.frame.card-dark{aspect-ratio:auto;}
+.frame .note{
+  position:absolute; inset:auto 0 0 0; padding:6px 10px; font-size:10px; letter-spacing:.14em;
+  text-transform:uppercase; font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  color:rgba(238,241,248,.5); background:linear-gradient(to top, rgba(4,6,12,.9), transparent);
+  pointer-events:none;
+}
+@media (max-width:700px){
+  .hud{display:none;}
+  .frame{aspect-ratio:4/5;}
+}
+.footer{font-size:.9em; color:var(--dim); border-top:1px solid var(--line); padding-top:1.6em;}
 @media (prefers-reduced-motion: reduce){
   .warp{display:none;}
-  .hud{opacity:.45;}
+  .hud{opacity:.4;}
 }
 </style>
 </head>
@@ -86,72 +151,186 @@ a:hover{text-decoration-color:var(--ink);}
 <canvas id="world" aria-hidden="true"></canvas>
 <div class="vignette" aria-hidden="true"></div>
 <div class="warp" aria-hidden="true"></div>
-<div class="scrim" aria-hidden="true"></div>
-<div class="hud" aria-hidden="true"><span>roll <b id="hud-roll">0.0&deg;</b></span><span>throttle <b id="hud-speed">0%</b></span></div>
+
+<div class="hud" id="hud" aria-hidden="true">
+  <span>roll <b id="hud-roll">0.0&deg;</b></span>
+  <span>throttle <b id="hud-speed">0%</b></span>
+  <span class="trick">trick <b id="hud-trick">&mdash;</b></span>
+</div>
 
 <main class="book">
 
-  <section>
-    <h1>FPV</h1>
-    <p class="lede">A first-person camera flying a heightfield, banking with your scroll velocity. Roll, dolly, and warp &mdash; no dependencies, no assets, all of it arithmetic in one canvas.</p>
-    <p class="hint">Scroll to fly</p>
+  <section class="hero">
+    <h1>Ilyaas Kapadia</h1>
+    <p class="lede">I train reinforcement-learning policies and build the worlds they learn in &mdash; fast C and CUDA environments where a policy can be trained in seconds instead of days. Everything below runs live in your browser.</p>
+    <p class="meta">Sophomore, computer science, University of Cincinnati. Previously Kernel (YC&nbsp;S25).</p>
+    <p class="hint">Scroll to fly &middot; fast scrolling earns tricks &middot; or press f, r, d</p>
   </section>
 
   <section>
-    <h2>What you are inside of</h2>
-    <p>A heightfield, a camera seven units above it, and a line that winds through the hills. Scroll position is distance travelled. Scroll velocity is bank angle, throttle, and the length of the streaks.</p>
-    <p>The grid runs from three units in front of the lens to four hundred and sixty out, spaced logarithmically, so the ground keeps detail as it rushes past instead of collapsing into one flat band near the horizon.</p>
+    <h2>Policies, live in your browser</h2>
+    <p style="color:var(--dim); font-size:.95em; margin-top:-.6em">Five simulations do not run until you ask them to. Five WebAssembly policies fighting this canvas for your CPU is not a portfolio, it is a space heater &mdash; so each one starts on a click and stops when you tell it to.</p>
+
+    <article class="card">
+      <div class="card-head"><h3>Countdown<span class="tag">live</span></h3><span class="for">0.8B params &middot; wllama</span></div>
+      <p>A 0.8B model trained with reinforcement learning on arithmetic puzzles, quantised and running locally in your tab. No server, no API key. Press run and it downloads into this page.</p>
+      <div class="frame" data-demo="/countdown/" data-title="Countdown, a small reasoning model running in the browser">
+        <button class="play" type="button"><span class="glyph" aria-hidden="true"></span><span class="label">run it live</span><span class="sub">downloads a 0.8B model into this tab</span></button>
+      </div>
+      <p class="links"><a href="/countdown/">open full page</a></p>
+    </article>
+
+    <article class="card">
+      <div class="card-head"><h3>Slither<span class="tag">playable</span></h3><span class="for">1 C arena &middot; 16 snakes</span></div>
+      <p>You are one snake and fifteen copies of my RL agent hunt with you, in the same C arena I trained them in &mdash; the training environment and the toy are the same code.</p>
+      <div class="frame" data-demo="/slither" data-title="Slither: you versus fifteen trained agents">
+        <button class="play" type="button"><span class="glyph" aria-hidden="true"></span><span class="label">run it live</span><span class="sub">runs the training arena &middot; keyboard or touch</span></button>
+      </div>
+      <p class="links"><a href="/slither">open full page</a></p>
+    </article>
+
+    <article class="card">
+      <div class="card-head"><h3>Bounce<span class="tag">live</span></h3><span class="for">PPO &middot; one policy per level</span></div>
+      <p>Nokia&rsquo;s 2001 classic, rebuilt for the browser and played by a PufferLib PPO policy trained in C, switching policies as the level advances.</p>
+      <div class="frame" data-demo="/bounce" data-title="Bounce: a trained policy playing the Nokia classic">
+        <button class="play" type="button"><span class="glyph" aria-hidden="true"></span><span class="label">run it live</span><span class="sub">wasm &middot; deterministic, same code as training</span></button>
+      </div>
+      <p class="links"><a href="/bounce">open full page</a></p>
+    </article>
+
+    <article class="card">
+      <div class="card-head"><h3>Monocopter<span class="tag">live</span></h3><span class="for">hover control</span></div>
+      <p>A PPO policy flying a simulated single-propeller drone in the browser via WebAssembly. Randomized, unmeasured physics &mdash; hovering a one-propeller craft is the whole difficulty.</p>
+      <div class="frame" data-demo="/monocopter/" data-title="Monocopter: an RL policy hovering a one-propeller drone">
+        <button class="play" type="button"><span class="glyph" aria-hidden="true"></span><span class="label">run it live</span><span class="sub">3d &middot; wasm &middot; randomized physics</span></button>
+      </div>
+      <p class="links"><a href="/monocopter/">open full page</a></p>
+    </article>
+
+    <article class="card">
+      <div class="card-head"><h3>Self-rising robot<span class="tag">live</span></h3><span class="for">~1B steps &middot; mujoco 3.16</span></div>
+      <p>A two-servo robot simulated in MuJoCo compiled to WebAssembly, driven by a PufferLib PPO policy trained for about a billion steps. Four out of four full-fall get-ups, deterministic in CPU MuJoCo &mdash; not yet hardware-validated.</p>
+      <div class="frame" data-demo="/self-rising-robot/" data-title="Self-rising robot: a MuJoCo policy getting up from a fall">
+        <button class="play" type="button"><span class="glyph" aria-hidden="true"></span><span class="label">run it live</span><span class="sub">MuJoCo in wasm &middot; ~1B training steps</span></button>
+      </div>
+      <p class="links"><a href="/self-rising-robot/">open full page</a></p>
+    </article>
   </section>
 
   <section>
-    <h2>Why the horizon is the whole trick</h2>
-    <p>Roll is what a body reads as flight. A camera leaning around its own forward axis drags the horizon with it, and everything else follows: yaw tracks the line, pitch stays level, and the sky gradient tilts at half the roll so it never looks painted onto the screen.</p>
-    <p>The shake is in the camera, not the page. Yaw and altitude take a small random walk proportional to throttle &mdash; the vibration you feel in your hands on a real descent.</p>
+    <h2>Environments, and the speed they train at</h2>
+
+    <article class="card">
+      <div class="card-head"><h3>Brotato RL<span class="tag off">sim + policy</span></h3><span class="for">1.8M steps/s &middot; RTX 5070</span></div>
+      <p>Twelve hours at a hackathon: I stripped the Godot engine out of Brotato and wrote a bit-exact C simulator with the physics and contact solving parallelised in CUDA &mdash; 4,096 environments on one card at about 1.8M env steps/s, against roughly 1,200 steps/s for the shipped game. The CPU and CUDA builds agree on every state field, and a Godot mod drives the real game headless so I can check my frames against its frames.</p>
+      <div class="frame"><video src="/brotato/demon_policy.mp4" controls muted loop playsinline preload="metadata"></video><div class="note">a 1B-step policy, in my simulator</div></div>
+      <p class="links"><a href="/brotato/">writeup and numbers</a> &middot; <a href="https://github.com/IlyaasK/brotato-rl">github.com/IlyaasK/brotato-rl</a></p>
+    </article>
+
+    <article class="card">
+      <div class="card-head"><h3>Every demo above is its own environment</h3><span class="for">c &middot; cuda &middot; pufferlib</span></div>
+      <p>The same C code trains the policy and plays it in the page &mdash; Bounce, Slither and the drone all run the training arena compiled to WebAssembly, so what you touched above is not a recording. When a policy needed to be faster to train, I rewrote the environment (CUDA for contact solving, C for the gameplay loop) rather than throwing hardware at it.</p>
+      <p class="links"><a href="https://github.com/PufferAI/PufferLib">pufferlib</a> &middot; <a href="https://github.com/IlyaasK">github.com/IlyaasK</a></p>
+    </article>
   </section>
 
   <section>
-    <h2>What the last attempt got wrong</h2>
-    <p>It sheared the text column sideways with a skew. Horizontal lines stayed perfectly level, so the page read as warped paper rather than motion &mdash; you cannot bank a paragraph. A camera has to be inside a scene, and text does not have an inside.</p>
-    <p>So the words stay absolutely still here, and the world moves behind them.</p>
+    <h2>Other work</h2>
+
+    <article class="card">
+      <div class="card-head"><h3>NES Eval<span class="tag off">benchmark</span></h3><span class="for">24 hours per agent</span></div>
+      <p>A benchmark that asks coding agents to write an NES emulator from scratch in 24 hours, graded frame by frame against a reference emulator &mdash; a port of Mechanize&rsquo;s GBA Eval. It is the benchmark I reach for when I want to know whether an agent can hold a long, exact task.</p>
+      <p class="links"><a href="/nes-eval/">ilya.as/nes-eval</a></p>
+    </article>
+
+    <article class="card">
+      <div class="card-head"><h3>Kernel (YC S25)<span class="tag off">internship</span></h3><span class="for">browser infra for agents</span></div>
+      <p>My first software internship. Browser infrastructure for AI agents: I implemented programmatic API key generation, owned their Terraform provider, and made their Chromium images smaller and faster to build.</p>
+      <p class="links">
+        Cut the server CI workflow from <strong>17m33s to 7m29s</strong> &mdash; <a href="https://github.com/kernel/kernel-images/pull/299">PR #299</a><br>
+        Slimmed the Chromium runtime images by <strong>366 MB</strong>; headful cold build 347s to 268s &mdash; <a href="https://github.com/kernel/kernel-images/pull/274">PR #274</a><br>
+        <a href="https://github.com/kernel/terraform-provider-kernel">terraform-provider-kernel</a>
+      </p>
+    </article>
+
+    <article class="card">
+      <div class="card-head"><h3>kstack<span class="tag off">tool</span></h3><span class="for">e-ink &middot; android</span></div>
+      <p>An e-ink-first Android client for driving a fleet of headless agents over Tailscale SSH. Built because I wanted to check on long runs from a device with a two-week battery.</p>
+      <p class="links"><a href="https://github.com/IlyaasK/kstack">github.com/IlyaasK/kstack</a></p>
+    </article>
+
+    <article class="card">
+      <div class="card-head"><h3>Writing<span class="tag off">notes</span></h3><span class="for">how I got here</span></div>
+      <p><a href="/blog/">Notes on what I am learning</a>, a <a href="/intern/">guide to getting a tech internship</a>, and the <a href="/truffle/">application I wrote to Deepshard</a> for Spring 2027.</p>
+    </article>
   </section>
 
-  <section>
-    <h2>Where this could go</h2>
-    <p>Behind the homepage as a hero, as the backdrop of a project page with a live demo, or as the whole site with the text riding in front of it. The terrain, the line, and the palette are one function each, so a different hill is one edit.</p>
-    <p class="tail">
+  <section class="footer">
+    <p>
       <a href="/">ilya.as</a> &middot;
       <a href="mailto:kapadiiy@mail.uc.edu">kapadiiy@mail.uc.edu</a> &middot;
+      <a href="/resume">r&eacute;sum&eacute;</a> &middot;
       <a href="https://github.com/IlyaasK">github.com/IlyaasK</a>
     </p>
+    <p>The valley behind this page is a heightfield with a carved corridor, rendered into one canvas: no dependencies, no assets, and the camera banks with your scroll velocity. Reduced motion keeps the flight and drops the tricks.</p>
   </section>
 
 </main>
 
 <script>
+/* demos are created on click: nothing runs behind your back, and one stop
+   button is enough to give the CPU back */
+(function () {
+  var frames = document.querySelectorAll('.frame[data-demo]');
+  Array.prototype.forEach.call(frames, function (f) {
+    var play = f.querySelector('.play');
+    if (!play) return;
+    play.addEventListener('click', function () {
+      if (f.classList.contains('running')) return;
+      var fr = document.createElement('iframe');
+      fr.src = f.getAttribute('data-demo');
+      fr.title = f.getAttribute('data-title') || 'live demo';
+      fr.setAttribute('allow', 'fullscreen');
+      var stop = document.createElement('button');
+      stop.type = 'button';
+      stop.className = 'stop';
+      stop.textContent = 'stop';
+      stop.addEventListener('click', function () {
+        fr.remove(); stop.remove();
+        f.classList.remove('running');
+      });
+      f.classList.add('running');
+      f.appendChild(fr);
+      f.appendChild(stop);
+    });
+  });
+})();
+
 (function () {
   var cv = document.getElementById('world');
   var ctx = cv.getContext('2d', { alpha: false });
   var root = document.documentElement;
+  var hud = document.getElementById('hud');
   var hudRoll = document.getElementById('hud-roll');
   var hudSpeed = document.getElementById('hud-speed');
+  var hudTrick = document.getElementById('hud-trick');
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   /* ---- the world ---- */
-  var SPAN = 3000;                 // world units travelled across the whole page
-  var NEAR = 3, FAR = 460;         // row spacing in depth
-  var CULL = 2.5;                  // draw plane: closer than this, quads project to garbage
-  var ROWS = 30, COLS = 15;        // resolution of the ground mesh
-  var LEVEL = 7;                   // how high the camera floats over the floor
-  var IDLE = 4;                    // units/s of hover when you are not scrolling
-  var MAXROLL = 24;                // degrees of bank at full throttle
-  var MAXSHAKE = 0.9;              // camera vibration in world units
+  var SPAN = 3400;
+  var NEAR = 3, FAR = 460;
+  var CULL = 2.5;
+  var ROWS = 30, COLS = 15;
+  var LEVEL = 7;
+  var IDLE = 4;
+  var MAXROLL = 24;
+  var MAXSHAKE = 0.9;
+  var TAU = Math.PI * 2;
 
   var W = 0, H = 0, F = 0, sky = null;
   var camZ = 0, hover = 0;
-  var x = 0, vx = 0;               // suspension state, in px per nominal frame
+  var x = 0, vx = 0;
 
-  /* the walls: hills that only exist away from the line, so the valley floor
-     stays open in front of the lens and there is always somewhere to fly */
   function wall(px, pz) {
     return 26 * Math.sin(px * 0.0058 + 0.7)
          + 15 * Math.sin(pz * 0.0061 + 1.9)
@@ -160,7 +339,7 @@ a:hover{text-decoration-color:var(--ink);}
   function blend(px, pz) {
     var lat = Math.abs(px - lineX(pz));
     var m = Math.min(Math.max((lat - 26) / 120, 0), 1);
-    return m * m * (3 - 2 * m);            // 0 on the floor, 1 out on the walls
+    return m * m * (3 - 2 * m);
   }
   function ripples(px, pz) {
     return 5.5 * Math.cos(px * 0.026 - pz * 0.02)
@@ -172,39 +351,38 @@ a:hover{text-decoration-color:var(--ink);}
     var m = blend(px, pz);
     return wall(px, pz) * m + ripples(px, pz) * (0.3 + 0.7 * m);
   }
-  function floorY(pz) { return ground(lineX(pz), pz); }
   function lineX(pz)  { return 95 * Math.sin(pz * 0.0011) + 38 * Math.sin(pz * 0.0037 + 0.4); }
   function lineDX(pz) { return 95 * 0.0011 * Math.cos(pz * 0.0011) + 38 * 0.0037 * Math.cos(pz * 0.0037 + 0.4); }
 
-  /* ---- camera ---- */
-  var cam = { x: 0, y: 0, z: 0, cs: 1, ss: 0, cr: 1, sr: 0 };
+  var cam = { x: 0, y: 0, z: 0, cs: 1, ss: 0, cr: 1, sr: 0, cp: 1, sp: 0 };
 
   function resize() {
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
     W = cv.clientWidth; H = cv.clientHeight;
     cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    F = H * 1.25;
     sky = null;
   }
 
-  /* world point -> screen. returns false when the point is behind the lens */
   var out = { x: 0, y: 0, z: 0 };
   function project(px, py, pz) {
     var dx = px - cam.x, dy = py - cam.y, dz = pz - cam.z;
     var X1 = dx * cam.cs - dz * cam.ss;
     var Z1 = dx * cam.ss + dz * cam.cs;
-    if (Z1 < CULL) return false;   // a quad straddling the lens fills the whole screen
     var Y1 = dy;
-    var X2 = X1 * cam.cr - Y1 * cam.sr;
-    var Y2 = X1 * cam.sr + Y1 * cam.cr;
-    out.x = W * 0.5 + (X2 / Z1) * F;
-    out.y = H * 0.56 - (Y2 / Z1) * F;
-    out.z = Z1;
+    /* pitch about the camera's own x axis, then roll about the view axis */
+    var Y2 = Y1 * cam.cp - Z1 * cam.sp;
+    var Z2 = Y1 * cam.sp + Z1 * cam.cp;
+    if (Z2 < CULL) return false;
+    var X3 = X1 * cam.cr - Y2 * cam.sr;
+    var Y3 = X1 * cam.sr + Y2 * cam.cr;
+    out.x = W * 0.5 + (X3 / Z2) * F;
+    out.y = H * 0.5 - (Y3 / Z2) * F;
+    out.z = Z2;
     return true;
   }
 
-  function drawSky(roll) {
+  function drawSky(pitch, roll) {
     if (!sky) {
       sky = ctx.createLinearGradient(0, -H * 0.3, 0, H * 0.82);
       sky.addColorStop(0, '#070a18');
@@ -214,34 +392,47 @@ a:hover{text-decoration-color:var(--ink);}
       sky.addColorStop(1, '#9a5a5c');
     }
     ctx.save();
-    // the sky band tilts at half the roll: the horizon stops looking painted on
-    ctx.translate(W * 0.5, H * 0.5); ctx.rotate(-roll * 0.5); ctx.translate(-W * 0.5, -H * 0.5);
+    ctx.translate(W * 0.5, H * 0.5);
+    ctx.rotate(-roll * 0.5);
+    ctx.translate(-W * 0.5, -H * 0.5 + Math.sin(pitch) * H * 0.55);
     ctx.fillStyle = sky;
-    ctx.fillRect(-W * 0.4, -H * 0.4, W * 1.8, H * 1.9);
+    ctx.fillRect(-W * 0.6, -H * 0.9, W * 2.2, H * 3);
+
+    /* stars high up, then stratus bands: something for the sky to do while the
+       camera is upside down, otherwise a flip just looks blank */
+    ctx.fillStyle = 'rgba(226,232,255,.5)';
+    for (var st = 0; st < 46; st++) {
+      var sx = ((st * 2654435761) % 1000) / 1000 * W * 1.6 - W * 0.3;
+      var sy = -H * 0.95 + ((st * 40503) % 1000) / 1000 * H * 0.9;
+      ctx.fillRect(sx, sy, 1.4, 1.4);
+    }
+    for (var i = 0; i < 9; i++) {
+      var cy = -H * 0.72 + i * H * 0.17;
+      ctx.fillStyle = i % 2 ? 'rgba(24,26,54,.75)' : 'rgba(46,38,78,.6)';
+      ctx.beginPath();
+      ctx.ellipse(W * 0.5 + (((i * 137) % 260) - 130), cy, W * (0.42 + (i % 3) * 0.12), H * (0.035 + (i % 2) * 0.02), 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
     ctx.restore();
   }
 
   function drawGround() {
-    var pts = new Array(ROWS * COLS);
-    var ok = new Array(ROWS * COLS);
-    var i, j, d, z, bx, u, px, py, k;
+    var pts = new Array(ROWS * COLS), ok = new Array(ROWS * COLS);
+    var i, j, d, z, half, u, px, py, k;
 
     for (i = 0; i < ROWS; i++) {
       d = NEAR * Math.pow(FAR / NEAR, i / (ROWS - 1));
       z = camZ + d;
-      // the strip widens with depth so the far ground always reaches both edges
-      var half = (d + 8) * 0.85;
-      bx = cam.x;
+      half = (d + 8) * 0.85;
       for (j = 0; j < COLS; j++) {
         u = -half + (2 * half) * (j / (COLS - 1));
-        px = bx + u; py = ground(px, z);
+        px = cam.x + u; py = ground(px, z);
         k = i * COLS + j;
         ok[k] = project(px, py, z);
         pts[k] = { x: out.x, y: out.y, z: out.z, h: py, w: px };
       }
     }
 
-    // far to near: the near ground paints over the far ground
     for (i = ROWS - 2; i >= 0; i--) {
       for (j = 0; j < COLS - 1; j++) {
         var a = i * COLS + j, b = a + 1, c = a + COLS + 1, e = a + COLS;
@@ -249,7 +440,6 @@ a:hover{text-decoration-color:var(--ink);}
         if (pts[a].y > H + 24 && pts[b].y > H + 24 && pts[c].y > H + 24 && pts[e].y > H + 24) continue;
         var depth = (pts[a].z + pts[b].z + pts[c].z + pts[e].z) * 0.25;
         var t = Math.min(depth / FAR, 1);
-        // a light hanging to the left and behind: the flank of every hill shows
         var dz = Math.max(pts[e].z - pts[a].z, 0.5);
         var dxw = pts[b].w - pts[a].w;
         var gx = dxw !== 0 ? (pts[b].h - pts[a].h) / dxw : 0;
@@ -260,7 +450,6 @@ a:hover{text-decoration-color:var(--ink);}
         var r = 21 + lit * 96, g = 22 + lit * 88, bl = 27 + lit * 74;
         var f = Math.pow(t, 1.3);
         r = r + (74 - r) * f; g = g + (56 - g) * f; bl = bl + (94 - bl) * f;
-
         ctx.beginPath();
         ctx.moveTo(pts[a].x, pts[a].y);
         ctx.lineTo(pts[b].x, pts[b].y);
@@ -269,20 +458,18 @@ a:hover{text-decoration-color:var(--ink);}
         ctx.closePath();
         ctx.fillStyle = ctx.strokeStyle = 'rgb(' + (r | 0) + ',' + (g | 0) + ',' + (bl | 0) + ')';
         ctx.fill();
-        ctx.stroke();   // seals the anti-aliasing seams between quads
+        ctx.stroke();
       }
     }
   }
 
-  /* fence posts pinned to the world: the visceral part of the speed */
   function drawPosts() {
     var step = 24, first = Math.floor((camZ + 5) / step), last = Math.floor((camZ + FAR) / step);
     ctx.lineWidth = 1;
     for (var i = first; i <= last; i++) {
       var z = i * step;
       var side = (i % 2) ? 1 : -1;
-      var lateral = side * (30 + ((i * 37) % 48));
-      var px = lineX(z) + lateral;
+      var px = lineX(z) + side * (30 + ((i * 37) % 48));
       var gy = ground(px, z);
       var hgt = 4 + ((i * 13) % 9) * 1.2;
       if (!project(px, gy, z)) continue;
@@ -291,10 +478,7 @@ a:hover{text-decoration-color:var(--ink);}
       var alpha = (1 - t) * 0.75;
       if (alpha < 0.02) continue;
       ctx.strokeStyle = 'rgba(9,11,17,' + alpha.toFixed(3) + ')';
-      ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(out.x, out.y);
-      ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(out.x, out.y); ctx.stroke();
     }
   }
 
@@ -302,18 +486,12 @@ a:hover{text-decoration-color:var(--ink);}
   function seedMotes() {
     motes = [];
     for (var i = 0; i < 90; i++) {
-      motes.push({
-        o: Math.random() * FAR,
-        u: (Math.random() - 0.5) * 420,
-        up: Math.random() * 26 + 2
-      });
+      motes.push({ o: Math.random() * FAR, u: (Math.random() - 0.5) * 420, up: Math.random() * 26 + 2 });
     }
   }
-
   function drawMotes(throttle) {
     if (throttle < 0.03 || !motes) return;
-    var stretch = throttle * 0.55;
-    var cx = W * 0.5, cy = H * 0.56;
+    var stretch = throttle * 0.55, cx = W * 0.5, cy = H * 0.5;
     ctx.strokeStyle = 'rgba(255,255,255,' + (throttle * 0.6).toFixed(3) + ')';
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -324,74 +502,124 @@ a:hover{text-decoration-color:var(--ink);}
       var py = ground(px, z) + m.up;
       if (!project(px, py, z)) continue;
       var t = Math.min(out.z / FAR, 1);
-      var dxp = out.x - cx, dyp = out.y - cy;
-      var len = stretch * (1 - t);
+      var dxp = out.x - cx, dyp = out.y - cy, len = stretch * (1 - t);
       ctx.moveTo(out.x, out.y);
       ctx.lineTo(out.x + dxp * len, out.y + dyp * len);
     }
     ctx.stroke();
   }
 
-  function render(throttle, rollDeg) {
-    camZ = progress() * SPAN + hover;
-    var yaw = Math.atan(lineDX(camZ));
-    // the shake lives in the camera, so the page never wobbles
-    var shake = MAXSHAKE * throttle;
-    cam.cs = Math.cos(yaw); cam.ss = Math.sin(yaw);
-    cam.cr = Math.cos(-rollRad); cam.sr = Math.sin(-rollRad);
-    cam.x = lineX(camZ) + (Math.random() - 0.5) * shake;
-    cam.y = floorY(camZ) + LEVEL + (Math.random() - 0.5) * shake;
-    cam.z = camZ;
+  /* ---- tricks ---- */
+  var TRICKS = ['backflip', 'barrel', 'dive', 'corkscrew'];
+  var trick = null, lastTrick = -1e9;
+  var pitch = 0, extraRoll = 0, punch = 0, trickLabel = '';
 
-    ctx.save();
-    ctx.rotate(0);
-    drawSky(rollRad);
-    drawGround();
-    drawPosts();
-    drawMotes(throttle);
-    ctx.restore();
+  function trigger(name) {
+    if (reduced.matches) return;
+    var now = performance.now();
+    if (trick || now - lastTrick < 1800) return;
+    lastTrick = now;
+    trick = { name: name, t: 0, dur: name === 'dive' ? 1.0 : 0.85 };
+  }
+  var hot = 0;
+  function maybeTrick(throttle) {
+    // three frames of real speed, so a single page-down jump is not a backflip
+    hot = throttle > 0.72 ? hot + 1 : 0;
+    if (hot >= 3) {
+      hot = 0;
+      trigger(TRICKS[(Math.random() * TRICKS.length) | 0]);
+    }
+  }
+  function stepTrick(dt) {
+    pitch = 0; extraRoll = 0; punch = 0; trickLabel = '';
+    if (!trick) return;
+    trick.t += dt / 1000;
+    var p = Math.min(trick.t / trick.dur, 1);
+    var e = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+    if (trick.name === 'backflip')  pitch = TAU * e;
+    if (trick.name === 'barrel')    extraRoll = TAU * e;
+    if (trick.name === 'corkscrew') { pitch = Math.PI * e; extraRoll = TAU * e; }
+    if (trick.name === 'dive')      { pitch = -Math.sin(p * Math.PI) * 1.25; punch = Math.sin(p * Math.PI); }
+    trickLabel = trick.name;
+    if (p >= 1) trick = null;
   }
 
-  var rollRad = 0;
+  window.addEventListener('keydown', function (ev) {
+    var k = ev.key.toLowerCase();
+    if (k === 'f') trigger('backflip');
+    else if (k === 'r') trigger('barrel');
+    else if (k === 'd' || k === 'c') trigger('dive');
+  });
+
+  /* ---- render ---- */
   function progress() {
     var max = root.scrollHeight - window.innerHeight;
     return max > 0 ? Math.min(Math.max(window.scrollY / max, 0), 1) : 0;
   }
 
-  function show(throttle, rollDeg) {
+  function render(throttle, rollDeg) {
+    F = H * (1.25 + punch * 0.22);
+    camZ = progress() * SPAN + hover + punch * 26;   // the punch: a lurch down the line
+    var yaw = Math.atan(lineDX(camZ));
+    var shake = MAXSHAKE * throttle;
+    cam.cs = Math.cos(yaw); cam.ss = Math.sin(yaw);
+    cam.cp = Math.cos(pitch); cam.sp = Math.sin(pitch);
+    var rollRad = rollDeg * Math.PI / 180;
+    cam.cr = Math.cos(-rollRad); cam.sr = Math.sin(-rollRad);
+    cam.x = lineX(camZ) + (Math.random() - 0.5) * shake;
+    cam.y = ground(lineX(camZ), camZ) + LEVEL + (Math.random() - 0.5) * shake;
+    cam.z = camZ;
+
+    drawSky(pitch, rollRad);
+    drawGround();
+    drawPosts();
+    drawMotes(throttle);
+  }
+
+  function show(throttle, rollDeg, label) {
     root.style.setProperty('--speed', throttle.toFixed(3));
     root.style.setProperty('--roll', rollDeg.toFixed(1) + 'deg');
     var r1 = Math.abs(rollDeg) < 0.05 ? 0 : rollDeg;
     hudRoll.innerHTML = (r1 >= 0 ? '+' : '\u2212') + Math.abs(r1).toFixed(1) + '&deg;';
     hudSpeed.textContent = Math.round(throttle * 100) + '%';
+    hud.classList.toggle('tricking', !!label);
+    if (label) hudTrick.textContent = label;
   }
 
-  /* ---- the loop ---- */
-  var lastY = window.scrollY, lastT = 0, acc = 0, running = false;
+  var lastY = window.scrollY, lastT = 0, running = false;
 
   function frame(now) {
     var dt = Math.min(Math.max(now - lastT, 1), 50); lastT = now;
     var dy = (window.scrollY - lastY) * (16.7 / dt);
     lastY = window.scrollY;
 
-    vx += (dy - x) * 0.30;      // same suspension as the page-wide experiment:
-    vx *= 1 - 0.46;             // 6% rebound, settles in about 5 frames
+    vx += (dy - x) * 0.30;
+    vx *= 1 - 0.46;
     x += vx;
 
-    // reduced motion still flies the line, it just never banks or shakes
     var throttle = reduced.matches ? 0 : Math.min(Math.abs(x) / 50, 1);
-    rollRad = (x < 0 ? -1 : 1) * throttle * MAXROLL * Math.PI / 180;
-    if (!reduced.matches) hover += IDLE * dt / 1000;
+    var rollDeg = (x < 0 ? -1 : 1) * throttle * MAXROLL;
+    stepTrick(dt);
+    maybeTrick(throttle);
+    rollDeg += extraRoll * 180 / Math.PI;
 
-    render(throttle, rollRad * 180 / Math.PI);
-    show(throttle, rollRad * 180 / Math.PI);
+    /* the world only hovers while you are up top; down in the portfolio it
+       runs on scroll alone, so five live policies are not competing with an
+       idle render loop */
+    var idleOK = window.scrollY < window.innerHeight * 0.9;
+    if (!reduced.matches && idleOK) hover += IDLE * dt / 1000;
 
-    var live = throttle > 0.004 || Math.abs(vx) > 0.02 || (!reduced.matches && !document.hidden);
+    render(throttle, rollDeg);
+    show(throttle, rollDeg, trickLabel);
+
+    var live = throttle > 0.004 || Math.abs(vx) > 0.02 || trick || (!reduced.matches && idleOK);
     if (live && !document.hidden) {
       requestAnimationFrame(frame);
     } else {
       x = 0; vx = 0;
-      render(0, 0); show(0, 0);
+      stepTrick(1e9);
+      render(0, 0);
+      show(0, 0, '');
       running = false;
     }
   }
@@ -405,13 +633,13 @@ a:hover{text-decoration-color:var(--ink);}
   }
 
   window.addEventListener('scroll', start, { passive: true });
-  window.addEventListener('resize', function () { resize(); seedMotes(); render(0, 0); show(0, 0); });
+  window.addEventListener('resize', function () { resize(); seedMotes(); render(0, 0); show(0, 0, ''); });
   if (reduced.addEventListener) reduced.addEventListener('change', start);
 
   seedMotes();
   resize();
-  show(0, 0);
   render(0, 0);
+  show(0, 0, '');
   start();
 })();
 </script>
