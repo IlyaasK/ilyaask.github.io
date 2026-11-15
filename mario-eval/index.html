@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mario Eval: make an N64 game cheaper to run</title>
+<meta name="description" content="An RLVR environment: make a Nintendo 64 game cheaper to run on the original hardware without changing it.">
+<meta property="og:title" content="Mario Eval: make an N64 game cheaper to run"><meta property="og:description" content="An RLVR environment: make a Nintendo 64 game cheaper to run on the original hardware without changing it.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/mario-eval/style.css">
+</head><body>
+<header class="site"><div class="wrap"><a class="logo" href="/mario-eval/">MARIO<span>EVAL</span></a>
+<nav class="site"><a href="/mario-eval/" class=on>Overview</a> <a href="/mario-eval/calibration/">Calibration</a> <a href="/mario-eval/blog/">Blog</a> <a href="https://github.com/IlyaasK/mario-eval">GitHub</a></nav></div></header>
+<main class="wrap">
+<div class="hero"><div>
+<h1>Make a Nintendo 64 game cheaper to run. Don't change it.</h1>
+<p class="lede">Mario Eval is a reinforcement-learning-with-verifiable-rewards environment. An agent gets the
+source of an N64 game, a toolchain, an emulator and a profiler, and has to cut what the game costs on the
+original hardware &mdash; CPU time, RSP time, memory traffic or RAM &mdash; while every frame of gameplay,
+picture and sound stays the same. The reward comes from measurements, not from a judge.</p>
+</div><svg viewBox="0 0 200 220" role="img" aria-label="Pip, a small round robot">
+  <line x1="100" y1="44" x2="100" y2="18" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+  <polygon points="100,4 110,16 100,28 90,16" fill="#3fb6e8" stroke="currentColor" stroke-width="3"/>
+  <ellipse cx="100" cy="76" rx="52" ry="38" fill="#eeeade" stroke="currentColor" stroke-width="4"/>
+  <rect x="62" y="62" width="76" height="28" rx="14" fill="#23314f" stroke="currentColor" stroke-width="3"/>
+  <circle cx="84" cy="76" r="6" fill="#7fe3ff"/>
+  <circle cx="116" cy="76" r="6" fill="#7fe3ff"/>
+  <ellipse cx="100" cy="150" rx="62" ry="50" fill="#f2b632" stroke="currentColor" stroke-width="4"/>
+  <ellipse cx="100" cy="150" rx="26" ry="20" fill="#f7cf6a" stroke="currentColor" stroke-width="3"/>
+  <path d="M40 140 q-22 6 -26 26" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+  <path d="M160 140 q22 6 26 26" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+  <ellipse cx="74" cy="204" rx="20" ry="9" fill="#5a5a60" stroke="currentColor" stroke-width="3"/>
+  <ellipse cx="126" cy="204" rx="20" ry="9" fill="#5a5a60" stroke="currentColor" stroke-width="3"/>
+</svg></div>
+
+<div class="status"><b>Status:</b> the environment, grader and agent container are built and calibrated on
+<b>Pip's Garden</b>, an original stand-in game written for this eval (the robot above). Super Mario 64
+plugs into the same harness once a legally dumped ROM is supplied; see
+<a href="/mario-eval/blog/road-to-super-mario-64/">the road to Super Mario 64</a>. No models have been run yet.</div>
+
+<h2>How a submission is graded</h2>
+<div class="diagram"><svg viewBox="0 0 940 150" role="img" aria-label="Grading pipeline">
+  <defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+    <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
+  <g font-family="IBM Plex Mono, monospace" font-size="13" fill="currentColor">
+    <g stroke="currentColor" stroke-width="1.5" fill="none">
+      <rect x="4" y="40" width="130" height="64" rx="6"/>
+      <rect x="168" y="40" width="130" height="64" rx="6"/>
+      <rect x="332" y="40" width="170" height="64" rx="6"/>
+      <rect x="536" y="16" width="190" height="112" rx="6"/>
+      <rect x="760" y="40" width="176" height="64" rx="6"/>
+      <line x1="134" y1="72" x2="166" y2="72" marker-end="url(#arr)"/>
+      <line x1="298" y1="72" x2="330" y2="72" marker-end="url(#arr)"/>
+      <line x1="502" y1="72" x2="534" y2="72" marker-end="url(#arr)"/>
+      <line x1="726" y1="72" x2="758" y2="72" marker-end="url(#arr)"/>
+    </g>
+    <text x="69" y="68" text-anchor="middle">source</text>
+    <text x="69" y="86" text-anchor="middle" opacity="0.7">patch</text>
+    <text x="233" y="68" text-anchor="middle">trusted</text>
+    <text x="233" y="86" text-anchor="middle">rebuild</text>
+    <text x="417" y="64" text-anchor="middle">ares N64</text>
+    <text x="417" y="82" text-anchor="middle" opacity="0.7">replays, unthrottled</text>
+    <text x="417" y="98" text-anchor="middle" opacity="0.7">interpreter + caches</text>
+    <text x="631" y="38" text-anchor="middle">gates</text>
+    <text x="631" y="60" text-anchor="middle" opacity="0.7">gameplay: bit-exact</text>
+    <text x="631" y="78" text-anchor="middle" opacity="0.7">video, audio: tolerance</text>
+    <text x="631" y="96" text-anchor="middle" opacity="0.7">integrity, 4 MB, budgets</text>
+    <text x="631" y="116" text-anchor="middle" opacity="0.7">any fail: reward -1</text>
+    <text x="848" y="68" text-anchor="middle">reward</text>
+    <text x="848" y="86" text-anchor="middle" opacity="0.7">1 - geomean(ratio)</text>
+  </g>
+</svg></div>
+<p>The grader rebuilds the submitted source with a pinned toolchain, then runs it in
+<a href="https://ares-emu.net/">ares</a> (CPU interpreter, so the VR4300's instruction and data caches apply to
+every instruction) with a small instrumentation patch. Recorded controller inputs are fed per <em>logical</em>
+game frame, and the game runs unthrottled, so a faster build plays exactly the same game. Every cost is counted
+by the emulator; nothing the ROM says about itself is trusted.</p>
+
+<div class="cards">
+<div class="card"><h3>speed</h3><p>CPU time per frame (COUNT ticks), including every cache stall.</p></div>
+<div class="card"><h3>rsp</h3><p>Vector-coprocessor busy cycles per frame.</p></div>
+<div class="card"><h3>traffic</h3><p>RDRAM bytes moved per frame by every bus device.</p></div>
+<div class="card"><h3>memory</h3><p>Distinct RDRAM bytes the game touches after boot.</p></div>
+</div>
+<p>A task names one profile. Reward = 1 &minus; the geometric mean over workloads of candidate cost / baseline
+cost, clipped to [&minus;1, 1]: halving the cost scores 0.5. A submission that fails any gate scores &minus;1 on
+every profile, however fast it is. Non-speed profiles also carry a frame-time budget, so RAM can't be bought with
+time.</p>
+
+<h3>What must not change</h3>
+<ul>
+<li><b>Gameplay</b>: the observation record (player, camera, enemies, gems, RNG state, ...) must match the original
+<em>bit for bit</em> on all 240 frames of every route.</li>
+<li><b>Video</b>: a pixel passes if a pixel within one pixel of it in the original frame is within 2/31 per channel;
+a frame fails above 0.2% failing pixels. Sub-pixel edge shifts pass; missing objects don't.</li>
+<li><b>Audio</b>: &ge; 40 dB SNR overall, &ge; 20 dB on every non-silent frame.</li>
+<li><b>Harness and hardware</b>: the harness files are byte-identical; the game fits a 4 MB console.</li>
+</ul>
+
+<h2>Calibration</h2>
+<p>Before trusting a grader with RL, it has to rank known patches correctly. These twelve were graded on four public
+and four held-out routes; the <a href="/mario-eval/calibration/">calibration page</a> has every number.</p>
+<table><tr><th>patch</th><th>status</th><th class="num">speed</th><th class="num">rsp</th><th class="num">traffic</th><th class="num">memory</th><th>caught by</th></tr>
+<tr><td><a href="/mario-eval/calibration/#r0-unchanged">Unchanged rebuild</a></td><td><span class="tag valid">valid</span></td><td class="num ">+0.000</td><td class="num ">+0.000</td><td class="num ">+0.000</td><td class="num ">+0.000</td><td class=small></td></tr>
+<tr><td><a href="/mario-eval/calibration/#r1-o2-ieee"><code>-O2 -fno-fast-math</code></a></td><td><span class="tag valid">valid</span></td><td class="num pos">+0.496</td><td class="num pos">+0.004</td><td class="num pos">+0.426</td><td class="num pos">+0.017</td><td class=small></td></tr>
+<tr><td><a href="/mario-eval/calibration/#r2-engine">View-projection once per frame, terrain heights precomputed</a></td><td><span class="tag valid">valid</span></td><td class="num pos">+0.168</td><td class="num pos">+0.001</td><td class="num pos">+0.346</td><td class="num neg" title="footprint_bytes regressed 0.0667% on concert (limit 0%)">&minus;1*</td><td class=small></td></tr>
+<tr><td><a href="/mario-eval/calibration/#r3-cde">Create Dirty Exclusive on the audio block</a></td><td><span class="tag valid">valid</span></td><td class="num pos">+0.043</td><td class="num ">-0.000</td><td class="num pos">+0.108</td><td class="num neg" title="footprint_bytes regressed 0.0231% on concert (limit 0%)">&minus;1*</td><td class=small></td></tr>
+<tr><td><a href="/mario-eval/calibration/#r4-memory">Delete an unused 256 KiB buffer</a></td><td><span class="tag valid">valid</span></td><td class="num ">+0.000</td><td class="num ">+0.000</td><td class="num ">+0.000</td><td class="num pos">+0.408</td><td class=small></td></tr>
+<tr><td><a href="/mario-eval/calibration/#r5-reassoc"><code>(P&middot;V)&middot;M</code> instead of <code>P&middot;(V&middot;M)</code></a></td><td><span class="tag valid">valid</span></td><td class="num neg">-0.007</td><td class="num pos">+0.001</td><td class="num neg" title="rdram_bytes regressed 7.84% on concert (limit 5%)">&minus;1*</td><td class="num ">+0.000</td><td class=small></td></tr>
+<tr><td><a href="/mario-eval/calibration/#r6-sine-table">Sine table and closed-form triangle wave in the synth</a></td><td><span class="tag valid">valid</span></td><td class="num pos">+0.049</td><td class="num neg">-0.001</td><td class="num neg" title="rdram_bytes regressed 31.7% on heldout-fortress (limit 5%)">&minus;1*</td><td class="num neg" title="footprint_bytes regressed 0.552% on concert (limit 0%)">&minus;1*</td><td class=small></td></tr>
+<tr class="invalid"><td><a href="/mario-eval/calibration/#i0-o2-fastmath"><code>-O2</code> with libdragon's default <code>-ffast-math</code></a></td><td><span class="tag invalid">invalid</span></td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class=small>gameplay</td></tr>
+<tr class="invalid"><td><a href="/mario-eval/calibration/#i1-mute">Skip audio synthesis</a></td><td><span class="tag invalid">invalid</span></td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class=small>gameplay, audio</td></tr>
+<tr class="invalid"><td><a href="/mario-eval/calibration/#i2-no-particles">Skip drawing particles</a></td><td><span class="tag invalid">invalid</span></td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class=small>video</td></tr>
+<tr class="invalid"><td><a href="/mario-eval/calibration/#i3-physics">Two physics substeps instead of four</a></td><td><span class="tag invalid">invalid</span></td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class=small>gameplay, video, audio</td></tr>
+<tr class="invalid"><td><a href="/mario-eval/calibration/#i4-tamper">Edit the harness</a></td><td><span class="tag invalid">invalid</span></td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class=small>integrity</td></tr>
+</table>
+<p class="small muted">Rewards on public + held-out routes. <b>&minus;1*</b>: valid submission, but it breaks that profile's budget (hover for the reason).</p>
+
+<h2>The baseline</h2>
+<p>Pip's Garden is correct and written the way many 1990s console games were: built at <code>-O0</code>, with
+redundant math, a direct-mapped cache it ignores, and memory it doesn't need. On the modelled N64 it takes:</p>
+<table><tr><th>workload</th><th class="num">frame (ms)</th><th class="num">VI fields</th><th class="num">CPU Mcycles</th><th class="num">RDRAM KB</th><th class="num">footprint KiB</th></tr>
+<tr><td>meadow</td><td class=num>143.7</td><td class=num>8.6</td><td class=num>13.5</td><td class=num>960</td><td class=num>620</td></tr>
+<tr><td>fortress</td><td class=num>176.0</td><td class=num>10.6</td><td class=num>16.5</td><td class=num>1133</td><td class=num>631</td></tr>
+<tr><td>storm</td><td class=num>182.9</td><td class=num>11.0</td><td class=num>17.1</td><td class=num>1151</td><td class=num>644</td></tr>
+<tr><td>concert</td><td class=num>145.5</td><td class=num>8.7</td><td class=num>13.6</td><td class=num>967</td><td class=num>609</td></tr>
+<tr><td>heldout-concert</td><td class=num>147.1</td><td class=num>8.8</td><td class=num>13.8</td><td class=num>995</td><td class=num>609</td></tr>
+<tr><td>heldout-fortress</td><td class=num>178.1</td><td class=num>10.7</td><td class=num>16.7</td><td class=num>1152</td><td class=num>635</td></tr>
+<tr><td>heldout-meadow</td><td class=num>147.7</td><td class=num>8.9</td><td class=num>13.9</td><td class=num>1007</td><td class=num>623</td></tr>
+<tr><td>heldout-storm</td><td class=num>179.7</td><td class=num>10.8</td><td class=num>16.8</td><td class=num>1101</td><td class=num>647</td></tr>
+</table>
+<p class="small muted">One NTSC video field is 16.7 ms; a game that wants 30 fps has two.</p>
+
+<h2>Writing</h2>
+<ul class="post-list"><li><a href="/mario-eval/blog/building-mario-eval/">Building Mario Eval</a> <span class=date>2026-11-14</span><br><span class="small muted">Why an optimization eval for the N64, why the grader came before the game, and how the reward is verified.</span></li><li><a href="/mario-eval/blog/calibrating-the-grader/">Calibrating the grader</a> <span class=date>2026-11-14</span><br><span class="small muted">Twelve known patches, what each one scored, and what they taught me about tolerances, budgets and the CACHE instruction.</span></li><li><a href="/mario-eval/blog/road-to-super-mario-64/">The road to Super Mario 64</a> <span class=date>2026-11-14</span><br><span class="small muted">What carries over from the stand-in game, what a ROM unlocks, and the five steps between here and Super Mario 64.</span></li><li><a href="/mario-eval/blog/what-the-emulator-measures/">What the emulator can and can&#x27;t measure</a> <span class=date>2026-11-14</span><br><span class="small muted">Which N64 costs ares models, which it doesn&#x27;t, and what that means for each reward profile.</span></li></ul>
+
+<h2>Run it</h2>
+<pre><code>git clone https://github.com/IlyaasK/mario-eval && cd mario-eval
+scripts/build-images.sh --no-task          # toolchain, ares + n64run, grader
+scripts/precompute.sh                      # baseline reference
+scripts/grade.sh path/to/your/game out/    # grade a source tree
+scripts/build-images.sh && cd quickstart && docker compose up -d   # agent container</code></pre>
+</main>
+<footer class="site"><div class="wrap">
+Built by <a href="https://ilya.as/">Ilyaas Kapadia</a>, modelled on Mechanize's
+<a href="https://gbaeval.com/">GBA Eval</a>. Not affiliated with or endorsed by Nintendo.
+No Nintendo code or assets are distributed; Super Mario 64 support requires your own legally obtained ROM.
+</div></footer>
+</body></html>

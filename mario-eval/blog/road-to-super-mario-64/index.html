@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The road to Super Mario 64 | Mario Eval</title>
+<meta name="description" content="What carries over from the stand-in game, what a ROM unlocks, and the five steps between here and Super Mario 64.">
+<meta property="og:title" content="The road to Super Mario 64 | Mario Eval"><meta property="og:description" content="What carries over from the stand-in game, what a ROM unlocks, and the five steps between here and Super Mario 64.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/mario-eval/style.css">
+</head><body>
+<header class="site"><div class="wrap"><a class="logo" href="/mario-eval/">MARIO<span>EVAL</span></a>
+<nav class="site"><a href="/mario-eval/">Overview</a> <a href="/mario-eval/calibration/">Calibration</a> <a href="/mario-eval/blog/" class=on>Blog</a> <a href="https://github.com/IlyaasK/mario-eval">GitHub</a></nav></div></header>
+<main class="wrap"><article class="prose"><h1>The road to Super Mario 64</h1><p class="meta">2026-11-14</p>
+<p>The eval is named for Super Mario 64, and SM64 is where it is headed: a game whose engine is famously
+unoptimized as shipped (built without compiler optimization, with debug code left in) and whose decompilation has
+made it the best-studied N64 codebase there is. Kaze's
+<a href="https://www.youtube.com/watch?v=t_rzYnXEQlE">rewrite of the whole source</a> shows how far it can be
+pushed; his <a href="https://www.youtube.com/watch?v=TSCzC-WECw8">video on walls</a> shows the trap, an optimization
+that also quietly removes glitches speedrunners rely on.</p>
+
+<h2>Why it isn't the first workload</h2>
+<p>The <a href="https://github.com/n64decomp/sm64">n64decomp/sm64</a> project is code only. Building it extracts
+textures, models, sounds and music from a ROM you supply, and this project does not distribute Nintendo's ROM or
+assets. Rather than block on that, the whole pipeline was built and calibrated on Pip's Garden, an original game,
+and SM64 plugs into it.</p>
+
+<h2>What carries over unchanged</h2>
+<ul>
+<li>The emulator build, its instrumentation and the logical-frame protocol.</li>
+<li>The grader: trusted rebuild, gates, metrics, profiles and reward.</li>
+<li>The agent container, the egress proxy and the run supervisor.</li>
+<li>The calibration discipline.</li>
+</ul>
+
+<h2>What is already in place</h2>
+<p><code>sm64/setup.sh</code> takes your ROM, checks it is the US release by SHA-1, checks out the decompilation at
+a pinned commit and builds the matching baseline. The decompilation directory, and everything extracted from the
+ROM, is kept out of git.</p>
+
+<h2>The five remaining steps</h2>
+<ol>
+<li><b>Harness calls in the game loop.</b> SM64 reads the controllers once per frame through the PIF, synchronously,
+which is exactly what the harness needs: that read becomes <code>mev_read_pad()</code>, and
+<code>mev_end_frame()</code> goes after the frame's graphics task completes.</li>
+<li><b>An unthrottled build.</b> The game loop waits for the video retrace; a benchmark build skips the wait so
+frame cost is pure work, the same approach the community's profiling builds take.</li>
+<li><b>An observation record.</b> Mario's position, velocity, action, health, coins and stars, the camera, the RNG
+seed and the active objects, compared bit for bit. This is what turns "don't change the game" into something a
+grader can check, and it is why an SM64 wall-collision rewrite that loses a glitch would be caught.</li>
+<li><b>Routes.</b> Controller routes through several courses, each starting from a replayed path out of the file
+select screen rather than an emulator savestate, because a savestate pins one build's memory layout and an
+optimized build won't have it.</li>
+<li><b>Calibration.</b> The unchanged rebuild must score zero; known-good patches (IEEE-preserving <code>-O2</code>,
+Create Dirty Exclusive, memory savings) positive; shortcuts &minus;1.</li>
+</ol>
+<p>Each of these needs the ROM to build and test, so none of them ships before it has been verified.</p>
+</article></main>
+<footer class="site"><div class="wrap">
+Built by <a href="https://ilya.as/">Ilyaas Kapadia</a>, modelled on Mechanize's
+<a href="https://gbaeval.com/">GBA Eval</a>. Not affiliated with or endorsed by Nintendo.
+No Nintendo code or assets are distributed; Super Mario 64 support requires your own legally obtained ROM.
+</div></footer>
+</body></html>

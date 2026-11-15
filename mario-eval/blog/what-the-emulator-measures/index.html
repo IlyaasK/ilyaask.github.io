@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What the emulator can and can&#x27;t measure | Mario Eval</title>
+<meta name="description" content="Which N64 costs ares models, which it doesn&#x27;t, and what that means for each reward profile.">
+<meta property="og:title" content="What the emulator can and can&#x27;t measure | Mario Eval"><meta property="og:description" content="Which N64 costs ares models, which it doesn&#x27;t, and what that means for each reward profile.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/mario-eval/style.css">
+</head><body>
+<header class="site"><div class="wrap"><a class="logo" href="/mario-eval/">MARIO<span>EVAL</span></a>
+<nav class="site"><a href="/mario-eval/">Overview</a> <a href="/mario-eval/calibration/">Calibration</a> <a href="/mario-eval/blog/" class=on>Blog</a> <a href="https://github.com/IlyaasK/mario-eval">GitHub</a></nav></div></header>
+<main class="wrap"><article class="prose"><h1>What the emulator can and can&#x27;t measure</h1><p class="meta">2026-11-14</p>
+<p>An RLVR reward is only as good as the thing that produces it. For Mario Eval that is ares, so before choosing the
+reward profiles I read the parts of its N64 core that decide what a cost is.</p>
+
+<h2>Modelled</h2>
+<ul>
+<li><b>CPU timing and both caches.</b> With the interpreter (the recompiler bypasses the cache model), every
+instruction fetch goes through a 16 KB, 32-byte-line instruction cache and every load and store through an 8 KB,
+16-byte-line write-back data cache. A miss stalls the CPU for a fixed number of cycles and moves a line over the bus.</li>
+<li><b>The CACHE instruction.</b> All the data-cache operations are implemented, including Create Dirty Exclusive,
+which marks a line valid and dirty without reading RDRAM. This is the instruction Kaze covers in
+<a href="https://www.youtube.com/watch?v=g5u3zW4SLow">his CACHE video</a>; in ares it really does save the fill.</li>
+<li><b>RSP timing.</b> The vector coprocessor's busy and halted cycles are counted.</li>
+<li><b>Bus traffic by device.</b> In homebrew mode ares counts bytes read and written by the CPU's I-cache, D-cache
+and uncached accesses, and by SP, DP, PI, SI, VI and AI DMA.</li>
+</ul>
+
+<h2>Not modelled</h2>
+<ul>
+<li><b>RDP rasterization time.</b> ares hands the RDP's commands to paraLLEl-RDP, which draws them correctly but
+reports completion immediately. On a console, a frame full of large textured triangles can be RDP-bound; here it
+never is.</li>
+<li><b>Bus contention.</b> A cache miss costs the same whether or not the RSP and RDP are hammering RDRAM at that
+moment. On a console, much of the cost of memory traffic is that everyone else has to wait for it.</li>
+</ul>
+
+<h2>What that means for the profiles</h2>
+<p>The four profiles were chosen to be measurable in this model:</p>
+<ul>
+<li><code>speed</code> is CPU time per frame, unthrottled, which includes every cache stall and any time the CPU
+spends waiting on the RSP. It does not include RDP time, so making the RDP's job easier is not rewarded.</li>
+<li><code>rsp</code> is RSP busy cycles.</li>
+<li><code>traffic</code> counts every byte moved over the bus. Because contention isn't modelled, a reduction is
+counted even when it would not have stalled anything; this is the profile that best stands in for "less pressure on
+the shared bus", which the model can't charge for directly.</li>
+<li><code>memory</code> counts distinct RDRAM lines touched after the boot loader hands over, so the IPL3 clearing all
+of RAM is not charged to the game, while a buffer the game clears once at startup is.</li>
+</ul>
+<p>"Frame time on a real console" is deliberately not one of them. It would need the RDP and the bus modelled, or
+measured.</p>
+
+<h2>Deterministic, so small numbers are real</h2>
+<p>The same ROM run twice gives identical counters, so a 3% change is a 3% change. That is useful and occasionally
+surprising: in calibration, reassociating one matrix product (same math, different rounding) moved RDRAM traffic up
+to 8% on one route, and replacing <code>sinf</code> with a table made the CPU faster but raised I-cache traffic by
+up to 30%, because the code moved and started colliding with other hot code in a direct-mapped cache. Kaze calls
+this the performance lottery in his
+<a href="https://www.youtube.com/watch?v=QAyMe8T540U">audio optimization video</a>. The grader doesn't hide it;
+a traffic-tasked agent has to manage layout as well as algorithms.</p>
+
+<h2>Closing the gap</h2>
+<p>The honest claim today is "cheaper on the ares N64 model". Turning that into "cheaper on an N64" needs hardware
+runs: the same ROMs on a console with a flash cartridge, timed with the CPU's Count register around the same
+harness calls, for the calibration patches and for the best submissions. If the rankings agree, the model is good
+enough for that profile; where they don't (anything RDP-bound will be the first place), the profile needs a better
+model or a hardware-in-the-loop grade.</p>
+</article></main>
+<footer class="site"><div class="wrap">
+Built by <a href="https://ilya.as/">Ilyaas Kapadia</a>, modelled on Mechanize's
+<a href="https://gbaeval.com/">GBA Eval</a>. Not affiliated with or endorsed by Nintendo.
+No Nintendo code or assets are distributed; Super Mario 64 support requires your own legally obtained ROM.
+</div></footer>
+</body></html>

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Building Mario Eval | Mario Eval</title>
+<meta name="description" content="Why an optimization eval for the N64, why the grader came before the game, and how the reward is verified.">
+<meta property="og:title" content="Building Mario Eval | Mario Eval"><meta property="og:description" content="Why an optimization eval for the N64, why the grader came before the game, and how the reward is verified.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/mario-eval/style.css">
+</head><body>
+<header class="site"><div class="wrap"><a class="logo" href="/mario-eval/">MARIO<span>EVAL</span></a>
+<nav class="site"><a href="/mario-eval/">Overview</a> <a href="/mario-eval/calibration/">Calibration</a> <a href="/mario-eval/blog/" class=on>Blog</a> <a href="https://github.com/IlyaasK/mario-eval">GitHub</a></nav></div></header>
+<main class="wrap"><article class="prose"><h1>Building Mario Eval</h1><p class="meta">2026-11-14</p>
+<p>Mario Eval asks a coding agent to do what N64 developers and, decades later, modders like
+<a href="https://www.youtube.com/@KazeEmanuar">Kaze Emanuar</a> have spent years on: make a Nintendo 64 game
+cheaper to run on the console it shipped for, without changing the game. It is built as an RLVR environment, so the
+hard part is not the task statement but the reward: a number that goes up only when the game genuinely got
+cheaper and stayed the same.</p>
+
+<h2>Why the N64</h2>
+<p>The N64 is a good place to test optimization skill because its costs are unusual and well understood. The CPU
+has a 16 KB instruction cache and an 8 KB data cache, both direct-mapped, in front of 4 MB of RDRAM that the CPU,
+the RSP, the RDP, audio and video all share. Instruction count is a poor proxy for cost: a loop that executes more
+instructions can be faster if it stays in cache, moving a function can make the game slower because it now
+collides with another one, and storing to memory you are about to overwrite costs a read first unless you use the
+<code>CACHE</code> instruction to say otherwise. Kaze's videos on
+<a href="https://www.youtube.com/watch?v=uYPH-NH3B6k">render speed</a>,
+<a href="https://www.youtube.com/watch?v=oZcbgNdWL7w">memory use</a> and the
+<a href="https://www.youtube.com/watch?v=g5u3zW4SLow">CACHE instruction</a> are the best tour of how much room there
+is, and of how often a plausible change is the wrong one.</p>
+
+<h2>Grader first</h2>
+<p>The tempting first step is to build the best optimized version of the game, then measure models against it. I
+did the opposite. A fully optimized starting point removes the accessible improvements and bakes in one person's
+idea of what counts. What an eval needs first is a grader that ranks known patches correctly: a real improvement
+scores positive, a shortcut that changes the game scores &minus;1, and a change that trades one resource for another
+shows up as exactly that. Everything else (the agent container, the corpus, the site) came after
+<a href="/mario-eval/calibration/">calibration</a> worked.</p>
+
+<h2>What is verified</h2>
+<p>A submission is a source tree. The grader rebuilds it with a pinned libdragon toolchain and runs it in ares, the
+accuracy-focused emulator, built from a pinned commit with a small patch that counts RDRAM lines touched and samples
+the CPU's program counter. ares runs the CPU interpreter here, so its models of both caches apply to every
+instruction, and its Create Dirty Exclusive implementation really skips the line fill.</p>
+<p>Two design choices make the measurement honest:</p>
+<ul>
+<li><b>Logical frames, not video fields.</b> The game runs unthrottled and reports the end of each frame through a
+harness call. Controller input is served per logical frame. A build that is twice as fast sees the same inputs on
+the same frames and plays the same game; if inputs were tied to video timing, faster code would literally play a
+different game and the comparison would be meaningless.</li>
+<li><b>The emulator counts, the ROM doesn't.</b> Frame cost is the CP0 Count register as ares advances it; RSP time,
+bus traffic per device and RAM footprint are counted inside the emulator. A ROM can't report a better number than
+it earned.</li>
+</ul>
+<p>Correctness is checked frame by frame against the original: the gameplay state bit for bit, the picture with a
+one-pixel neighbourhood tolerance, the audio by signal-to-noise ratio. The tolerances were chosen from calibration
+patches, not guessed: legitimate changes land orders of magnitude inside them, shortcuts orders of magnitude
+outside.</p>
+
+<h2>One objective per task</h2>
+<p>"Faster, cheaper, more efficient" is several objectives that disagree. A lookup table trades RAM for CPU time;
+batching trades traffic for buffer space; a code change can speed the CPU up and increase bus traffic because the
+new layout misses the instruction cache more. Rather than invent an exchange rate between bytes and cycles, each
+task names one profile (<code>speed</code>, <code>rsp</code>, <code>traffic</code> or <code>memory</code>) and the
+others act as budgets. Calibration shows why this matters: the sine-table patch makes the game faster and fails the
+traffic budget, for a reason that is entirely real.</p>
+
+<h2>Why a stand-in game</h2>
+<p>Super Mario 64 is the point, but the decompilation can only be built from a ROM dumped from a cartridge you own,
+and none is distributed here. So the harness was built and calibrated on <b>Pip's Garden</b>, an original game
+written for this eval: small, deterministic, and unoptimized in the ways real 1990s engines were, from
+<code>-O0</code> builds to per-object matrix rebuilds and a software synthesizer that calls <code>asinf</code> for every
+sample. Everything about it that matters to grading (the harness contract, the logical-frame protocol, the
+measurements) carries over to Super Mario 64 unchanged; the
+<a href="/mario-eval/blog/road-to-super-mario-64/">road to Super Mario 64</a> post covers what changes.</p>
+
+<h2>The agent's environment</h2>
+<p>The agent works in a container with the game's source, the toolchain, the emulator and the same grader it is
+scored by, restricted to the public routes. <code>mev profile</code> gives a clock-weighted per-function profile in
+which cache stalls land on the instruction that caused them. The container sits on a Docker network with no route
+out; its only egress is a proxy that admits model-API hosts and refuses everything else, which was checked from
+inside the container. Held-out routes live on the host and are only used when a checkpoint is graded.</p>
+
+<h2>What it doesn't measure (yet)</h2>
+<p>ares does not model how long the RDP takes to draw, or contention on the memory bus between the CPU and the RCP.
+Those are real costs on a console, and the eval can't reward reducing them until it can measure them; the
+<a href="/mario-eval/blog/what-the-emulator-measures/">emulator post</a> goes through what that means for the profiles and
+how hardware validation would close the gap.</p>
+</article></main>
+<footer class="site"><div class="wrap">
+Built by <a href="https://ilya.as/">Ilyaas Kapadia</a>, modelled on Mechanize's
+<a href="https://gbaeval.com/">GBA Eval</a>. Not affiliated with or endorsed by Nintendo.
+No Nintendo code or assets are distributed; Super Mario 64 support requires your own legally obtained ROM.
+</div></footer>
+</body></html>

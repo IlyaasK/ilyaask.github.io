@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calibrating the grader | Mario Eval</title>
+<meta name="description" content="Twelve known patches, what each one scored, and what they taught me about tolerances, budgets and the CACHE instruction.">
+<meta property="og:title" content="Calibrating the grader | Mario Eval"><meta property="og:description" content="Twelve known patches, what each one scored, and what they taught me about tolerances, budgets and the CACHE instruction.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/mario-eval/style.css">
+</head><body>
+<header class="site"><div class="wrap"><a class="logo" href="/mario-eval/">MARIO<span>EVAL</span></a>
+<nav class="site"><a href="/mario-eval/">Overview</a> <a href="/mario-eval/calibration/">Calibration</a> <a href="/mario-eval/blog/" class=on>Blog</a> <a href="https://github.com/IlyaasK/mario-eval">GitHub</a></nav></div></header>
+<main class="wrap"><article class="prose"><h1>Calibrating the grader</h1><p class="meta">2026-11-14</p>
+<p>A reward function for RL has to be right about cases you already understand before it can be trusted on cases
+you don't. So before any model touches Mario Eval, I wrote twelve patches against the baseline whose outcomes I
+could predict, and graded each one exactly like a submission, on four public and four held-out routes. The full
+numbers are on the <a href="/mario-eval/calibration/">calibration page</a>; this post is about what they showed.</p>
+
+<h2>The shortcuts all fail, and fail early</h2>
+<p>Five patches make the game cheaper by changing it. All five score &minus;1, and the grader names the first thing
+that went wrong:</p>
+<ul>
+<li><b>Muting the synthesizer</b> is caught by the gameplay gate before the audio gate: the voice count in the
+observation record differs on frame 9, because voices that never decay are never freed. The audio gate then
+reports 0 dB SNR.</li>
+<li><b>Two physics substeps instead of four</b> changes Pip's height on frame 1.</li>
+<li><b>Not drawing particles</b> passes every gameplay check (particles still exist; they're just invisible) and
+is caught by video alone: 1.0% to 4.8% of pixels fail on the worst frame of each route, against a 0.2% limit.</li>
+<li><b><code>-O2</code> with fast-math</b>, libdragon's default, is the interesting one. It is the most natural
+first move for an agent, it halves frame time, and it fails: on frame 54 of the meadow route, Pip's x-velocity is
+0.393291771 instead of 0.393291712. Fast-math lets the compiler reorder and contract floating-point expressions,
+and one rounding difference in the simulation eventually becomes a different game. The same flags with
+<code>-fno-fast-math</code> are valid and score 0.496.</li>
+<li><b>Editing the harness</b> is caught by a hash before anything is built.</li>
+</ul>
+
+<h2>Tolerances, set from both sides</h2>
+<p>Gameplay is compared bit for bit, but the picture and the sound can't be: a legitimate change to how a vertex
+is computed can move an edge by a fraction of a pixel. Two probes measure how much legitimate noise there is.
+Reassociating one matrix product, <code>(P&middot;V)&middot;M</code> instead of <code>P&middot;(V&middot;M)</code>,
+changed at most 0.001% of the pixels on any frame. Replacing <code>sinf</code> with an interpolated table and the
+<code>asinf(sinf(x))</code> triangle wave with its closed form left the audio at 88 to 91 dB SNR, and no frame below
+67 dB.</p>
+<p>The limits (0.2% of pixels with a one-pixel neighbourhood and 2/31 per channel; 40 dB overall and 20 dB per
+frame) sit between the two sides. Audio has an enormous margin. Video has less than I'd like: the smallest shortcut
+failure is a fortress route where only 0.97% of pixels change, five times the limit. A shortcut that removes
+something small and rare could slip under it, which is an argument for more routes and for gameplay-level checks of
+everything that's drawn, not for loosening anything.</p>
+
+<h2>The CACHE instruction, measured</h2>
+<p>The Create Dirty Exclusive patch is four lines: before the synthesizer fills its 2 KB output block, claim each
+16-byte line with <code>cache 0x0d</code>, so the data cache doesn't read 2 KB of stale samples from RDRAM only to
+overwrite them. On the concert route, the most audio-heavy, data-cache misses fell from 15,532 to 4,831 per frame
+and D-cache traffic from 346 KB to 86 KB per frame, and frame time fell 8.6%. Overall: +0.043 on
+<code>speed</code>, +0.108 on <code>traffic</code>. It is a small, real, hardware-specific win, which is exactly what
+the eval is meant to reward, and the emulator models it faithfully enough to see it.</p>
+
+<h2>Budgets are where the surprises are</h2>
+<p>Each task scores one resource and treats the others as budgets. That's where calibration found things I hadn't
+predicted:</p>
+<ul>
+<li>The <b>sine table</b> is 5% faster and moves 32% <em>more</em> data on one route. Not because of the table: the
+new code shifted the layout, and hot functions started evicting each other from the direct-mapped instruction
+cache. It's valid for <code>speed</code> and rejected for <code>traffic</code>.</li>
+<li>The <b>reassociated product</b> costs nothing in time and still raises traffic 7.8% on one route, by the same
+mechanism.</li>
+<li>The <b>engine patch</b> (view-projection once per frame, terrain heights precomputed) is a clear speed win and is
+rejected for <code>memory</code>: the height table is 324 bytes the baseline didn't have.</li>
+</ul>
+<p>None of these are grader bugs. They're the N64's costs being what they are, and the reason a single combined
+score would be misleading. An agent asked to reduce traffic has to manage code layout as well as algorithms; one
+asked to reduce RAM can't spend it on tables.</p>
+
+<h2>What calibration doesn't prove</h2>
+<p>Every number here is from the ares model of the N64, which does not time the RDP or model bus contention (see
+<a href="/mario-eval/blog/what-the-emulator-measures/">what the emulator measures</a>). The rankings above are about
+CPU, RSP, traffic and memory as ares counts them. The next calibration step is the same twelve ROMs on a console.</p>
+</article></main>
+<footer class="site"><div class="wrap">
+Built by <a href="https://ilya.as/">Ilyaas Kapadia</a>, modelled on Mechanize's
+<a href="https://gbaeval.com/">GBA Eval</a>. Not affiliated with or endorsed by Nintendo.
+No Nintendo code or assets are distributed; Super Mario 64 support requires your own legally obtained ROM.
+</div></footer>
+</body></html>
