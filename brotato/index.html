@@ -4,33 +4,52 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Brotato RL · Ilyaas Kapadia</title>
-<meta name="description" content="A bit-exact C/CUDA Brotato simulator and a reinforcement-learning policy for Demon endless, trained with PufferLib 5." />
+<meta name="description" content="A bit-exact C/CUDA Brotato simulator and a reinforcement-learning policy for Demon endless, trained with PufferLib 5 — playable in the browser." />
 <style>
 body{max-width:760px;margin:40px auto;padding:0 18px;font:16px/1.55 system-ui,sans-serif;color:#222;background:#fafafa}
 h1{margin-bottom:4px}video{width:100%;border-radius:8px;background:#111}
 table{border-collapse:collapse;width:100%;margin:12px 0}td,th{border-bottom:1px solid #ddd;padding:6px 8px;text-align:left}
 code{background:#eee;padding:1px 4px;border-radius:3px}a{color:#0a58ca}
+.demo{position:relative;width:100%;aspect-ratio:3/2;border-radius:8px;overflow:hidden;background:#111}
+.demo iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.cap{color:#555;font-size:14px;margin-top:6px}
 </style>
 </head>
 <body>
 <h1>Brotato RL</h1>
 <p>A reinforcement-learning environment for <b>Brotato</b> (Demon, Danger 5, endless mode), built in a 12-hour hackathon with <a href="https://github.com/PufferAI/PufferLib">PufferLib 5</a>. Code: <a href="https://github.com/IlyaasK/brotato-rl">github.com/IlyaasK/brotato-rl</a>.</p>
-<video src="/brotato/demon_policy.mp4" controls autoplay muted loop playsinline></video>
-<p><i>A 1B-step Demon policy playing the simulator (<code>puffer eval</code>).</i></p>
+
+<h2>Play it</h2>
+<div class="demo"><iframe src="/brotato/game.html" title="Brotato simulator"></iframe></div>
+<p class="cap">The same C simulator, compiled to WebAssembly, playing a 10B-step Demon endless Danger-5 policy at 60&nbsp;Hz. Click the canvas first so it takes the keyboard: <b>WASD / arrow keys</b> drive the same 8-way action space, so you can take over from the policy at any moment. <a href="/brotato/game.html">Open full window</a>.</p>
+
 <h2>What it is</h2>
 <ul>
-<li><b>Simulator:</b> a C reimplementation of the game that runs on CPU and CUDA. GPU and CPU results are bit-identical on every state field.</li>
-<li><b>Checked against the real game:</b> a Godot mod drives the real game headless and records every frame. The simulator replays those recordings and has to match them value for value.</li>
+<li><b>Simulator:</b> a C reimplementation of the game that runs on CPU and CUDA. GPU and CPU results are bit-identical on every state field (20,000 steps &times; 32 envs, every field compared, padding included).</li>
+<li><b>Checked against the real game:</b> a Godot mod drives the real game headless and records every frame. The simulator replays those recordings and matches value for value: the discrete half of the 203-value observation (masks, counts, ids, levels, wave flags) is <b>exact</b> over 827 ticks &mdash; 0 of 130,666 values differ &mdash; and the continuous half is within 1 float32 ULP (max 9.15e-07, none above 1e-06).</li>
+<li><b>Honest bound:</b> the game does not reproduce itself. Two runs with identical seed, pack and actions diverge from each other by <b>0.0656</b> in observations and <b>3.29&nbsp;px</b> in enemy positions (and by up to two waves in outcome), so our agreement with any one run is far tighter than the game's agreement with itself.</li>
 <li><b>Full action space:</b> 31 actions covering movement, buying weapons, items, pets and structures, reroll, lock, ban, recycle, combine, level-ups and crates, with a per-phase action mask. The observation has 203 values.</li>
-<li><b>Training speed:</b> about <b>1.8M env steps/s</b> on an RTX 5070 with 4,096 environments.</li>
+<li><b>Training speed:</b> <b>2.2M</b> env steps/s at 4,096 environments, rising to <b>3.9M</b> at 6,144&ndash;7,168 on one RTX&nbsp;5070; a 1B-step run takes 16 minutes, the 10B-step policy below took 3h20m.</li>
 </ul>
+
 <h2>Results so far</h2>
 <table>
 <tr><th></th><th>Result</th></tr>
 <tr><td>Real-game recordings, matching frame for frame</td><td>up to ticks 1977 / 1551 / 1854 (of 3,600 / 3,600 / 2,799), every recorded action matching</td></tr>
-<tr><td>Policy in the simulator (1B steps)</td><td>wave 3.08 on average over 257 episodes; buys weapons, items and pets; fills 6 weapon slots</td></tr>
-<tr><td>Same policy in the real game</td><td>dies in wave 1, so transfer isn't solved yet</td></tr>
+<tr><td>Policy in the simulator</td><td>reaches wave &asymp;3 in the training sweep after 1B steps; 6 weapon slots filled, buys weapons, items and pets</td></tr>
+<tr><td>Same policy in the real game (10B steps)</td><td><b>4.33 waves on average</b> over seeds 1&ndash;3 on both the mid and final checkpoints (best 6), with the simulator matching the game's wave count exactly on 8 of 11 seed pairs</td></tr>
+<tr><td>Reward</td><td>+1 per wave completed, plus potential-based shaping from the <a href="https://brotato.wiki.spellsandguns.com/ArosRising%27s_Guide_to_Endless_Mode">endless-mode guide</a>: harvesting and luck first, the pruner &rarr; potato thrower &rarr; excalibur weapon ladder, Max-HP scaling (materials deliberately unshaped, since paying for <i>holding</i> gold fights the snowball)</td></tr>
 </table>
-<p>Game files aren't included; you need your own copy of Brotato.</p>
+
+<h2>Earlier clip</h2>
+<video src="/brotato/demon_policy.mp4" controls autoplay muted loop playsinline></video>
+<p class="cap">A 1B-step policy playing the desktop simulator, before the browser build.</p>
+
+<h2>Notes</h2>
+<ul>
+<li>The sprites in the demo above were extracted from the author's own copy of the game; the simulator and its repository ship no game art, and they build and run with primitive-shape fallbacks when it is absent.</li>
+<li>No animation data is in the numeric core: each enemy and weapon draws a single frame, so walk/idle/death clips are not played, and per-kind sprite offsets are not applied (tall bosses sit slightly lower than in the game).</li>
+<li>The browser build is single-threaded, which is irrelevant for play.</li>
+</ul>
 </body>
 </html>
