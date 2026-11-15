@@ -91,27 +91,35 @@ time.</p>
 <li><b>Gameplay</b>: the observation record (player, camera, enemies, gems, RNG state, ...) must match the original
 <em>bit for bit</em> on all 240 frames of every route.</li>
 <li><b>Video</b>: a pixel passes if a pixel within one pixel of it in the original frame is within 2/31 per channel;
-a frame fails above 0.2% failing pixels. Sub-pixel edge shifts pass; missing objects don't.</li>
+a frame fails above 0.2% failing pixels. Sub-pixel edge shifts pass; missing objects don't.
+<b>Accepted visual changes</b> judged equal or better looking, like Kaze's always-full-detail Mario, also pass:
+each is a published patch to the original, verified to leave gameplay and audio identical, and its picture counts as
+a second reference.</li>
 <li><b>Audio</b>: &ge; 40 dB SNR overall, &ge; 20 dB on every non-silent frame.</li>
 <li><b>Harness and hardware</b>: the harness files are byte-identical; the game fits a 4 MB console.</li>
 </ul>
 
 <h2>Calibration</h2>
-<p>Before trusting a grader with RL, it has to rank known patches correctly. These twelve were graded on four public
-and four held-out routes; the <a href="/mario-eval/calibration/">calibration page</a> has every number.</p>
+<p>Before trusting a grader with RL, it has to rank known patches correctly. These fifteen were graded on four public
+and four held-out routes; the <a href="/mario-eval/calibration/">calibration page</a> has every number, and
+<a href="/mario-eval/blog/calibrating-the-grader/">the calibration post</a> explains them, including a result I first got
+wrong.</p>
 <table><tr><th>patch</th><th>status</th><th class="num">speed</th><th class="num">rsp</th><th class="num">traffic</th><th class="num">memory</th><th>caught by</th></tr>
 <tr><td><a href="/mario-eval/calibration/#r0-unchanged">Unchanged rebuild</a></td><td><span class="tag valid">valid</span></td><td class="num ">+0.000</td><td class="num ">+0.000</td><td class="num ">+0.000</td><td class="num ">+0.000</td><td class=small></td></tr>
-<tr><td><a href="/mario-eval/calibration/#r1-o2-ieee"><code>-O2 -fno-fast-math</code></a></td><td><span class="tag valid">valid</span></td><td class="num pos">+0.496</td><td class="num pos">+0.004</td><td class="num pos">+0.426</td><td class="num pos">+0.017</td><td class=small></td></tr>
-<tr><td><a href="/mario-eval/calibration/#r2-engine">View-projection once per frame, terrain heights precomputed</a></td><td><span class="tag valid">valid</span></td><td class="num pos">+0.168</td><td class="num pos">+0.001</td><td class="num pos">+0.346</td><td class="num neg" title="footprint_bytes regressed 0.0667% on concert (limit 0%)">&minus;1*</td><td class=small></td></tr>
-<tr><td><a href="/mario-eval/calibration/#r3-cde">Create Dirty Exclusive on the audio block</a></td><td><span class="tag valid">valid</span></td><td class="num pos">+0.043</td><td class="num ">-0.000</td><td class="num pos">+0.108</td><td class="num neg" title="footprint_bytes regressed 0.0231% on concert (limit 0%)">&minus;1*</td><td class=small></td></tr>
-<tr><td><a href="/mario-eval/calibration/#r4-memory">Delete an unused 256 KiB buffer</a></td><td><span class="tag valid">valid</span></td><td class="num ">+0.000</td><td class="num ">+0.000</td><td class="num ">+0.000</td><td class="num pos">+0.408</td><td class=small></td></tr>
-<tr><td><a href="/mario-eval/calibration/#r5-reassoc"><code>(P&middot;V)&middot;M</code> instead of <code>P&middot;(V&middot;M)</code></a></td><td><span class="tag valid">valid</span></td><td class="num neg">-0.007</td><td class="num pos">+0.001</td><td class="num neg" title="rdram_bytes regressed 7.84% on concert (limit 5%)">&minus;1*</td><td class="num ">+0.000</td><td class=small></td></tr>
-<tr><td><a href="/mario-eval/calibration/#r6-sine-table">Sine table and closed-form triangle wave in the synth</a></td><td><span class="tag valid">valid</span></td><td class="num pos">+0.049</td><td class="num neg">-0.001</td><td class="num neg" title="rdram_bytes regressed 31.7% on heldout-fortress (limit 5%)">&minus;1*</td><td class="num neg" title="footprint_bytes regressed 0.552% on concert (limit 0%)">&minus;1*</td><td class=small></td></tr>
+<tr><td><a href="/mario-eval/calibration/#r1-o2-ieee"><code>-O2 -fno-fast-math</code></a></td><td><span class="tag valid">valid</span></td><td class="num pos">+0.498</td><td class="num pos">+0.005</td><td class="num pos">+0.496</td><td class="num pos">+0.017</td><td class=small></td></tr>
+<tr><td><a href="/mario-eval/calibration/#r2-engine">View-projection once per frame, terrain heights precomputed</a></td><td><span class="tag valid">valid</span></td><td class="num pos">+0.105</td><td class="num pos">+0.001</td><td class="num pos">+0.081</td><td class="num neg" title="footprint_bytes regressed 0.0688% on heldout-fortress (limit 0%)">&minus;1*</td><td class=small></td></tr>
+<tr><td><a href="/mario-eval/calibration/#r3-cde">Create Dirty Exclusive on the audio block</a></td><td><span class="tag valid">valid</span></td><td class="num neg">-0.008</td><td class="num neg">-0.001</td><td class="num neg">-0.037</td><td class="num neg" title="footprint_bytes regressed 0.0205% on concert (limit 0%)">&minus;1*</td><td class=small></td></tr>
+<tr><td><a href="/mario-eval/calibration/#r4-memory">Delete an unused 256 KiB buffer</a></td><td><span class="tag valid">valid</span></td><td class="num ">+0.000</td><td class="num ">-0.000</td><td class="num ">-0.000</td><td class="num pos">+0.408</td><td class=small></td></tr>
+<tr><td><a href="/mario-eval/calibration/#r5-reassoc"><code>(P&middot;V)&middot;M</code> instead of <code>P&middot;(V&middot;M)</code></a></td><td><span class="tag valid">valid</span></td><td class="num neg">-0.002</td><td class="num ">+0.000</td><td class="num neg">-0.008</td><td class="num ">+0.000</td><td class=small></td></tr>
+<tr><td><a href="/mario-eval/calibration/#r6-sine-table">Sine table and closed-form triangle wave in the synth</a></td><td><span class="tag valid">valid</span></td><td class="num pos">+0.086</td><td class="num neg">-0.001</td><td class="num pos">+0.045</td><td class="num neg" title="footprint_bytes regressed 0.528% on concert (limit 0%)">&minus;1*</td><td class=small></td></tr>
 <tr class="invalid"><td><a href="/mario-eval/calibration/#i0-o2-fastmath"><code>-O2</code> with libdragon's default <code>-ffast-math</code></a></td><td><span class="tag invalid">invalid</span></td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class=small>gameplay</td></tr>
 <tr class="invalid"><td><a href="/mario-eval/calibration/#i1-mute">Skip audio synthesis</a></td><td><span class="tag invalid">invalid</span></td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class=small>gameplay, audio</td></tr>
 <tr class="invalid"><td><a href="/mario-eval/calibration/#i2-no-particles">Skip drawing particles</a></td><td><span class="tag invalid">invalid</span></td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class=small>video</td></tr>
 <tr class="invalid"><td><a href="/mario-eval/calibration/#i3-physics">Two physics substeps instead of four</a></td><td><span class="tag invalid">invalid</span></td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class=small>gameplay, video, audio</td></tr>
 <tr class="invalid"><td><a href="/mario-eval/calibration/#i4-tamper">Edit the harness</a></td><td><span class="tag invalid">invalid</span></td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class=small>integrity</td></tr>
+<tr><td><a href="/mario-eval/calibration/#r7-full-detail">Always draw Pip at full detail</a></td><td><span class="tag valid">valid</span></td><td class="num neg">-0.002</td><td class="num neg">-0.006</td><td class="num neg">-0.007</td><td class="num neg" title="footprint_bytes regressed 0.413% on heldout-meadow (limit 0%)">&minus;1*</td><td class=small></td></tr>
+<tr class="invalid"><td><a href="/mario-eval/calibration/#i5-low-detail">Always draw Pip at the lowest detail</a></td><td><span class="tag invalid">invalid</span></td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class=small>video</td></tr>
+<tr><td><a href="/mario-eval/calibration/#r8-full-detail-shifted">Always draw Pip at full detail, deleting the distance check</a></td><td><span class="tag valid">valid</span></td><td class="num neg" title="frame_ticks regressed 17.8% on concert (limit 5%)">&minus;1*</td><td class="num neg" title="frame time regressed 17.8% on concert (budget 5%)">&minus;1*</td><td class="num neg" title="rdram_bytes regressed 43.7% on concert (limit 5%)">&minus;1*</td><td class="num neg" title="footprint_bytes regressed 0.403% on heldout-meadow (limit 0%)">&minus;1*</td><td class=small></td></tr>
 </table>
 <p class="small muted">Rewards on public + held-out routes. <b>&minus;1*</b>: valid submission, but it breaks that profile's budget (hover for the reason).</p>
 
@@ -119,19 +127,19 @@ and four held-out routes; the <a href="/mario-eval/calibration/">calibration pag
 <p>Pip's Garden is correct and written the way many 1990s console games were: built at <code>-O0</code>, with
 redundant math, a direct-mapped cache it ignores, and memory it doesn't need. On the modelled N64 it takes:</p>
 <table><tr><th>workload</th><th class="num">frame (ms)</th><th class="num">VI fields</th><th class="num">CPU Mcycles</th><th class="num">RDRAM KB</th><th class="num">footprint KiB</th></tr>
-<tr><td>meadow</td><td class=num>143.7</td><td class=num>8.6</td><td class=num>13.5</td><td class=num>960</td><td class=num>620</td></tr>
-<tr><td>fortress</td><td class=num>176.0</td><td class=num>10.6</td><td class=num>16.5</td><td class=num>1133</td><td class=num>631</td></tr>
-<tr><td>storm</td><td class=num>182.9</td><td class=num>11.0</td><td class=num>17.1</td><td class=num>1151</td><td class=num>644</td></tr>
-<tr><td>concert</td><td class=num>145.5</td><td class=num>8.7</td><td class=num>13.6</td><td class=num>967</td><td class=num>609</td></tr>
-<tr><td>heldout-concert</td><td class=num>147.1</td><td class=num>8.8</td><td class=num>13.8</td><td class=num>995</td><td class=num>609</td></tr>
-<tr><td>heldout-fortress</td><td class=num>178.1</td><td class=num>10.7</td><td class=num>16.7</td><td class=num>1152</td><td class=num>635</td></tr>
-<tr><td>heldout-meadow</td><td class=num>147.7</td><td class=num>8.9</td><td class=num>13.9</td><td class=num>1007</td><td class=num>623</td></tr>
-<tr><td>heldout-storm</td><td class=num>179.7</td><td class=num>10.8</td><td class=num>16.8</td><td class=num>1101</td><td class=num>647</td></tr>
+<tr><td>meadow</td><td class=num>146.7</td><td class=num>8.8</td><td class=num>13.8</td><td class=num>1135</td><td class=num>620</td></tr>
+<tr><td>fortress</td><td class=num>180.3</td><td class=num>10.8</td><td class=num>16.9</td><td class=num>1372</td><td class=num>631</td></tr>
+<tr><td>storm</td><td class=num>187.8</td><td class=num>11.3</td><td class=num>17.6</td><td class=num>1372</td><td class=num>644</td></tr>
+<tr><td>concert</td><td class=num>139.0</td><td class=num>8.3</td><td class=num>13.0</td><td class=num>931</td><td class=num>609</td></tr>
+<tr><td>heldout-concert</td><td class=num>141.6</td><td class=num>8.5</td><td class=num>13.3</td><td class=num>981</td><td class=num>610</td></tr>
+<tr><td>heldout-fortress</td><td class=num>182.4</td><td class=num>10.9</td><td class=num>17.1</td><td class=num>1403</td><td class=num>636</td></tr>
+<tr><td>heldout-meadow</td><td class=num>150.1</td><td class=num>9.0</td><td class=num>14.1</td><td class=num>1183</td><td class=num>621</td></tr>
+<tr><td>heldout-storm</td><td class=num>182.1</td><td class=num>10.9</td><td class=num>17.1</td><td class=num>1279</td><td class=num>648</td></tr>
 </table>
 <p class="small muted">One NTSC video field is 16.7 ms; a game that wants 30 fps has two.</p>
 
 <h2>Writing</h2>
-<ul class="post-list"><li><a href="/mario-eval/blog/building-mario-eval/">Building Mario Eval</a> <span class=date>2026-11-14</span><br><span class="small muted">Why an optimization eval for the N64, why the grader came before the game, and how the reward is verified.</span></li><li><a href="/mario-eval/blog/calibrating-the-grader/">Calibrating the grader</a> <span class=date>2026-11-14</span><br><span class="small muted">Twelve known patches, what each one scored, and what they taught me about tolerances, budgets and the CACHE instruction.</span></li><li><a href="/mario-eval/blog/road-to-super-mario-64/">The road to Super Mario 64</a> <span class=date>2026-11-14</span><br><span class="small muted">What carries over from the stand-in game, what a ROM unlocks, and the five steps between here and Super Mario 64.</span></li><li><a href="/mario-eval/blog/what-the-emulator-measures/">What the emulator can and can&#x27;t measure</a> <span class=date>2026-11-14</span><br><span class="small muted">Which N64 costs ares models, which it doesn&#x27;t, and what that means for each reward profile.</span></li></ul>
+<ul class="post-list"><li><a href="/mario-eval/blog/calibrating-the-grader/">Calibrating the grader</a> <span class=date>2026-11-15</span><br><span class="small muted">Fifteen known patches, what each one scored, and what they taught me about tolerances, budgets, accepted visual changes and the performance lottery.</span></li><li><a href="/mario-eval/blog/building-mario-eval/">Building Mario Eval</a> <span class=date>2026-11-14</span><br><span class="small muted">Why an optimization eval for the N64, why the grader came before the game, and how the reward is verified.</span></li><li><a href="/mario-eval/blog/road-to-super-mario-64/">The road to Super Mario 64</a> <span class=date>2026-11-14</span><br><span class="small muted">What carries over from the stand-in game, what a ROM unlocks, and the five steps between here and Super Mario 64.</span></li><li><a href="/mario-eval/blog/what-the-emulator-measures/">What the emulator can and can&#x27;t measure</a> <span class=date>2026-11-14</span><br><span class="small muted">Which N64 costs ares models, which it doesn&#x27;t, and what that means for each reward profile.</span></li></ul>
 
 <h2>Run it</h2>
 <pre><code>git clone https://github.com/IlyaasK/mario-eval && cd mario-eval

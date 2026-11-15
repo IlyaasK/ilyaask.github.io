@@ -53,12 +53,14 @@ measured.</p>
 
 <h2>Deterministic, so small numbers are real</h2>
 <p>The same ROM run twice gives identical counters, so a 3% change is a 3% change. That is useful and occasionally
-surprising: in calibration, reassociating one matrix product (same math, different rounding) moved RDRAM traffic up
-to 8% on one route, and replacing <code>sinf</code> with a table made the CPU faster but raised I-cache traffic by
-up to 30%, because the code moved and started colliding with other hot code in a direct-mapped cache. Kaze calls
-this the performance lottery in his
-<a href="https://www.youtube.com/watch?v=QAyMe8T540U">audio optimization video</a>. The grader doesn't hide it;
-a traffic-tasked agent has to manage layout as well as algorithms.</p>
+surprising. In calibration, deleting 208 bytes of code (the distance check behind Pip's detail levels) made the game
+up to 17.8% slower on one route: every piece of data after the deleted code moved down by 208 bytes while the stack
+and heap buffers stayed put, hot data started evicting each other in the direct-mapped 8 KB data cache, and data-cache
+misses roughly quadrupled. Deleting 112 bytes for the same visible result cost nothing. Kaze calls this the
+performance lottery in his
+<a href="https://www.youtube.com/watch?v=QAyMe8T540U">audio optimization video</a>. It is not an emulator artifact:
+the cache is direct-mapped on the console too. The grader doesn't hide it; an agent has to manage layout as well as
+algorithms.</p>
 
 <h2>Closing the gap</h2>
 <p>The honest claim today is "cheaper on the ares N64 model". Turning that into "cheaper on an N64" needs hardware

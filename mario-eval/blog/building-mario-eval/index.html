@@ -62,8 +62,9 @@ outside.</p>
 batching trades traffic for buffer space; a code change can speed the CPU up and increase bus traffic because the
 new layout misses the instruction cache more. Rather than invent an exchange rate between bytes and cycles, each
 task names one profile (<code>speed</code>, <code>rsp</code>, <code>traffic</code> or <code>memory</code>) and the
-others act as budgets. Calibration shows why this matters: the sine-table patch makes the game faster and fails the
-traffic budget, for a reason that is entirely real.</p>
+others act as budgets. Calibration shows why this matters: precomputing the terrain's heights makes the game 10%
+faster and fails the memory budget, because the table is 448 bytes the original didn't need. That is a real trade,
+not a grader bug.</p>
 
 <h2>Why a stand-in game</h2>
 <p>Super Mario 64 is the point, but the decompilation can only be built from a ROM dumped from a cartridge you own,
