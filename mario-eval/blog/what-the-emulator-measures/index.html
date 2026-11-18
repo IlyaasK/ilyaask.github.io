@@ -1,73 +1,72 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>What the emulator can and can&#x27;t measure | Mario Eval</title>
-<meta name="description" content="Which N64 costs ares models, which it doesn&#x27;t, and what that means for each reward profile.">
-<meta property="og:title" content="What the emulator can and can&#x27;t measure | Mario Eval"><meta property="og:description" content="Which N64 costs ares models, which it doesn&#x27;t, and what that means for each reward profile.">
+<title>What the emulator measures (and how we closed the RDP gap) | Mario Eval</title>
+<meta name="description" content="How our instrumented ares build models VR4300 caches, CACHE 0x0d, RSP microcode, 62.5 MHz RDP cycles, and RDRAM traffic.">
+<meta property="og:title" content="What the emulator measures (and how we closed the RDP gap) | Mario Eval"><meta property="og:description" content="How our instrumented ares build models VR4300 caches, CACHE 0x0d, RSP microcode, 62.5 MHz RDP cycles, and RDRAM traffic.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/mario-eval/style.css">
 </head><body>
 <header class="site"><div class="wrap"><a class="logo" href="/mario-eval/">MARIO<span>EVAL</span></a>
-<nav class="site"><a href="/mario-eval/">Overview</a> <a href="/mario-eval/calibration/">Calibration</a> <a href="/mario-eval/blog/" class=on>Blog</a> <a href="https://github.com/IlyaasK/mario-eval">GitHub</a></nav></div></header>
-<main class="wrap"><article class="prose"><h1>What the emulator can and can&#x27;t measure</h1><p class="meta">2026-11-14</p>
-<p>An RLVR reward is only as good as the thing that produces it. For Mario Eval that is ares, so before choosing the
-reward profiles I read the parts of its N64 core that decide what a cost is.</p>
+<nav class="site"><a href="/mario-eval/">Overview</a> <a href="/mario-eval/leaderboard/">Leaderboard</a> <a href="/mario-eval/calibration/">Calibration</a> <a href="/mario-eval/blog/" class=on>Blog</a> <a href="https://github.com/IlyaasK/mario-eval">GitHub</a></nav></div></header>
+<main class="wrap"><article class="prose"><h1>What the emulator measures (and how we closed the RDP gap)</h1><p class="meta">2026-11-16</p>
+<p>An RLVR reward is only as honest as the hardware model underneath it. Stock N64 emulators optimize for 60 Hz desktop
+playback rather than cycle attribution: dynamic recompilers skip cache simulation, and fast HLE/Vulkan plugins complete
+RDP draws instantaneously. Before wiring the leaderboard profiles, we audited ares's N64 core and added
+<code>0001-mario-eval-instrumentation.patch</code> so CPU, RSP, RDP, and RDRAM costs are all first-class signals.</p>
 
-<h2>Modelled</h2>
+<h2>Modelled inside <code>n64run</code></h2>
 <ul>
-<li><b>CPU timing and both caches.</b> With the interpreter (the recompiler bypasses the cache model), every
-instruction fetch goes through a 16 KB, 32-byte-line instruction cache and every load and store through an 8 KB,
-16-byte-line write-back data cache. A miss stalls the CPU for a fixed number of cycles and moves a line over the bus.</li>
-<li><b>The CACHE instruction.</b> All the data-cache operations are implemented, including Create Dirty Exclusive,
-which marks a line valid and dirty without reading RDRAM. This is the instruction Kaze covers in
-<a href="https://www.youtube.com/watch?v=g5u3zW4SLow">his CACHE video</a>; in ares it really does save the fill.</li>
-<li><b>RSP timing.</b> The vector coprocessor's busy and halted cycles are counted.</li>
-<li><b>Bus traffic by device.</b> In homebrew mode ares counts bytes read and written by the CPU's I-cache, D-cache
-and uncached accesses, and by SP, DP, PI, SI, VI and AI DMA.</li>
+<li><b>VR4300 CPU timing and direct-mapped caches.</b> Running ares's pure interpreter sends every instruction fetch
+through the 16 KB (32-byte line) direct-mapped I-cache and every load/store through the 8 KB (16-byte line) write-back
+D-cache. Misses stall the CPU and transfer exact cache lines over RDRAM.</li>
+<li><b><code>CACHE 0x0d</code> (Create Dirty Exclusive).</b> Every VR4300 <code>CACHE</code> opcode is active. Marking a
+16-byte aligned scratch line dirty-exclusive before overwriting a 64-byte <code>Mtx</code> or vertex buffer genuinely
+eliminates the wasted RDRAM line fill, matching Kaze Emanuar's
+<a href="https://www.youtube.com/watch?v=g5u3zW4SLow">CACHE hardware benchmarks</a>.</li>
+<li><b>RSP vector &amp; scalar cycles.</b> Non-halted RSP cycles are counted across both <code>gspFast3D</code>
+geometry/lighting Display Lists and <code>rspAspMain</code> ADPCM audio synthesis.</li>
+<li><b>Deterministic 62.5 MHz RDP (<code>gclk</code>) cycle &amp; pixel model.</b> Alongside paraLLEl-RDP's exact pixel
+rendering, our RDP command profiler models 1-cycle vs 2-cycle/copy/fill raster throughput, Z-buffer read/compare/write
+and blender read-modify-write memory penalties, TMEM load stalls (<code>LoadBlock</code>, <code>LoadTile</code>,
+<code>LoadTLUT</code>), and <code>DPPipeSync</code> / <code>DPLoadSync</code> / <code>DPTileSync</code> pipeline
+flushes. Switching opaque layers from <code>G_RM_AA_ZB_OPA_SURF</code> to <code>G_RM_RA_ZB_OPA_SURF</code> or culling
+off-screen skybox tiles directly drops <code>rdp_busy</code> and <code>DP Draw</code> bus traffic.</li>
+<li><b>Per-device RDRAM traffic &amp; 4 MB cacheline footprint.</b> Every RDRAM transfer is attributed to its bus
+master (<code>VR4300 ICache</code>, <code>VR4300 DCache</code>, <code>VR4300 Uncached</code>, <code>SP DMA</code>,
+<code>PI DMA</code>, <code>SI DMA</code>, <code>DP DMA</code>, and <code>DP Draw</code>), and a 16-byte line bitmap
+reset at the game's entry point measures exact post-IPL3 RAM footprint against the 4,194,304-byte limit.</li>
 </ul>
 
-<h2>Not modelled</h2>
+<h2>How the six profiles map to hardware</h2>
 <ul>
-<li><b>RDP rasterization time.</b> ares hands the RDP's commands to paraLLEl-RDP, which draws them correctly but
-reports completion immediately. On a console, a frame full of large textured triangles can be RDP-bound; here it
-never is.</li>
-<li><b>Bus contention.</b> A cache miss costs the same whether or not the RSP and RDP are hammering RDRAM at that
-moment. On a console, much of the cost of memory traffic is that everyone else has to wait for it.</li>
+<li><b><code>console</code> (headline)</b> takes the per-frame bottleneck <code>max(CPU_ms, RSP_ms, RDP_ms)</code>
+across the suite within 4 MB RAM. A course stalled on VR4300 collision code and a scene stalled on RDP fillrate must
+both get faster to move the headline FPS.</li>
+<li><b><code>speed</code></b> isolates VR4300 <code>COUNT</code> ticks (46.875 MHz) including I/D-cache miss stalls.</li>
+<li><b><code>rdp</code></b> isolates 62.5 MHz RDP raster, Z/blend, TMEM, and sync cycles.</li>
+<li><b><code>rsp</code></b> isolates RSP microcode busy cycles.</li>
+<li><b><code>traffic</code></b> sums RDRAM bytes across all bus masters &mdash; standing in directly for shared Rambus
+bandwidth pressure.</li>
+<li><b><code>memory</code></b> counts distinct 16-byte RDRAM cachelines ever touched after boot.</li>
 </ul>
 
-<h2>What that means for the profiles</h2>
-<p>The four profiles were chosen to be measurable in this model:</p>
-<ul>
-<li><code>speed</code> is CPU time per frame, unthrottled, which includes every cache stall and any time the CPU
-spends waiting on the RSP. It does not include RDP time, so making the RDP's job easier is not rewarded.</li>
-<li><code>rsp</code> is RSP busy cycles.</li>
-<li><code>traffic</code> counts every byte moved over the bus. Because contention isn't modelled, a reduction is
-counted even when it would not have stalled anything; this is the profile that best stands in for "less pressure on
-the shared bus", which the model can't charge for directly.</li>
-<li><code>memory</code> counts distinct RDRAM lines touched after the boot loader hands over, so the IPL3 clearing all
-of RAM is not charged to the game, while a buffer the game clears once at startup is.</li>
-</ul>
-<p>"Frame time on a real console" is deliberately not one of them. It would need the RDP and the bus modelled, or
-measured.</p>
+<h2>Deterministic, so cache-layout effects are real</h2>
+<p>Two runs of the same ROM produce identical cycle, cache, RDP, and RDRAM counts down to the last tick. That makes
+direct-mapped cache collisions immediately visible. On Pip's Garden, deleting 208 bytes of LOD branch code shifted
+downstream globals into an 8 KB D-cache alias with the stack/heap, quadrupling D-cache misses from ~6,800 to ~28,700
+per frame; on vanilla Super Mario 64, <code>rendering_graph_node.o</code> and <code>math_util.o</code> sit almost
+exactly <code>63 &times; 16 KB</code> apart in <code>sm64.us.map</code>, evicting each other on every scene-graph node.
+Kaze calls this the <a href="https://www.youtube.com/watch?v=QAyMe8T540U">performance lottery</a>; controlling
+<code>sm64.ld</code> section layout turns luck into deterministic engineering.</p>
 
-<h2>Deterministic, so small numbers are real</h2>
-<p>The same ROM run twice gives identical counters, so a 3% change is a 3% change. That is useful and occasionally
-surprising. In calibration, deleting 208 bytes of code (the distance check behind Pip's detail levels) made the game
-up to 17.8% slower on one route: every piece of data after the deleted code moved down by 208 bytes while the stack
-and heap buffers stayed put, hot data started evicting each other in the direct-mapped 8 KB data cache, and data-cache
-misses roughly quadrupled. Deleting 112 bytes for the same visible result cost nothing. Kaze calls this the
-performance lottery in his
-<a href="https://www.youtube.com/watch?v=QAyMe8T540U">audio optimization video</a>. It is not an emulator artifact:
-the cache is direct-mapped on the console too. The grader doesn't hide it; an agent has to manage layout as well as
-algorithms.</p>
-
-<h2>Closing the gap</h2>
-<p>The honest claim today is "cheaper on the ares N64 model". Turning that into "cheaper on an N64" needs hardware
-runs: the same ROMs on a console with a flash cartridge, timed with the CPU's Count register around the same
-harness calls, for the calibration patches and for the best submissions. If the rankings agree, the model is good
-enough for that profile; where they don't (anything RDP-bound will be the first place), the profile needs a better
-model or a hardware-in-the-loop grade.</p>
+<h2>What still separates emulation from a physical deck</h2>
+<p>While individual CPU cache stalls, RSP cycles, RDP fill/TMEM cycles, and per-master RDRAM byte counts are all
+modelled deterministically, simultaneous cycle-by-cycle Rambus arbitration stalls between overlapping CPU and RCP burst
+transfers are captured as aggregate bus bytes in <code>traffic</code> rather than dynamic wait states. Validating top
+calibration rungs and frontier agent checkpoints on a retail NUS-CPU deck via flashcart remains the ultimate ground
+truth.</p>
 </article></main>
 <footer class="site"><div class="wrap">
 Built by <a href="https://ilya.as/">Ilyaas Kapadia</a>, modelled on Mechanize's

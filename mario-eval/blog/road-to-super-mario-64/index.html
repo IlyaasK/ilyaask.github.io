@@ -1,59 +1,53 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The road to Super Mario 64 | Mario Eval</title>
-<meta name="description" content="What carries over from the stand-in game, what a ROM unlocks, and the five steps between here and Super Mario 64.">
-<meta property="og:title" content="The road to Super Mario 64 | Mario Eval"><meta property="og:description" content="What carries over from the stand-in game, what a ROM unlocks, and the five steps between here and Super Mario 64.">
+<title>Wiring Super Mario 64 into Mario Eval | Mario Eval</title>
+<meta name="description" content="How we wired n64decomp/sm64 across 12 courses with zero distributed Nintendo assets, deterministic audio/RDP sync, and Hyrum&#x27;s Law.">
+<meta property="og:title" content="Wiring Super Mario 64 into Mario Eval | Mario Eval"><meta property="og:description" content="How we wired n64decomp/sm64 across 12 courses with zero distributed Nintendo assets, deterministic audio/RDP sync, and Hyrum&#x27;s Law.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/mario-eval/style.css">
 </head><body>
 <header class="site"><div class="wrap"><a class="logo" href="/mario-eval/">MARIO<span>EVAL</span></a>
-<nav class="site"><a href="/mario-eval/">Overview</a> <a href="/mario-eval/calibration/">Calibration</a> <a href="/mario-eval/blog/" class=on>Blog</a> <a href="https://github.com/IlyaasK/mario-eval">GitHub</a></nav></div></header>
-<main class="wrap"><article class="prose"><h1>The road to Super Mario 64</h1><p class="meta">2026-11-14</p>
-<p>The eval is named for Super Mario 64, and SM64 is where it is headed: a game whose engine is famously
-unoptimized as shipped (built without compiler optimization, with debug code left in) and whose decompilation has
-made it the best-studied N64 codebase there is. Kaze's
-<a href="https://www.youtube.com/watch?v=t_rzYnXEQlE">rewrite of the whole source</a> shows how far it can be
-pushed; his <a href="https://www.youtube.com/watch?v=TSCzC-WECw8">video on walls</a> shows the trap, an optimization
-that also quietly removes glitches speedrunners rely on.</p>
+<nav class="site"><a href="/mario-eval/">Overview</a> <a href="/mario-eval/leaderboard/">Leaderboard</a> <a href="/mario-eval/calibration/">Calibration</a> <a href="/mario-eval/blog/" class=on>Blog</a> <a href="https://github.com/IlyaasK/mario-eval">GitHub</a></nav></div></header>
+<main class="wrap"><article class="prose"><h1>Wiring Super Mario 64 into Mario Eval</h1><p class="meta">2026-11-17</p>
+<p>Mario Eval was designed from day one for <b>Super Mario 64</b>: a launch-window 1996 N64 codebase famously shipped at
+IDO <code>-O0</code> in its core game engine, studied for decades by speedrunners and decompilers, and pushed to its
+hardware limits by <a href="https://www.youtube.com/@KazeEmanuar">Kaze Emanuar</a>. Wiring
+<a href="https://github.com/n64decomp/sm64"><code>n64decomp/sm64</code></a> into a leak-proof 24-hour RLVR benchmark
+required solving five engineering constraints cleanly.</p>
 
-<h2>Why it isn't the first workload</h2>
-<p>The <a href="https://github.com/n64decomp/sm64">n64decomp/sm64</a> project is code only. Building it extracts
-textures, models, sounds and music from a ROM you supply, and this project does not distribute Nintendo's ROM or
-assets. Rather than block on that, the whole pipeline was built and calibrated on Pip's Garden, an original game,
-and SM64 plugs into it.</p>
+<h2>1. Zero Nintendo code or assets in the repo</h2>
+<p><code>sm64/setup.sh</code> takes a legally dumped US <code>.z64</code> ROM you supply locally, verifies its SHA-1
+(<code>9bef1128717f958171a4afac3ed78ee2bb4e86ce</code>), clones <code>n64decomp/sm64</code> at pinned commit
+<code>9921382a</code> into git-ignored <code>sm64/decomp/</code>, extracts assets inside Docker, and immediately deletes
+<code>baserom.us.z64</code>. When building <code>mario-eval-task</code>, Docker build assertions verify that zero
+<code>.z64</code> ROMs, zero held-out routes, and zero calibration patches enter the agent image.</p>
 
-<h2>What carries over unchanged</h2>
-<ul>
-<li>The emulator build, its instrumentation and the logical-frame protocol.</li>
-<li>The grader: trusted rebuild, gates, metrics, profiles and reward.</li>
-<li>The agent container, the egress proxy and the run supervisor.</li>
-<li>The calibration discipline.</li>
-</ul>
+<h2>2. Unthrottled deterministic frames + <code>PLAY=1</code> console gate</h2>
+<p>In benchmark builds (<code>#ifndef PLAY</code>), <code>thread5_game_loop</code> reads controller inputs synchronously
+per logical frame (<code>mev_read_pad_sync()</code>), waits for <b>both</b> <code>MESG_SP_COMPLETE</code> and
+<code>MESG_DP_COMPLETE</code> on each <code>M_GFXTASK</code>, steps two deterministic 544-sample <code>M_AUDTASK</code>
+subframes (<code>1088</code> stereo samples per 30 Hz frame) through <code>rspAspMain</code>, and emits
+<code>@mev</code> over IS-Viewer. Every submission must also pass <code>make check-play</code> (<code>PLAY=1</code>),
+which restores normal 60 Hz VBlank pacing and asynchronous <code>thread4_sound</code> console execution so agents cannot
+rip out real-hardware scheduling.</p>
 
-<h2>What is already in place</h2>
-<p><code>sm64/setup.sh</code> takes your ROM, checks it is the US release by SHA-1, checks out the decompilation at
-a pinned commit and builds the matching baseline. The decompilation directory, and everything extracted from the
-ROM, is kept out of git.</p>
+<h2>3. Twelve courses booted without savestates</h2>
+<p>Emulator savestates pin one build's RAM layout and break as soon as an agent repacks structs or relocates BSS.
+Instead, our harness boots a clean initialized Save File A and routes frame-0 controller chord inputs directly into
+<b>12 courses</b> (6 public: Bob-omb Battlefield, Whomp's Fortress, Jolly Roger Bay, Dire Dire Docks Area 2 / Bowser's
+Sub, Bowser in the Fire Sea, and Rainbow Ride; 6 private held-out: Cool Cool Mountain, Lethal Lava Land, Shifting Sand
+Land, plus alternate trajectories <code>bob2</code>, <code>jrb2</code>, and <code>ddd2</code>).</p>
 
-<h2>The five remaining steps</h2>
-<ol>
-<li><b>Harness calls in the game loop.</b> SM64 reads the controllers once per frame through the PIF, synchronously,
-which is exactly what the harness needs: that read becomes <code>mev_read_pad()</code>, and
-<code>mev_end_frame()</code> goes after the frame's graphics task completes.</li>
-<li><b>An unthrottled build.</b> The game loop waits for the video retrace; a benchmark build skips the wait so
-frame cost is pure work, the same approach the community's profiling builds take.</li>
-<li><b>An observation record.</b> Mario's position, velocity, action, health, coins and stars, the camera, the RNG
-seed and the active objects, compared bit for bit. This is what turns "don't change the game" into something a
-grader can check, and it is why an SM64 wall-collision rewrite that loses a glitch would be caught.</li>
-<li><b>Routes.</b> Controller routes through several courses, each starting from a replayed path out of the file
-select screen rather than an emulator savestate, because a savestate pins one build's memory layout and an
-optimized build won't have it.</li>
-<li><b>Calibration.</b> The unchanged rebuild must score zero; known-good patches (IEEE-preserving <code>-O2</code>,
-Create Dirty Exclusive, memory savings) positive; shortcuts &minus;1.</li>
-</ol>
-<p>Each of these needs the ROM to build and test, so none of them ships before it has been verified.</p>
+<h2>4. Player Equivalence &amp; Hyrum's Law</h2>
+<p>Requiring 0-ULP internal struct equality on SM64 would ban Kaze's best optimizations (hibernating distant off-screen
+objects, replacing 22.5 KB of trig LUTs with minimax polynomials, or reordering scene-graph culling). Conversely,
+allowing arbitrary engine rewrites would break 1996 SM64 physics and glitches (quarter-steps, wall-kick windows, BLJs).
+Our SM64 gameplay gate enforces <b>Player Equivalence</b>: exact level/area, ±1-frame (and exact final) stars/coins/health
+and Mario action transitions, and tight sub-pixel L-infinity tolerances on Mario's position (<code>2.0</code> units) and
+Lakitu's camera (<code>4.0</code> units), paired with whole-frame pixel verification and 40 dB audio SNR. Fixing engine
+C/memory undefined behavior is rewarded; changing how 1996 Mario plays scores &minus;1.</p>
 </article></main>
 <footer class="site"><div class="wrap">
 Built by <a href="https://ilya.as/">Ilyaas Kapadia</a>, modelled on Mechanize's

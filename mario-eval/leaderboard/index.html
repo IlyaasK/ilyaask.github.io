@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leaderboard &amp; Kaze Ceiling | Mario Eval</title>
+<meta name="description" content="A 24h RLVR environment: super-optimize Super Mario 64 or Pip&#x27;s Garden on the original 4 MB N64 hardware without changing the game.">
+<meta property="og:title" content="Leaderboard &amp; Kaze Ceiling | Mario Eval"><meta property="og:description" content="A 24h RLVR environment: super-optimize Super Mario 64 or Pip&#x27;s Garden on the original 4 MB N64 hardware without changing the game.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/mario-eval/style.css">
+</head><body>
+<header class="site"><div class="wrap"><a class="logo" href="/mario-eval/">MARIO<span>EVAL</span></a>
+<nav class="site"><a href="/mario-eval/">Overview</a> <a href="/mario-eval/leaderboard/" class=on>Leaderboard</a> <a href="/mario-eval/calibration/">Calibration</a> <a href="/mario-eval/blog/">Blog</a> <a href="https://github.com/IlyaasK/mario-eval">GitHub</a></nav></div></header>
+<main class="wrap">
+<div class="prose">
+<h1>Leaderboard &amp; Reference Ceiling</h1>
+<p>Every submission is graded on <b>12 Super Mario 64 courses</b> (6 public + 6 private held-out, 240 frames each) on
+an instrumented <code>ares</code> N64 console model (93.75 MHz VR4300 + 16 KB I$ / 8 KB D$, 62.5 MHz RSP &amp; RDP,
+4 MB RDRAM). To calibrate how much headroom exists above a naive <code>-O2</code> recompile, we engineered a 3-rung
+<a href="/mario-eval/blog/kaze-ceiling-on-super-mario-64/">Kaze Emanuar Reference Ceiling</a> under the exact same gates and
+toolchain given to 24-hour agents.</p>
+</div>
+
+<div class="table-wrap"><table><tr><th>entry</th><th>type</th><th class="bar-cell">console speedup</th><th class="num">console</th><th class="num">vs -O2</th><th class="num">mean FPS</th><th class="num">bus&times;</th><th class="num">RAM &Delta;</th></tr><tr class=ceiling-row><td><a href="/mario-eval/calibration/#sm64-r9-kaze-ceiling">Kaze Reference Ceiling (R9)</a><br><span class="small muted">Expert N64 engineering ceiling (I-cache + 1-ULP trig + 3-line Surface + Sub cache + lazy Mtx + RA_ZB_OPA + coin batch + -304 KB)</span></td><td><span class="tag valid">ceiling</span></td><td class="bar-cell"><b>1.22&times;</b><div class="bar-track"><div class="bar-fill ceiling" style="width:97.8%"></div></div></td><td class="num pos">+0.182</td><td class="num">1.03&times;</td><td class="num">14.2</td><td class="num">1.19&times;</td><td class="num">-252 KiB</td></tr><tr><td><a href="/mario-eval/calibration/#sm64-r8-kaze-collision-objects">Kaze Rung 2: Collision &amp; Objects (R8)</a><br><span class="small muted">R7 + 3-cache-line struct Surface + Bowser&#x27;s Sub stationary surface cache + single-floor shadows + watermark pool</span></td><td><span class="tag ref">ref</span></td><td class="bar-cell"><b>1.22&times;</b><div class="bar-track"><div class="bar-fill " style="width:97.6%"></div></div></td><td class="num pos">+0.180</td><td class="num">1.03&times;</td><td class="num">14.1</td><td class="num">1.12&times;</td><td class="num">-50 KiB</td></tr><tr><td><a href="/mario-eval/calibration/#sm64-r6-kaze-super">Early Multi-Subsystem Rung (R6)</a><br><span class="small muted">GCC -O2 + Kaze matrix math + CACHE 0x0d + skybox cull + double-buffer</span></td><td><span class="tag ref">ref</span></td><td class="bar-cell"><b>1.21&times;</b><div class="bar-track"><div class="bar-fill " style="width:96.5%"></div></div></td><td class="num pos">+0.171</td><td class="num">1.02&times;</td><td class="num">14.0</td><td class="num">1.20&times;</td><td class="num">-213 KiB</td></tr><tr><td><a href="/mario-eval/calibration/#sm64-r7-kaze-icache-trig">Kaze Rung 1: I-Cache &amp; Table-Free Math (R7)</a><br><span class="small muted">sm64.ld 16 KB I-cache de-aliasing + 1-ULP polynomial sins/coss + bit-exact 256 B atan2s + IEEE random_float</span></td><td><span class="tag ref">ref</span></td><td class="bar-cell"><b>1.19&times;</b><div class="bar-track"><div class="bar-fill " style="width:94.9%"></div></div></td><td class="num pos">+0.157</td><td class="num">1.00&times;</td><td class="num">13.7</td><td class="num">1.11&times;</td><td class="num">-50 KiB</td></tr><tr><td><a href="/mario-eval/calibration/#sm64-r1-gcc-o2">Compiler Only: GCC -O2 -fno-fast-math (R1)</a><br><span class="small muted">Zero C edits: switch Makefile from 1996 IDO -O0 to modern mips64-elf-gcc -O2</span></td><td><span class="tag ref">compiler</span></td><td class="bar-cell"><b>1.18&times;</b><div class="bar-track"><div class="bar-fill compiler" style="width:94.7%"></div></div></td><td class="num pos">+0.155</td><td class="num">1.00&times;</td><td class="num">13.7</td><td class="num">1.11&times;</td><td class="num">-63 KiB</td></tr><tr><td><a href="/mario-eval/calibration/#sm64-r2-kaze-mtx">IDO -O0 + Kaze Matrix Math (R2)</a><br><span class="small muted">Stackless mtxf_mul + packed 32-bit mtxf_to_mtx under original IDO compiler</span></td><td><span class="tag ref">ref</span></td><td class="bar-cell"><b>1.03&times;</b><div class="bar-track"><div class="bar-fill " style="width:82.7%"></div></div></td><td class="num pos">+0.033</td><td class="num">0.87&times;</td><td class="num">12.0</td><td class="num">1.01&times;</td><td class="num">0 KiB</td></tr><tr><td><a href="/mario-eval/calibration/#sm64-r4-kaze-rdp-opa">IDO -O0 + G_RM_RA_ZB_OPA_SURF (R4)</a><br><span class="small muted">Drop per-pixel IM_RD framebuffer reads on opaque surfaces under original IDO compiler</span></td><td><span class="tag ref">ref</span></td><td class="bar-cell"><b>1.01&times;</b><div class="bar-track"><div class="bar-fill " style="width:80.6%"></div></div></td><td class="num pos">+0.008</td><td class="num">0.85&times;</td><td class="num">11.7</td><td class="num">1.07&times;</td><td class="num">0 KiB</td></tr><tr><td><a href="/mario-eval/calibration/#sm64-r0-unchanged">1996 Retail US Baseline (IDO -O0)</a><br><span class="small muted">Unmodified n64decomp/sm64 matching the 8 MB retail US cartridge</span></td><td><span class="tag ref">ref</span></td><td class="bar-cell"><b>1.00&times;</b><div class="bar-track"><div class="bar-fill " style="width:80.0%"></div></div></td><td class="num ">+0.000</td><td class="num">0.84&times;</td><td class="num">11.6</td><td class="num">1.00&times;</td><td class="num">0 KiB</td></tr></table></div>
+
+<div class="chart-box"><svg viewBox="0 0 920 270" role="img" aria-label="Super Mario 64 hardware optimization ladder">
+<g font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor">
+<text x="68" y="20" font-weight="600">Super Mario 64 hardware optimization ladder &mdash; console speedup across 12 courses</text>
+<line x1="68" y1="203.8" x2="884" y2="203.8" stroke="currentColor" opacity="0.16"/>
+<text x="60" y="207.8" text-anchor="end" opacity="0.75">1.00&times;</text>
+<line x1="68" y1="173.4" x2="884" y2="173.4" stroke="currentColor" opacity="0.16"/>
+<text x="60" y="177.4" text-anchor="end" opacity="0.75">1.05&times;</text>
+<line x1="68" y1="142.9" x2="884" y2="142.9" stroke="currentColor" opacity="0.16"/>
+<text x="60" y="146.9" text-anchor="end" opacity="0.75">1.10&times;</text>
+<line x1="68" y1="112.5" x2="884" y2="112.5" stroke="currentColor" opacity="0.16"/>
+<text x="60" y="116.5" text-anchor="end" opacity="0.75">1.15&times;</text>
+<line x1="68" y1="82.1" x2="884" y2="82.1" stroke="currentColor" opacity="0.16"/>
+<text x="60" y="86.1" text-anchor="end" opacity="0.75">1.20&times;</text>
+<line x1="68" y1="51.6" x2="884" y2="51.6" stroke="currentColor" opacity="0.16"/>
+<text x="60" y="55.6" text-anchor="end" opacity="0.75">1.25&times;</text>
+<polyline fill="none" stroke="#1f5fbf" stroke-width="2.5" points="68.0,203.8 204.0,183.0 340.0,199.2 476.0,91.8 612.0,90.7 748.0,69.8 884.0,68.4"/>
+<circle cx="68.0" cy="203.8" r="4" fill="#1f5fbf"/>
+<text x="68.0" y="193.8" text-anchor="start" font-weight="400">1.00&times; (11.6 fps)</text>
+<text x="68.0" y="236" text-anchor="start" font-size="10.5" opacity="0.8">1996 IDO -O0</text>
+<circle cx="204.0" cy="183.0" r="4" fill="#1f5fbf"/>
+<text x="204.0" y="199.0" text-anchor="middle" font-weight="400">1.03&times; (12.0 fps)</text>
+<text x="204.0" y="250" text-anchor="middle" font-size="10.5" opacity="0.8">IDO + Kaze Mtx</text>
+<circle cx="340.0" cy="199.2" r="4" fill="#1f5fbf"/>
+<text x="340.0" y="189.2" text-anchor="middle" font-weight="400">1.01&times; (11.7 fps)</text>
+<text x="340.0" y="236" text-anchor="middle" font-size="10.5" opacity="0.8">IDO + RA_ZB_OPA</text>
+<circle cx="476.0" cy="91.8" r="4" fill="#d4a017"/>
+<text x="476.0" y="107.8" text-anchor="middle" font-weight="400">1.18&times; (13.7 fps)</text>
+<text x="476.0" y="250" text-anchor="middle" font-size="10.5" opacity="0.8">GCC -O2</text>
+<circle cx="612.0" cy="90.7" r="4" fill="#1f5fbf"/>
+<text x="612.0" y="80.7" text-anchor="middle" font-weight="400">1.19&times; (13.7 fps)</text>
+<text x="612.0" y="236" text-anchor="middle" font-size="10.5" opacity="0.8">R7: I$ + 1-ULP Trig</text>
+<circle cx="748.0" cy="69.8" r="4" fill="#1f5fbf"/>
+<text x="748.0" y="85.8" text-anchor="middle" font-weight="400">1.22&times; (14.1 fps)</text>
+<text x="748.0" y="250" text-anchor="middle" font-size="10.5" opacity="0.8">R8: 3-Line Surf + Sub</text>
+<circle cx="884.0" cy="68.4" r="5" fill="#1f7a3a"/>
+<text x="884.0" y="58.4" text-anchor="end" font-weight="600">1.22&times; (14.2 fps)</text>
+<text x="884.0" y="236" text-anchor="end" font-size="10.5" opacity="0.8">R9: Kaze Ceiling</text>
+</g></svg></div>
+<div class="chart-box"><svg viewBox="0 0 920 360" role="img" aria-label="Super Mario 64 per-course console frame time: 1996 IDO baseline vs Kaze Reference Ceiling">
+<g font-family="IBM Plex Mono, monospace" font-size="12" fill="currentColor">
+<text x="210" y="20" font-weight="600">Console frame time per course (ms, lower is faster) &mdash; 1996 IDO -O0 vs Kaze Reference Ceiling</text>
+<line x1="210.0" y1="38" x2="210.0" y2="336" stroke="currentColor" stroke-width="1" opacity="0.18"/>
+<text x="210.0" y="352" text-anchor="middle" font-size="11" opacity="0.75">0ms</text>
+<line x1="307.2" y1="38" x2="307.2" y2="336" stroke="currentColor" stroke-width="1" opacity="0.18"/>
+<text x="307.2" y="352" text-anchor="middle" font-size="11" opacity="0.75">20ms</text>
+<line x1="372.0" y1="38" x2="372.0" y2="336" stroke="#d4a017" stroke-width="1" stroke-dasharray="4,3"/>
+<text x="372.0" y="352" text-anchor="middle" font-size="11" opacity="0.75">33.3ms (30 FPS)</text>
+<line x1="453.0" y1="38" x2="453.0" y2="336" stroke="currentColor" stroke-width="1" opacity="0.18"/>
+<text x="453.0" y="352" text-anchor="middle" font-size="11" opacity="0.75">50ms</text>
+<line x1="574.5" y1="38" x2="574.5" y2="336" stroke="currentColor" stroke-width="1" opacity="0.18"/>
+<text x="574.5" y="352" text-anchor="middle" font-size="11" opacity="0.75">75ms</text>
+<line x1="696.0" y1="38" x2="696.0" y2="336" stroke="currentColor" stroke-width="1" opacity="0.18"/>
+<text x="696.0" y="352" text-anchor="middle" font-size="11" opacity="0.75">100ms</text>
+<text x="198" y="63" text-anchor="end">Bob-omb Battlefield</text>
+<text x="198" y="78" text-anchor="end" font-size="10.5" opacity="0.65">RDP 9.3ms</text>
+<rect x="210" y="51" width="464.2" height="12" rx="2" fill="currentColor" opacity="0.28"/>
+<rect x="210" y="66" width="384.9" height="13" rx="2" fill="#1f7a3a"/>
+<text x="681.2" y="61" font-size="11" opacity="0.75">95.5ms (10.5 fps)</text>
+<text x="601.9" y="77" font-size="11.5" font-weight="600">79.2ms (12.6 fps, 1.21&times;)</text>
+<text x="198" y="109" text-anchor="end">Whomp&#x27;s Fortress</text>
+<text x="198" y="124" text-anchor="end" font-size="10.5" opacity="0.65">RDP 7.8ms</text>
+<rect x="210" y="97" width="378.2" height="12" rx="2" fill="currentColor" opacity="0.28"/>
+<rect x="210" y="112" width="296.1" height="13" rx="2" fill="#1f7a3a"/>
+<text x="595.2" y="107" font-size="11" opacity="0.75">77.8ms (12.9 fps)</text>
+<text x="513.1" y="123" font-size="11.5" font-weight="600">60.9ms (16.4 fps, 1.28&times;)</text>
+<text x="198" y="155" text-anchor="end">Jolly Roger Bay</text>
+<text x="198" y="170" text-anchor="end" font-size="10.5" opacity="0.65">RDP 18.2ms</text>
+<rect x="210" y="143" width="518.5" height="12" rx="2" fill="currentColor" opacity="0.28"/>
+<rect x="210" y="158" width="425.9" height="13" rx="2" fill="#1f7a3a"/>
+<text x="735.5" y="153" font-size="11" opacity="0.75">106.7ms (9.4 fps)</text>
+<text x="642.9" y="169" font-size="11.5" font-weight="600">87.6ms (11.4 fps, 1.22&times;)</text>
+<text x="198" y="201" text-anchor="end">Dire Dire Docks (Sub)</text>
+<text x="198" y="216" text-anchor="end" font-size="10.5" opacity="0.65">RDP 9.6ms</text>
+<rect x="210" y="189" width="397.4" height="12" rx="2" fill="currentColor" opacity="0.28"/>
+<rect x="210" y="204" width="334.5" height="13" rx="2" fill="#1f7a3a"/>
+<text x="614.4" y="199" font-size="11" opacity="0.75">81.8ms (12.2 fps)</text>
+<text x="551.5" y="215" font-size="11.5" font-weight="600">68.8ms (14.5 fps, 1.19&times;)</text>
+<text x="198" y="247" text-anchor="end">Bowser in the Fire Sea</text>
+<text x="198" y="262" text-anchor="end" font-size="10.5" opacity="0.65">RDP 5.5ms</text>
+<rect x="210" y="235" width="336.9" height="12" rx="2" fill="currentColor" opacity="0.28"/>
+<rect x="210" y="250" width="266.9" height="13" rx="2" fill="#1f7a3a"/>
+<text x="553.9" y="245" font-size="11" opacity="0.75">69.3ms (14.4 fps)</text>
+<text x="483.9" y="261" font-size="11.5" font-weight="600">54.9ms (18.2 fps, 1.26&times;)</text>
+<text x="198" y="293" text-anchor="end">Rainbow Ride</text>
+<text x="198" y="308" text-anchor="end" font-size="10.5" opacity="0.65">RDP 4.8ms</text>
+<rect x="210" y="281" width="421.8" height="12" rx="2" fill="currentColor" opacity="0.28"/>
+<rect x="210" y="296" width="342.7" height="13" rx="2" fill="#1f7a3a"/>
+<text x="638.8" y="291" font-size="11" opacity="0.75">86.8ms (11.5 fps)</text>
+<text x="559.7" y="307" font-size="11.5" font-weight="600">70.5ms (14.2 fps, 1.23&times;)</text>
+</g></svg></div>
+
+<div class="prose">
+<h2>Run a 24-hour agent evaluation</h2>
+<p>Agent runs record every inner-loop <code>mev profile</code> milestone to <code>/task/.mev-history.jsonl</code> and
+emit <code>results/&lt;run&gt;/trajectory.json</code> automatically when graded. Copy any finished run directory into
+<code>results/agents/&lt;slug&gt;/</code> and rebuild the site to plot its 24-hour scaling curve above.</p>
+<pre><code># 1. Supply your legally dumped US Super Mario 64 .z64 ROM (never committed or shipped)
+./sm64/setup.sh "/path/to/Super Mario 64 (USA).z64"
+./scripts/build-images.sh --game sm64
+./scripts/precompute.sh --game sm64
+
+# 2. Verify container isolation, build, profiler, and grader end-to-end
+./quickstart/smoke-test.sh --game sm64
+
+# 3. Launch a 24h isolated agent run + held-out grading + trajectory extraction
+./quickstart/run-agent.sh --game sm64 claude</code></pre>
+</div>
+</main>
+<footer class="site"><div class="wrap">
+Built by <a href="https://ilya.as/">Ilyaas Kapadia</a>, modelled on Mechanize's
+<a href="https://gbaeval.com/">GBA Eval</a>. Not affiliated with or endorsed by Nintendo.
+No Nintendo code or assets are distributed; Super Mario 64 support requires your own legally obtained ROM.
+</div></footer>
+</body></html>
