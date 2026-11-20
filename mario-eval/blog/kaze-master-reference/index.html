@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Kaze master reference: what an expert does with SM64 | Mario Eval</title>
+<meta name="description" content="Every optimization from Kaze Emanuar&#x27;s videos that keeps the game the same, rebuilt on vanilla SM64 as the human-expert rung: 1.68x on the console model. What made it in, what did not, and why the grader got stricter along the way.">
+<meta property="og:title" content="The Kaze master reference: what an expert does with SM64 | Mario Eval"><meta property="og:description" content="Every optimization from Kaze Emanuar&#x27;s videos that keeps the game the same, rebuilt on vanilla SM64 as the human-expert rung: 1.68x on the console model. What made it in, what did not, and why the grader got stricter along the way.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/mario-eval/style.css">
+</head><body>
+<header class="site"><div class="wrap"><a class="logo" href="/mario-eval/">MARIO<span>EVAL</span></a>
+<nav class="site"><a href="/mario-eval/">Overview</a> <a href="/mario-eval/leaderboard/">Leaderboard</a> <a href="/mario-eval/calibration/">Calibration</a> <a href="/mario-eval/blog/" class=on>Blog</a> <a href="https://github.com/IlyaasK/mario-eval">GitHub</a></nav></div></header>
+<main class="wrap"><article class="prose"><h1>The Kaze master reference: what an expert does with SM64</h1><p class="meta">2026-11-20</p>
+<p>The question this eval asks is how much cheaper Super Mario 64 can run on the original Nintendo 64 when it is
+engineered well for that hardware, while the player gets exactly the same game. To judge an agent's answer we need a
+human one. <a href="https://www.youtube.com/@KazeEmanuar">Kaze Emanuar</a> has spent years doing this work and
+explaining it on video. The new calibration rung
+<a href="/mario-eval/calibration/#sm64-r10-kaze-master"><code>r10-kaze-master</code></a> is our attempt to put all of it into
+vanilla SM64: every technique from his public videos and code that keeps the game the same, and nothing of our own.</p>
+
+<h2>How it was built</h2>
+<p>No single copy of Kaze's work exists. His two code downloads each serve one video: the
+<a href="https://github.com/KazeEmanuar/SM64-but-some-optimizations-are-removed">repository for "How Optimizations made
+Mario 64 SLOWER"</a> is cut down from his own mod, and the audio code from "Revolutionizing N64 programming!" says it
+was "not designed to work with the vanilla decomp repo". So we went to the videos: all 403 on his channel were
+transcribed, the source code he shows on screen in 44 technical videos was read frame by frame (about 440 frames),
+and each technique was checked against our tree and classified:</p>
+<ul>
+  <li><b>A</b>: the output is bit-identical, so it goes in;</li>
+  <li><b>B</b>: a visual change Kaze ships and considers no worse, which goes in only as a published, precomputed
+      accepted variant (no LOD, full-detail Mario, F3DEX2, reduced-aliasing opaque modes, Rainbow Ride decoration
+      baked into the level);</li>
+  <li><b>C</b>: it changes gameplay or audio, or only applies to his own engine and assets, so it stays out.</li>
+</ul>
+<p>Every change was measured on the six public courses and kept only if it helped, the "performance lottery" Kaze
+describes. The transcripts and frames are his content and are not in the repository.</p>
+
+<h2>Result</h2>
+<table>
+<tr><th>course</th><th class="num">vanilla ms</th><th class="num">kaze-master ms</th></tr>
+<tr><td>Jolly Roger Bay</td><td class="num">39.3</td><td class="num">22.4</td></tr>
+<tr><td>Dire Dire Docks</td><td class="num">30.5</td><td class="num">18.3</td></tr>
+<tr><td>Rainbow Ride</td><td class="num">32.3</td><td class="num">18.6</td></tr>
+<tr><td>Bob-omb Battlefield</td><td class="num">33.0</td><td class="num">19.9</td></tr>
+<tr><td>Whomp's Fortress</td><td class="num">30.7</td><td class="num">17.1</td></tr>
+<tr><td>Bowser in the Fire Sea</td><td class="num">29.6</td><td class="num">19.6</td></tr>
+</table>
+<p>Geometric mean <b>1.68&times;</b> on the console model (reward 0.188), every gate passing. GCC <code>-O2</code> alone
+gives 1.40&times;. The largest single steps were compiling the renderer, math, collision and audio code for size so
+each frame's working set fits the 16 KB instruction cache, linking the audio thread's per-update code contiguously,
+vertical object culling, and baking Rainbow Ride's 14 decoration pieces into the level.</p>
+
+<h2>What did not make it</h2>
+<ul>
+  <li><b>Changes the game.</b> One-raycast walls remove wall kicks; the folded-polynomial sine, the fast inverse
+      square root and the rational <code>atan2</code> give different numbers than vanilla, so physics drifts; his
+      rewritten sound engine drops script features.</li>
+  <li><b>Depends on his engine.</b> Removing the duplicate sample DMA buffers from "Mario 64 wastes SO MUCH MEMORY"
+      broke playback here (audio fell to about &minus;6 dB SNR): vanilla's sample loader relies on them, and his own
+      ADPCM engine replaced that code.</li>
+  <li><b>Measured slower here.</b> A reserved register for the current object (21 KB smaller code, 2% slower), a
+      hand-written node dispatch table, inlining the fused matrix builder, and several cache-instruction tricks were
+      neutral or worse on these routes.</li>
+  <li><b>Waiting on a ruling.</b> Turning dithering off (about 15% of frame time in one of Kaze's scenes, but he calls
+      it a matter of taste), one-matrix shadows, and re-exported actor rigs change how things look.</li>
+</ul>
+
+<h2>What the work changed in the grader</h2>
+<p>Building an expert reference is a good audit. Along the way:</p>
+<ul>
+  <li>The clock units were wrong and the CPU, RSP and RDP were summed. Now each frame costs its busiest unit, the CPU
+      pays for waiting on the shared memory bus, and that one constant was fitted to Kaze's real-hardware frame rates
+      for vanilla JRB, DDD and RR.</li>
+  <li>Accepted visual variants used to be single changes, so a submission combining two failed. Now every combination
+      is precomputed (31 of them), and a change can be scoped to the course it affects.</li>
+  <li>The emulator charged nothing for CPU memory accesses that bypass the caches, so mapping hot data uncached would
+      have skipped every cache-miss charge. They now cost what a cache fill costs.</li>
+  <li>The reward is now <code>log2(speedup)/4</code>: each doubling is worth the same, with no ceiling.</li>
+</ul>
+
+<h2>Beyond Kaze</h2>
+<p><a href="/mario-eval/calibration/#sm64-r11-beyond-kaze"><code>r11-beyond-kaze</code></a> adds work Kaze never
+described: object fields ordered so each frame's hot fields share 16-byte D-cache lines, skipped stores of unchanged
+values, an audio struct reorder, and double buffering. It exists to check that the reward keeps climbing past the
+human reference, which is where a strong agent should end up.</p>
+
+<p>Known gap: Jolly Roger Bay cannot reach 60 FPS without changing the picture. Its translucent fog plane over the
+water costs about 4 ms of RDP time on its own; Kaze calls it "the main reason why this level has such poor frame
+rates". The rules keep it, because removing it changes what the player sees.</p>
+</article></main>
+<footer class="site"><div class="wrap">
+Built by <a href="https://ilya.as/">Ilyaas Kapadia</a>, modelled on Mechanize's
+<a href="https://gbaeval.com/">GBA Eval</a>. Not affiliated with or endorsed by Nintendo.
+No Nintendo code or assets are distributed; Super Mario 64 support requires your own legally obtained ROM.
+</div></footer>
+</body></html>
