@@ -2,8 +2,8 @@
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Kaze master reference: what an expert does with SM64 | Mario Eval</title>
-<meta name="description" content="A reconstruction of Kaze Emanuar&#x27;s published optimizations on vanilla SM64: 1.65x on the console model. What made it in, what did not, and why the grader got stricter along the way.">
-<meta property="og:title" content="The Kaze master reference: what an expert does with SM64 | Mario Eval"><meta property="og:description" content="A reconstruction of Kaze Emanuar&#x27;s published optimizations on vanilla SM64: 1.65x on the console model. What made it in, what did not, and why the grader got stricter along the way.">
+<meta name="description" content="A reconstruction of Kaze Emanuar&#x27;s published optimizations on vanilla SM64: 1.67x on the console model. What made it in, what did not, and why the grader got stricter along the way.">
+<meta property="og:title" content="The Kaze master reference: what an expert does with SM64 | Mario Eval"><meta property="og:description" content="A reconstruction of Kaze Emanuar&#x27;s published optimizations on vanilla SM64: 1.67x on the console model. What made it in, what did not, and why the grader got stricter along the way.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/mario-eval/style.css">
@@ -40,14 +40,14 @@ describes. The transcripts and frames are his content and are not in the reposit
 <h2>Result</h2>
 <table>
 <tr><th>course</th><th class="num">vanilla ms</th><th class="num">kaze-master ms</th></tr>
-<tr><td>Jolly Roger Bay</td><td class="num">39.3</td><td class="num">22.9</td></tr>
-<tr><td>Dire Dire Docks</td><td class="num">30.5</td><td class="num">18.9</td></tr>
-<tr><td>Rainbow Ride</td><td class="num">32.3</td><td class="num">18.8</td></tr>
-<tr><td>Bob-omb Battlefield</td><td class="num">33.0</td><td class="num">20.2</td></tr>
-<tr><td>Whomp's Fortress</td><td class="num">30.7</td><td class="num">17.6</td></tr>
-<tr><td>Bowser in the Fire Sea</td><td class="num">29.6</td><td class="num">19.8</td></tr>
+<tr><td>Jolly Roger Bay</td><td class="num">39.3</td><td class="num">22.5</td></tr>
+<tr><td>Dire Dire Docks</td><td class="num">30.5</td><td class="num">18.5</td></tr>
+<tr><td>Rainbow Ride</td><td class="num">32.3</td><td class="num">18.7</td></tr>
+<tr><td>Bob-omb Battlefield</td><td class="num">33.0</td><td class="num">20.1</td></tr>
+<tr><td>Whomp's Fortress</td><td class="num">30.7</td><td class="num">17.3</td></tr>
+<tr><td>Bowser in the Fire Sea</td><td class="num">29.6</td><td class="num">19.7</td></tr>
 </table>
-<p>Geometric mean <b>1.65&times;</b> on the console model (reward 0.181), every gate passing. GCC <code>-O2</code> alone
+<p>Geometric mean <b>1.67&times;</b> on the console model (reward 0.185), every gate passing. GCC <code>-O2</code> alone
 gives 1.39&times;. The largest single steps were compiling the renderer, math, collision and audio code for size so
 each frame's working set fits the 16 KB instruction cache, linking the audio thread's per-update code contiguously,
 vertical object culling, and baking Rainbow Ride's 14 decoration pieces into the level.</p>
@@ -63,6 +63,16 @@ corrects the 901 polynomial results that differ, and keeping the vanilla test fo
 drawn. Gameplay and audio are now bit-identical to vanilla on the public routes and on mashing (Rainbow Ride's
 accepted decoration variant itself shifts 54 audio samples), at a cost of about 2%. The gameplay gate now also checks
 every object within 2,000 units of Mario.</p>
+<p><b>Every remaining technique, measured (2026-11-21).</b> We then tried each remaining Kaze and ultrasm64 technique
+as its own change on top of this reference: about 60 trials, each timed at seven code layouts and checked for exact
+gameplay and audio on the public routes plus 24 seeded button-mashing runs. Four were exact and faster on every
+layout and are now in: compiling the N64 system library for size (r10's libultra flags only applied to the IDO
+compiler), Kaze's 4&times;3 matrices with shared rotation products, an exact flat-floor shortcut in collision from
+FazanaJ's fork, and overlapping the framebuffers' unused border rows (10 KB of RAM). Together they take the reference
+from 1.65&times; to 1.67&times;. Most of the rest landed inside the layout noise. Kaze's graphics-side work (F3DEX3,
+display-list culling, 1-cycle fog, front-to-back drawing, dither off) saves RSP or RDP time but cannot move the score,
+because every public route is CPU-bound. The full record is
+<a href="https://github.com/IlyaasK/mario-eval/blob/main/sm64/calibration/r10-trials.md">r10-trials.md</a>.</p>
 
 <h2>What did not make it</h2>
 <ul>
