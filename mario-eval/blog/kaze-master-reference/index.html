@@ -2,8 +2,8 @@
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Kaze master reference: what an expert does with SM64 | Mario Eval</title>
-<meta name="description" content="A reconstruction of Kaze Emanuar&#x27;s published optimizations on vanilla SM64: 1.69x on the console model. What made it in, what did not, and why the grader got stricter along the way.">
-<meta property="og:title" content="The Kaze master reference: what an expert does with SM64 | Mario Eval"><meta property="og:description" content="A reconstruction of Kaze Emanuar&#x27;s published optimizations on vanilla SM64: 1.69x on the console model. What made it in, what did not, and why the grader got stricter along the way.">
+<meta name="description" content="A reconstruction of Kaze Emanuar&#x27;s published optimizations on vanilla SM64: 1.65x on the console model. What made it in, what did not, and why the grader got stricter along the way.">
+<meta property="og:title" content="The Kaze master reference: what an expert does with SM64 | Mario Eval"><meta property="og:description" content="A reconstruction of Kaze Emanuar&#x27;s published optimizations on vanilla SM64: 1.65x on the console model. What made it in, what did not, and why the grader got stricter along the way.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/mario-eval/style.css">
@@ -40,25 +40,35 @@ describes. The transcripts and frames are his content and are not in the reposit
 <h2>Result</h2>
 <table>
 <tr><th>course</th><th class="num">vanilla ms</th><th class="num">kaze-master ms</th></tr>
-<tr><td>Jolly Roger Bay</td><td class="num">39.3</td><td class="num">22.3</td></tr>
-<tr><td>Dire Dire Docks</td><td class="num">30.5</td><td class="num">18.3</td></tr>
-<tr><td>Rainbow Ride</td><td class="num">32.3</td><td class="num">18.5</td></tr>
-<tr><td>Bob-omb Battlefield</td><td class="num">33.0</td><td class="num">19.7</td></tr>
-<tr><td>Whomp's Fortress</td><td class="num">30.7</td><td class="num">17.3</td></tr>
-<tr><td>Bowser in the Fire Sea</td><td class="num">29.6</td><td class="num">19.6</td></tr>
+<tr><td>Jolly Roger Bay</td><td class="num">39.3</td><td class="num">22.9</td></tr>
+<tr><td>Dire Dire Docks</td><td class="num">30.5</td><td class="num">18.9</td></tr>
+<tr><td>Rainbow Ride</td><td class="num">32.3</td><td class="num">18.8</td></tr>
+<tr><td>Bob-omb Battlefield</td><td class="num">33.0</td><td class="num">20.2</td></tr>
+<tr><td>Whomp's Fortress</td><td class="num">30.7</td><td class="num">17.6</td></tr>
+<tr><td>Bowser in the Fire Sea</td><td class="num">29.6</td><td class="num">19.8</td></tr>
 </table>
-<p>Geometric mean <b>1.69&times;</b> on the console model (reward 0.189), every gate passing. GCC <code>-O2</code> alone
+<p>Geometric mean <b>1.65&times;</b> on the console model (reward 0.181), every gate passing. GCC <code>-O2</code> alone
 gives 1.39&times;. The largest single steps were compiling the renderer, math, collision and audio code for size so
 each frame's working set fits the 16 KB instruction cache, linking the audio thread's per-update code contiguously,
 vertical object culling, and baking Rainbow Ride's 14 decoration pieces into the level.</p>
 <p>The follow-up pass removed unused engine command bodies and shared audio-bank relocation code. Branch hints did
 not move the score; rolling more matrix functions saved code space but ran slower on these routes.</p>
+<p><b>Correction (2026-11-21).</b> This reference was first published at 1.69&times;. Seeded button mashing, added
+to the held-out routes, then showed it was not the same game. Its table-free sine and cosine were within one unit in
+the last place of vanilla's table, not equal: 1,803 of 4,096 entries differed, which moved Mario, the camera and
+sound panning (a 1.8-unit camera jump in Rainbow Ride, changed audio in Bob-omb Battlefield). And vertical culling
+skipped drawing objects whose drawing code moves other objects, freezing the sushi sharks' collision helpers in Dire
+Dire Docks. Both passed the old gate's tolerances on the six scripted routes. The fixes are a 512-byte map that
+corrects the 901 polynomial results that differ, and keeping the vanilla test for objects that move others when
+drawn. Gameplay and audio are now bit-identical to vanilla on the public routes and on mashing (Rainbow Ride's
+accepted decoration variant itself shifts 54 audio samples), at a cost of about 2%. The gameplay gate now also checks
+every object within 2,000 units of Mario.</p>
 
 <h2>What did not make it</h2>
 <ul>
-  <li><b>Changes the game.</b> One-raycast walls remove wall kicks; the folded-polynomial sine, the fast inverse
-      square root and the rational <code>atan2</code> give different numbers than vanilla, so physics drifts; his
-      rewritten sound engine drops script features.</li>
+  <li><b>Changes the game.</b> One-raycast walls remove wall kicks; the fast inverse square root gives different
+      numbers than vanilla, so physics drifts; his rewritten sound engine drops script features. His polynomial sine
+      and <code>atan2</code> are in, corrected to return vanilla's exact table values.</li>
   <li><b>Depends on his engine.</b> Removing the duplicate sample DMA buffers from "Mario 64 wastes SO MUCH MEMORY"
       broke playback here (audio fell to about &minus;6 dB SNR): vanilla's sample loader relies on them, and his own
       ADPCM engine replaced that code.</li>
