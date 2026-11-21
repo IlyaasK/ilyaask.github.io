@@ -32,11 +32,11 @@
 <figcaption>The published build scores 1.0000 on this game. With <code>FIRST_FRAME_SKIPS = false</code> the emulator runs one frame ahead of the reference, every recorded button press reaches the game one frame later than when the replay was recorded, and the playthrough diverges. <span class="muted">Frames 150–870 of <code>double-action-blaster-guys-gameplay</code>.</span>
 <a href="/nes-eval/play/?game=double-action-blaster-guys-gameplay&model=deepseek-flag-off&mode=replay">Run the whole replay live in your browser</a>.</figcaption>
 </figure>
-<h2>nes-core on Thwaite: one frame ahead, from the first call</h2>
+<h2>nes-core (v1.0 build) on Thwaite: one frame ahead, from the first call</h2>
 <figure>
 <video class="nes" src="/nes-eval/clips/nescore-thwaite.mp4" controls muted loop playsinline preload="metadata"></video>
-<div class="clip-labels"><span>Reference</span><span>nes-core</span><span>Difference</span></div>
-<figcaption>The baseline emulates a whole frame on its first <code>emu_run_frame</code> call; the reference emulates nothing on that call. From then on the baseline is one frame ahead, the replayed inputs land a frame late, and 5,835 of 6,000 frames differ. The same emulator with that one call skipped scores 0.9998 here. <span class="muted">Frames 120–840 of <code>thwaite-gameplay</code>.</span>
+<div class="clip-labels"><span>Reference</span><span>nes-core (v1.0 build)</span><span>Difference</span></div>
+<figcaption>The v1.0 baseline emulates a whole frame on its first <code>emu_run_frame</code> call; the reference emulates nothing on that call. From then on the baseline is one frame ahead, the replayed inputs land a frame late, and 5,835 of 6,000 frames differ. The current build, which follows the convention v1.1 states, scores 0.9998 here. <span class="muted">Frames 120–840 of <code>thwaite-gameplay</code>.</span>
 <a href="/nes-eval/play/?game=thwaite-gameplay&model=nes-core&mode=replay">Run the whole replay live in your browser</a>.</figcaption>
 </figure>
 <h2>DeepSeek V4.1 Flash on Nova the Squirrel: a near-miss</h2>
