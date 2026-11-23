@@ -1,217 +1,213 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mario Eval: super-optimize an N64 game on real hardware</title>
-<meta name="description" content="A 24h RLVR environment: super-optimize Super Mario 64 or Pip&#x27;s Garden on the original 4 MB N64 hardware without changing the game.">
-<meta property="og:title" content="Mario Eval: super-optimize an N64 game on real hardware"><meta property="og:description" content="A 24h RLVR environment: super-optimize Super Mario 64 or Pip&#x27;s Garden on the original 4 MB N64 hardware without changing the game.">
+<meta name="theme-color" content="#0a0a0d">
+<title>Mario Eval — Super-optimize an N64 game on real hardware</title>
+<meta name="description" content="A 24h RLVR environment: super-optimize Super Mario 64 or Pip&#x27;s Garden on original 4 MB N64 hardware without changing the game.">
+<meta property="og:title" content="Mario Eval — Super-optimize an N64 game on real hardware"><meta property="og:description" content="A 24h RLVR environment: super-optimize Super Mario 64 or Pip&#x27;s Garden on original 4 MB N64 hardware without changing the game.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/mario-eval/style.css">
 </head><body>
-<header class="site"><div class="wrap"><a class="logo" href="/mario-eval/">MARIO<span>EVAL</span></a>
-<nav class="site"><a href="/mario-eval/" class=on>Overview</a> <a href="/mario-eval/leaderboard/">Leaderboard</a> <a href="/mario-eval/calibration/">Calibration</a> <a href="/mario-eval/blog/">Blog</a> <a href="https://github.com/IlyaasK/mario-eval">GitHub</a></nav></div></header>
+<header class="site"><div class="wrap">
+  <div class="brand">
+    <span class="n64-leds" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    <a class="logo" href="/mario-eval/">MARIO<span>EVAL</span></a>
+    <span class="brand-sep" aria-hidden="true">&middot;</span>
+    <span class="brand-sub">By <a href="https://ilya.as/">Ilyaas Kapadia</a></span>
+  </div>
+  <nav class="site"><a href="/mario-eval/" class=on>About</a><a href="/mario-eval/leaderboard/">Leaderboard</a><a href="/mario-eval/calibration/">Calibration</a><a href="/mario-eval/blog/">Blog</a><a class="cta" href="https://github.com/IlyaasK/mario-eval" target="_blank" rel="noreferrer noopener">GitHub &rarr;</a></nav>
+</div></header>
 <main class="wrap">
-<div class="hero"><div>
-<h1>Make a Nintendo 64 game cheaper to run. Don't change it.</h1>
-<p class="lede">Mario Eval is a 24-hour reinforcement-learning-with-verifiable-rewards environment modelled on
-<a href="https://gbaeval.com/">GBA Eval</a>. An agent gets the C decompilation of <b>Super Mario 64</b> (or the
-open-source <b>Pip's Garden</b> game), pinned N64 compilers, an instrumented cycle/cache/RDP-accurate <code>ares</code>
-emulator and a profiler, and must speed up real 4 MB console execution while keeping gameplay, picture, and 40 dB audio
-faithful.</p>
-</div><svg viewBox="0 0 200 220" role="img" aria-label="Pip, a small round robot">
-  <line x1="100" y1="44" x2="100" y2="18" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
-  <polygon points="100,4 110,16 100,28 90,16" fill="#3fb6e8" stroke="currentColor" stroke-width="3"/>
-  <ellipse cx="100" cy="76" rx="52" ry="38" fill="#eeeade" stroke="currentColor" stroke-width="4"/>
-  <rect x="62" y="62" width="76" height="28" rx="14" fill="#23314f" stroke="currentColor" stroke-width="3"/>
-  <circle cx="84" cy="76" r="6" fill="#7fe3ff"/>
-  <circle cx="116" cy="76" r="6" fill="#7fe3ff"/>
-  <ellipse cx="100" cy="150" rx="62" ry="50" fill="#f2b632" stroke="currentColor" stroke-width="4"/>
-  <ellipse cx="100" cy="150" rx="26" ry="20" fill="#f7cf6a" stroke="currentColor" stroke-width="3"/>
-  <path d="M40 140 q-22 6 -26 26" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
-  <path d="M160 140 q22 6 26 26" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
-  <ellipse cx="74" cy="204" rx="20" ry="9" fill="#5a5a60" stroke="currentColor" stroke-width="3"/>
-  <ellipse cx="126" cy="204" rx="20" ry="9" fill="#5a5a60" stroke="currentColor" stroke-width="3"/>
-</svg></div>
-
-<div class="status"><b>v2.0 Ready:</b> 6-course <b>Super Mario 64</b> suite + 8-route <b>Pip's Garden</b> suite,
-headline <b>console</b> frame-cost profile (busiest of CPU with bus contention, RSP, RDP and RDRAM), Player Equivalence +
-Hyrum's Law gates, log-scaled reward, and the <b>Kaze master</b> human-expert reference.</div>
+<div class="hero">
+  <div>
+    <div class="eyebrow"><span class="dot"></span>N64 4 MB Hardware RLVR Benchmark</div>
+    <h1>Super-optimize an N64 game. Don't change it.</h1>
+    <p class="lede">An AI coding agent gets the C decompilation of <b>Super Mario 64</b> (or the open-source <b>Pip's Garden</b>), pinned N64 compilers, an instrumented cycle/cache/RDP-accurate <code>ares</code> emulator, and 24 hours to make original 4 MB console execution faster while preserving gameplay, picture, and 40 dB audio.</p>
+    <div class="hero-links">
+      <a class="btn primary" href="/mario-eval/leaderboard/">View Leaderboard &rarr;</a>
+      <a class="btn" href="/mario-eval/calibration/">Calibration Suite</a>
+      <a class="btn" href="https://github.com/IlyaasK/mario-eval" target="_blank" rel="noreferrer noopener">Source on GitHub</a>
+    </div>
+  </div>
+  <svg viewBox="0 0 200 220" role="img" aria-label="Pip, a small round robot">
+  <line x1="100" y1="44" x2="100" y2="18" stroke="#7b68ee" stroke-width="4" stroke-linecap="round"/>
+  <polygon points="100,4 110,16 100,28 90,16" fill="#38bdf8" stroke="#e8e4f4" stroke-width="2.5"/>
+  <ellipse cx="100" cy="76" rx="52" ry="38" fill="#252230" stroke="#7b68ee" stroke-width="3.5"/>
+  <rect x="62" y="62" width="76" height="28" rx="14" fill="#0a0a0d" stroke="#4a4560" stroke-width="2.5"/>
+  <circle cx="84" cy="76" r="6" fill="#2ed573"/>
+  <circle cx="116" cy="76" r="6" fill="#2ed573"/>
+  <ellipse cx="100" cy="150" rx="62" ry="50" fill="#ffb000" stroke="#e8e4f4" stroke-width="3.5"/>
+  <ellipse cx="100" cy="150" rx="26" ry="20" fill="#ffd166" stroke="#1a1820" stroke-width="2.5"/>
+  <path d="M40 140 q-22 6 -26 26" fill="none" stroke="#8a849f" stroke-width="6" stroke-linecap="round"/>
+  <path d="M160 140 q22 6 26 26" fill="none" stroke="#8a849f" stroke-width="6" stroke-linecap="round"/>
+  <ellipse cx="74" cy="204" rx="20" ry="9" fill="#4a4560" stroke="#e8e4f4" stroke-width="2.5"/>
+  <ellipse cx="126" cy="204" rx="20" ry="9" fill="#4a4560" stroke="#e8e4f4" stroke-width="2.5"/>
+</svg>
+</div>
 
 
 <div class="kpis">
-  <div class="kpi"><div class="val">6 courses</div><div class="lbl">public SM64 routes; host trials can add private routes and randomized inputs</div></div>
-  <div class="kpi"><div class="val">34.1 &rarr; 57.0 FPS</div><div class="lbl">uncapped frame rate the console could sustain (1000 / est. console ms): 1996 build vs Kaze master</div></div>
-  <div class="kpi"><div class="val">1.38&times;</div><div class="lbl">GCC -O2 compiler-only speedup</div></div>
-  <div class="kpi"><div class="val accent">1.67&times;</div><div class="lbl">Kaze master reference (<a href="/mario-eval/leaderboard/">Leaderboard</a>)</div></div>
+  <div class="kpi"><div class="val">34 &rarr; 57 FPS</div><div class="lbl">uncapped console throughput (1000 / est. console ms): 1996 IDO vs Kaze master</div></div>
+  <div class="kpi"><div class="val indigo">1.38&times;</div><div class="lbl">GCC -O2 compiler-only baseline (zero C edits)</div></div>
+  <div class="kpi"><div class="val pcb">1.67&times;</div><div class="lbl">Kaze master reference (6 public courses; 1.65&times; on 25 routes)</div></div>
+  <div class="kpi"><div class="val amber">1.69&times;</div><div class="lbl">Kimi K3.1 Pro trial best valid (25 routes, beats Kaze 1.65&times;)</div></div>
 </div>
+
+
+<div class="prose"><h2>Trial runs (harness &amp; grader bring-up)</h2><p>Bring-up runs used to stress-test the v2 hardware cost model, profiler, and 25-route held-out split and iron out bugs. Kept separate from standardized leaderboard entries because the environment evolved mid-run.</p></div>
+<div class="table-wrap"><table><thead><tr><th>trial run</th><th>type</th><th class="num">routes</th><th class="num">best valid&times;</th><th class="num">console</th><th class="num">vs -O2</th><th class="num">mean FPS</th><th class="num">attempt repo</th></tr></thead><tbody>
+<tr class="trial-row"><td><a href="https://github.com/IlyaasK/mario-eval-attempt-kimi-k3.1-pro-trial" target="_blank" rel="noreferrer noopener"><b>Kimi K3.1 Pro (Cerebras, Trial Run)</b></a> (~26h)<br><span class="small muted">Bring-up trial run (omp) used to iron out v2 harness, profiler &amp; held-out bugs; migrated mid-run from v1 to v2. Best 100%-valid 25-route checkpoint (4b54858) beat Kaze master (1.646x) at 1.695x (+2.9%) with PLAY=1 runtime smoke passing. Final commit d6af2f6 reached 1.82x public / 1.79x raw 25-route before Cerebras deactivated the trial model (404), but tripped 7/19 held-out video gates due to a 1-line 4-vert shadow LUT typo (253312a; fixing that typo alone makes d6af2f6 pass all 25 routes + PLAY=1 at 1.792x).</span></td><td><span class="tag trial">trial</span></td><td class="num">25</td><td class="num pos"><b>1.69&times;</b></td><td class="num pos">+0.190</td><td class="num">1.24&times;</td><td class="num">59.3</td><td class="num"><a href="https://github.com/IlyaasK/mario-eval-attempt-kimi-k3.1-pro-trial" target="_blank" rel="noreferrer noopener">GitHub &rarr;</a></td></tr>
+</tbody></table></div>
+<div class="chart-box"><div class="panel-title" style="margin-bottom:8px">Trial run checkpoints (25 routes &mdash; hover points for details)</div><div class="svg-tip" id="home-trial-traj-tip"></div>
+<svg id="home-trial-traj" viewBox="0 0 920 285" role="img" aria-label="24-hour optimization scaling curve">
+<g font-family="IBM Plex Mono, monospace" font-size="11.5" fill="#e8e4f4">
+<text x="68" y="20" font-weight="600">Best valid host-graded console speedup vs wall-clock hours</text>
+<line x1="68" y1="228.1" x2="876" y2="228.1" stroke="#2e2a3a" stroke-width="1"/>
+<text x="58" y="232.1" text-anchor="end" font-size="10.5" fill="#8a849f">1.0&times;</text>
+<line x1="68" y1="179.3" x2="876" y2="179.3" stroke="#2e2a3a" stroke-width="1"/>
+<text x="58" y="183.3" text-anchor="end" font-size="10.5" fill="#8a849f">1.2&times;</text>
+<line x1="68" y1="130.5" x2="876" y2="130.5" stroke="#2e2a3a" stroke-width="1"/>
+<text x="58" y="134.5" text-anchor="end" font-size="10.5" fill="#8a849f">1.4&times;</text>
+<line x1="68" y1="81.7" x2="876" y2="81.7" stroke="#2e2a3a" stroke-width="1"/>
+<text x="58" y="85.7" text-anchor="end" font-size="10.5" fill="#8a849f">1.6&times;</text>
+<line x1="68.0" y1="38" x2="68.0" y2="233" stroke="#2e2a3a" stroke-width="1"/>
+<text x="68.0" y="253" text-anchor="middle" font-size="10.5" fill="#8a849f">0h</text>
+<line x1="202.7" y1="38" x2="202.7" y2="233" stroke="#2e2a3a" stroke-width="1"/>
+<text x="202.7" y="253" text-anchor="middle" font-size="10.5" fill="#8a849f">4h</text>
+<line x1="337.3" y1="38" x2="337.3" y2="233" stroke="#2e2a3a" stroke-width="1"/>
+<text x="337.3" y="253" text-anchor="middle" font-size="10.5" fill="#8a849f">8h</text>
+<line x1="472.0" y1="38" x2="472.0" y2="233" stroke="#2e2a3a" stroke-width="1"/>
+<text x="472.0" y="253" text-anchor="middle" font-size="10.5" fill="#8a849f">12h</text>
+<line x1="606.7" y1="38" x2="606.7" y2="233" stroke="#2e2a3a" stroke-width="1"/>
+<text x="606.7" y="253" text-anchor="middle" font-size="10.5" fill="#8a849f">16h</text>
+<line x1="741.3" y1="38" x2="741.3" y2="233" stroke="#2e2a3a" stroke-width="1"/>
+<text x="741.3" y="253" text-anchor="middle" font-size="10.5" fill="#8a849f">20h</text>
+<line x1="876.0" y1="38" x2="876.0" y2="233" stroke="#2e2a3a" stroke-width="1"/>
+<text x="876.0" y="253" text-anchor="middle" font-size="10.5" fill="#8a849f">24h</text>
+<line x1="68" y1="137.7" x2="876" y2="137.7" stroke="#ffb000" stroke-dasharray="5,4" stroke-width="1.5"/>
+<text x="872" y="131.7" text-anchor="end" fill="#ffb000" font-size="11">GCC -O2 (1.37&times;)</text>
+<line x1="68" y1="70.4" x2="876" y2="70.4" stroke="#2ed573" stroke-dasharray="5,4" stroke-width="1.5"/>
+<text x="872" y="64.4" text-anchor="end" fill="#2ed573" font-size="11">Kaze master (1.65&times;)</text>
+<polyline fill="none" stroke="#38bdf8" stroke-width="2.5" points="68.0,228.1 392.9,72.4 461.2,64.9 529.5,60.0 597.7,58.7"/>
+<circle class="pt" cx="68.0" cy="228.1" r="4.5" fill="#38bdf8" stroke="#0a0a0d" stroke-width="1.5" data-tip="Kimi K3.1 Pro (trial) @ 0.0h: 1.000x [baseline]"/>
+<circle class="pt" cx="392.9" cy="72.4" r="4.5" fill="#38bdf8" stroke="#0a0a0d" stroke-width="1.5" data-tip="Kimi K3.1 Pro (trial) @ 9.7h: 1.638x (1.20x vs -O2) [v2-checkpoint-1]"/>
+<circle class="pt" cx="461.2" cy="64.9" r="4.5" fill="#38bdf8" stroke="#0a0a0d" stroke-width="1.5" data-tip="Kimi K3.1 Pro (trial) @ 11.7h: 1.669x (1.22x vs -O2) [v2-checkpoint-2]"/>
+<circle class="pt" cx="529.5" cy="60.0" r="4.5" fill="#38bdf8" stroke="#0a0a0d" stroke-width="1.5" data-tip="Kimi K3.1 Pro (trial) @ 13.7h: 1.689x (1.23x vs -O2) [v2-checkpoint-3]"/>
+<circle class="pt" cx="597.7" cy="58.7" r="4.5" fill="#38bdf8" stroke="#0a0a0d" stroke-width="1.5" data-tip="Kimi K3.1 Pro (trial) @ 15.7h: 1.695x (1.24x vs -O2) [v2-checkpoint-4]"/>
+<text x="607.7" y="62.7" text-anchor="start" fill="#38bdf8" font-weight="600">Kimi K3.1 Pro (trial) (1.69&times;)</text>
+</g></svg>
+<script>(function(){
+var svg=document.getElementById("home-trial-traj"),tip=document.getElementById("home-trial-traj-tip");
+if(!svg||!tip)return;
+svg.querySelectorAll("circle.pt").forEach(function(c){
+  c.style.cursor="pointer";
+  c.addEventListener("mouseenter",function(e){
+    tip.textContent=c.getAttribute("data-tip");tip.style.display="block";
+    var box=svg.parentElement.getBoundingClientRect();
+    tip.style.left=Math.min(box.width-220,Math.max(8,e.clientX-box.left+12))+"px";
+    tip.style.top=Math.max(8,e.clientY-box.top-34)+"px";
+  });
+  c.addEventListener("mouseleave",function(){tip.style.display="none";});
+});
+})();</script></div>
+
+
+<div class="panel" id="telem-panel">
+  <div class="panel-head">
+    <div class="panel-title">N64 Hardware Bottleneck Inspector (ares cycle/cache/RDP model)</div>
+    <div class="pill-bar"><button class="pill on" data-course="all">6-Course Summary</button><button class="pill" data-course="bob">BoB</button><button class="pill" data-course="wf">WF</button><button class="pill" data-course="jrb">JRB</button><button class="pill" data-course="ddd">DDD Sub</button><button class="pill" data-course="bitfs">BitFS</button><button class="pill" data-course="rr">RR</button></div>
+  </div>
+  <p class="small muted" style="margin-bottom:4px">Click any Super Mario 64 course to inspect how optimization shifts the limiting hardware unit between the 93.75 MHz VR4300 CPU, 62.5 MHz RSP, 62.5 MHz RDP, and 4 MB RDRAM bus. Highlighted bar = active bottleneck.</p>
+  <div class="telem-grid" id="telem-grid"></div>
+</div>
+<script>(function(){
+var DATA={"all": [{"label": "1996 IDO -O0", "badge": "baseline", "cls": "", "con": 29.55, "cpu": 29.81, "rsp": 18.02, "rdp": 12.08, "mem": 11.5, "fps": 34.1, "sp": 1.0, "dom": "cpu"}, {"label": "GCC -O2", "badge": "compiler", "cls": "", "con": 21.39, "cpu": 21.35, "rsp": 18.02, "rdp": 12.08, "mem": 10.49, "fps": 47.1, "sp": 1.38, "dom": "cpu"}, {"label": "Kaze Master (R10)", "badge": "expert ref", "cls": "highlight", "con": 17.65, "cpu": 17.75, "rsp": 10.76, "rdp": 10.59, "mem": 9.27, "fps": 57.0, "sp": 1.67, "dom": "cpu"}, {"label": "Kimi K3.1 Pro (trial)", "badge": "trial (25-route valid)", "cls": "trial-card", "con": 17.15, "cpu": 17.2, "rsp": 10.24, "rdp": 10.55, "mem": 9.24, "fps": 58.6, "sp": 1.72, "dom": "cpu"}], "bob": [{"label": "1996 IDO -O0", "badge": "baseline", "cls": "", "con": 30.33, "cpu": 30.33, "rsp": 22.43, "rdp": 12.58, "mem": 11.94, "fps": 33.0, "sp": 1.0, "dom": "cpu"}, {"label": "GCC -O2", "badge": "compiler", "cls": "", "con": 23.05, "cpu": 21.93, "rsp": 22.43, "rdp": 12.6, "mem": 10.87, "fps": 43.4, "sp": 1.32, "dom": "rsp"}, {"label": "Kaze Master (R10)", "badge": "expert ref", "cls": "highlight", "con": 18.24, "cpu": 18.24, "rsp": 12.26, "rdp": 10.91, "mem": 9.61, "fps": 54.8, "sp": 1.66, "dom": "cpu"}, {"label": "Kimi K3.1 Pro (trial)", "badge": "trial (25-route valid)", "cls": "trial-card", "con": 17.5, "cpu": 17.5, "rsp": 11.69, "rdp": 10.85, "mem": 9.52, "fps": 57.1, "sp": 1.73, "dom": "cpu"}], "wf": [{"label": "1996 IDO -O0", "badge": "baseline", "cls": "", "con": 27.78, "cpu": 27.78, "rsp": 15.2, "rdp": 10.54, "mem": 11.24, "fps": 36.0, "sp": 1.0, "dom": "cpu"}, {"label": "GCC -O2", "badge": "compiler", "cls": "", "con": 19.51, "cpu": 19.51, "rsp": 15.2, "rdp": 10.56, "mem": 10.14, "fps": 51.3, "sp": 1.42, "dom": "cpu"}, {"label": "Kaze Master (R10)", "badge": "expert ref", "cls": "highlight", "con": 15.73, "cpu": 15.73, "rsp": 8.81, "rdp": 9.01, "mem": 8.83, "fps": 63.6, "sp": 1.77, "dom": "cpu"}, {"label": "Kimi K3.1 Pro (trial)", "badge": "trial (25-route valid)", "cls": "trial-card", "con": 15.15, "cpu": 15.15, "rsp": 8.32, "rdp": 8.99, "mem": 8.84, "fps": 66.0, "sp": 1.83, "dom": "cpu"}], "jrb": [{"label": "1996 IDO -O0", "badge": "baseline", "cls": "", "con": 38.53, "cpu": 38.53, "rsp": 23.32, "rdp": 23.16, "mem": 16.41, "fps": 26.0, "sp": 1.0, "dom": "cpu"}, {"label": "GCC -O2", "badge": "compiler", "cls": "", "con": 27.27, "cpu": 27.19, "rsp": 23.32, "rdp": 23.15, "mem": 15.04, "fps": 36.7, "sp": 1.41, "dom": "cpu"}, {"label": "Kaze Master (R10)", "badge": "expert ref", "cls": "highlight", "con": 22.43, "cpu": 22.28, "rsp": 13.28, "rdp": 20.34, "mem": 13.05, "fps": 44.6, "sp": 1.72, "dom": "cpu"}, {"label": "Kimi K3.1 Pro (trial)", "badge": "trial (25-route valid)", "cls": "trial-card", "con": 21.33, "cpu": 21.01, "rsp": 12.81, "rdp": 20.31, "mem": 13.02, "fps": 46.9, "sp": 1.81, "dom": "cpu"}], "ddd": [{"label": "1996 IDO -O0", "badge": "baseline", "cls": "", "con": 28.15, "cpu": 28.15, "rsp": 17.36, "rdp": 12.54, "mem": 12.0, "fps": 35.5, "sp": 1.0, "dom": "cpu"}, {"label": "GCC -O2", "badge": "compiler", "cls": "", "con": 20.28, "cpu": 20.24, "rsp": 17.36, "rdp": 12.54, "mem": 11.07, "fps": 49.3, "sp": 1.39, "dom": "cpu"}, {"label": "Kaze Master (R10)", "badge": "expert ref", "cls": "highlight", "con": 16.94, "cpu": 16.94, "rsp": 10.25, "rdp": 11.23, "mem": 9.67, "fps": 59.0, "sp": 1.66, "dom": "cpu"}, {"label": "Kimi K3.1 Pro (trial)", "badge": "trial (25-route valid)", "cls": "trial-card", "con": 16.81, "cpu": 16.81, "rsp": 10.32, "rdp": 11.28, "mem": 9.93, "fps": 59.5, "sp": 1.67, "dom": "cpu"}], "bitfs": [{"label": "1996 IDO -O0", "badge": "baseline", "cls": "", "con": 25.83, "cpu": 25.83, "rsp": 11.33, "rdp": 6.69, "mem": 8.2, "fps": 38.7, "sp": 1.0, "dom": "cpu"}, {"label": "GCC -O2", "badge": "compiler", "cls": "", "con": 19.15, "cpu": 19.15, "rsp": 11.33, "rdp": 6.7, "mem": 7.53, "fps": 52.2, "sp": 1.35, "dom": "cpu"}, {"label": "Kaze Master (R10)", "badge": "expert ref", "cls": "highlight", "con": 16.86, "cpu": 16.86, "rsp": 7.8, "rdp": 6.11, "mem": 6.96, "fps": 59.3, "sp": 1.53, "dom": "cpu"}, {"label": "Kimi K3.1 Pro (trial)", "badge": "trial (25-route valid)", "cls": "trial-card", "con": 16.19, "cpu": 16.19, "rsp": 7.34, "rdp": 6.02, "mem": 6.85, "fps": 61.8, "sp": 1.6, "dom": "cpu"}], "rr": [{"label": "1996 IDO -O0", "badge": "baseline", "cls": "", "con": 28.23, "cpu": 28.23, "rsp": 18.5, "rdp": 6.95, "mem": 9.23, "fps": 35.4, "sp": 1.0, "dom": "cpu"}, {"label": "GCC -O2", "badge": "compiler", "cls": "", "con": 20.1, "cpu": 20.07, "rsp": 18.5, "rdp": 6.97, "mem": 8.27, "fps": 49.8, "sp": 1.4, "dom": "cpu"}, {"label": "Kaze Master (R10)", "badge": "expert ref", "cls": "highlight", "con": 16.45, "cpu": 16.45, "rsp": 12.17, "rdp": 5.95, "mem": 7.48, "fps": 60.8, "sp": 1.72, "dom": "cpu"}, {"label": "Kimi K3.1 Pro (trial)", "badge": "trial (25-route valid)", "cls": "trial-card", "con": 16.54, "cpu": 16.54, "rsp": 10.94, "rdp": 5.85, "mem": 7.3, "fps": 60.5, "sp": 1.71, "dom": "cpu"}]};
+var grid=document.getElementById("telem-grid");
+var btns=document.querySelectorAll("#telem-panel .pill");
+function render(cid){
+  var items=DATA[cid]||[];
+  var maxMs=Math.max.apply(null,items.map(function(x){return Math.max(x.con,x.cpu,x.rsp,x.rdp,x.mem);}).concat([20]));
+  grid.innerHTML=items.map(function(x){
+    function row(k,lbl,v){
+      var pct=Math.min(100,(v/maxMs)*100).toFixed(1);
+      return '<div class="meter-row'+(x.dom===k?' dom':'')+'"><span class="meter-lbl">'+lbl+'</span>'
+        +'<div class="meter-bg"><div class="meter-bar '+k+'" style="width:'+pct+'%"></div></div>'
+        +'<span class="meter-val">'+v.toFixed(1)+'ms</span></div>';
+    }
+    return '<div class="telem-card '+x.cls+'">'
+      +'<div class="telem-top"><span class="telem-name">'+x.label+'</span><span class="telem-fps">'+x.fps.toFixed(1)+' fps</span></div>'
+      +'<div class="telem-sub">'+x.badge+' &middot; <b>'+x.sp.toFixed(2)+'&times;</b> ('+x.con.toFixed(1)+' ms)</div>'
+      +row("cpu","CPU",x.cpu)+row("rsp","RSP",x.rsp)+row("rdp","RDP",x.rdp)+row("mem","RAM",x.mem)
+      +'</div>';
+  }).join("");
+}
+btns.forEach(function(b){
+  b.addEventListener("click",function(){
+    btns.forEach(function(x){x.classList.remove("on");});
+    b.classList.add("on");
+    render(b.getAttribute("data-course"));
+  });
+});
+render("all");
+})();</script>
 
 
 <h2>How a submission is graded</h2>
 <div class="diagram"><svg viewBox="0 0 960 156" role="img" aria-label="Grading pipeline">
   <defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
-    <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
-  <g font-family="IBM Plex Mono, monospace" font-size="12.5" fill="currentColor">
-    <g stroke="currentColor" stroke-width="1.5" fill="none">
+    <path d="M0 0 L10 5 L0 10 z" fill="#7b68ee"/></marker></defs>
+  <g font-family="IBM Plex Mono, monospace" font-size="12" fill="#e8e4f4">
+    <g stroke="#4a4560" stroke-width="1.5" fill="#0a0a0d">
       <rect x="4" y="42" width="132" height="68" rx="6"/>
       <rect x="168" y="42" width="136" height="68" rx="6"/>
-      <rect x="336" y="38" width="176" height="76" rx="6"/>
-      <rect x="544" y="14" width="202" height="124" rx="6"/>
-      <rect x="778" y="38" width="178" height="76" rx="6"/>
+      <rect x="336" y="38" width="176" height="76" rx="6" stroke="#7b68ee"/>
+      <rect x="544" y="14" width="202" height="124" rx="6" stroke="#ffb000"/>
+      <rect x="778" y="38" width="178" height="76" rx="6" stroke="#2ed573"/>
+    </g>
+    <g stroke="#7b68ee" stroke-width="1.6">
       <line x1="136" y1="76" x2="166" y2="76" marker-end="url(#arr)"/>
       <line x1="304" y1="76" x2="334" y2="76" marker-end="url(#arr)"/>
       <line x1="512" y1="76" x2="542" y2="76" marker-end="url(#arr)"/>
       <line x1="746" y1="76" x2="776" y2="76" marker-end="url(#arr)"/>
     </g>
-    <text x="70" y="70" text-anchor="middle">source</text>
-    <text x="70" y="89" text-anchor="middle" opacity="0.7">SM64 / Pip</text>
-    <text x="236" y="70" text-anchor="middle">trusted build</text>
-    <text x="236" y="89" text-anchor="middle" opacity="0.7">bench + PLAY=1</text>
-    <text x="424" y="63" text-anchor="middle">ares N64</text>
-    <text x="424" y="81" text-anchor="middle" opacity="0.7">93.75MHz CPU + I/D$</text>
-    <text x="424" y="99" text-anchor="middle" opacity="0.7">62.5MHz RSP/RDP + Bus</text>
-    <text x="645" y="36" text-anchor="middle">6 gates (6 courses)</text>
-    <text x="645" y="57" text-anchor="middle" opacity="0.7">player-equiv / exact</text>
-    <text x="645" y="75" text-anchor="middle" opacity="0.7">video + 40 dB audio</text>
-    <text x="645" y="93" text-anchor="middle" opacity="0.7">integrity + 4 MB RAM</text>
-    <text x="645" y="111" text-anchor="middle" opacity="0.7">cross-budget caps</text>
-    <text x="645" y="128" text-anchor="middle" opacity="0.7">any fail &rarr; &minus;1.0</text>
-    <text x="867" y="64" text-anchor="middle">console score</text>
-    <text x="867" y="82" text-anchor="middle" opacity="0.7">max(CPU,RSP,RDP)</text>
-    <text x="867" y="100" text-anchor="middle" opacity="0.7">FPS &amp; vs -O2</text>
+    <text x="70" y="70" text-anchor="middle" font-weight="600">source</text>
+    <text x="70" y="89" text-anchor="middle" fill="#8a849f">SM64 / Pip</text>
+    <text x="236" y="70" text-anchor="middle" font-weight="600">trusted build</text>
+    <text x="236" y="89" text-anchor="middle" fill="#8a849f">bench + PLAY=1</text>
+    <text x="424" y="63" text-anchor="middle" font-weight="600" fill="#7b68ee">ares N64</text>
+    <text x="424" y="81" text-anchor="middle" fill="#8a849f">93.75MHz CPU + I/D$</text>
+    <text x="424" y="99" text-anchor="middle" fill="#8a849f">62.5MHz RSP/RDP + Bus</text>
+    <text x="645" y="36" text-anchor="middle" font-weight="600" fill="#ffb000">6 gates (6–25 routes)</text>
+    <text x="645" y="57" text-anchor="middle" fill="#8a849f">player-equiv / exact</text>
+    <text x="645" y="75" text-anchor="middle" fill="#8a849f">video + 40 dB audio</text>
+    <text x="645" y="93" text-anchor="middle" fill="#8a849f">integrity + 4 MB RAM</text>
+    <text x="645" y="111" text-anchor="middle" fill="#8a849f">cross-budget caps</text>
+    <text x="645" y="128" text-anchor="middle" fill="#ff5a63">any fail &rarr; &minus;1.0</text>
+    <text x="867" y="64" text-anchor="middle" font-weight="600" fill="#2ed573">console score</text>
+    <text x="867" y="82" text-anchor="middle" fill="#8a849f">max(CPU,RSP,RDP,RAM)</text>
+    <text x="867" y="100" text-anchor="middle" fill="#8a849f">FPS &amp; vs -O2</text>
   </g>
 </svg></div>
 
 <div class="cards">
-<div class="card primary"><h3>console <span>headline</span></h3><p>Per-frame <code>max(CPU_ms, RSP_ms, RDP_ms, RDRAM_ms)</code> within 4 MB RDRAM &mdash; true N64 frame rate.</p></div>
-<div class="card"><h3>speed <span>diagnostic</span></h3><p>93.75 MHz VR4300 CPU time per frame (COUNT ticks), including 16 KB I$ / 8 KB D$ stalls and bus-coupled RCP contention.</p></div>
-<div class="card"><h3>rdp <span>diagnostic</span></h3><p>62.5 MHz RDP combiner, Z/blend RMW, 4-bank 2 KB RDRAM page-miss, TMEM upload &amp; pipe-sync cycles.</p></div>
-<div class="card"><h3>rsp <span>diagnostic</span></h3><p>62.5 MHz RSP Fast3D + ABI1 audio microcode busy cycles per frame.</p></div>
-<div class="card"><h3>traffic <span>diagnostic</span></h3><p>RDRAM bytes moved per frame across CPU caches, SP, DP, PI &amp; SI DMA.</p></div>
-<div class="card"><h3>memory <span>diagnostic</span></h3><p>Distinct 16-byte RDRAM lines touched after boot (hard 4,194,304 B ceiling).</p></div>
+  <div class="card primary"><h3>console <span>headline</span></h3><p>Per-frame <code>max(CPU_ms, RSP_ms, RDP_ms, RDRAM_ms)</code> within 4 MB RDRAM &mdash; true console frame time.</p></div>
+  <div class="card"><h3>speed <span>diagnostic</span></h3><p>93.75 MHz VR4300 CPU cycles per frame, including 16 KB I$ / 8 KB D$ stalls and RCP bus contention.</p></div>
+  <div class="card"><h3>rdp <span>diagnostic</span></h3><p>62.5 MHz RDP combiner, early-Z rejection, 4-bank 2 KB RDRAM row misses, TMEM loads &amp; syncs.</p></div>
+  <div class="card"><h3>rsp <span>diagnostic</span></h3><p>62.5 MHz RSP Fast3D graphics &amp; ABI1 audio microcode busy cycles per frame.</p></div>
+  <div class="card"><h3>traffic <span>diagnostic</span></h3><p>RDRAM bytes moved per frame across CPU caches, SP, DP, PI, SI &amp; 60 Hz VI scanout.</p></div>
+  <div class="card"><h3>memory <span>diagnostic</span></h3><p>Distinct 16-byte RDRAM lines touched after boot (hard 4,194,304 B retail ceiling).</p></div>
 </div>
 
-
-<h2>Super Mario 64 calibration &amp; Kaze master reference</h2>
-<p>Calibrated on the US decompilation across <b>6 public courses</b> (Bob-omb Battlefield, Whomp's Fortress,
-Jolly Roger Bay, Dire Dire Docks Area 2 / Bowser's Sub, Bowser in the Fire Sea, and Rainbow Ride), from the untouched
-1996 IDO <code>-O0</code> ROM up to the <a href="/mario-eval/blog/kaze-master-reference/">Kaze master reference</a>
-and one rung beyond it:</p>
-<div class="chart-box"><svg viewBox="0 0 920 360" role="img" aria-label="Super Mario 64 per-course console frame time: original IDO baseline vs Kaze master reference">
-<g font-family="IBM Plex Mono, monospace" font-size="12" fill="currentColor">
-<text x="210" y="20" font-weight="600">Console frame time per course (ms, lower is faster) &mdash; original IDO vs Kaze master</text>
-<line x1="210.0" y1="38" x2="210.0" y2="336" stroke="currentColor" stroke-width="1" opacity="0.18"/>
-<text x="210.0" y="352" text-anchor="middle" font-size="11" opacity="0.75">0ms</text>
-<line x1="469.3" y1="38" x2="469.3" y2="336" stroke="currentColor" stroke-width="1" opacity="0.18"/>
-<text x="469.3" y="352" text-anchor="middle" font-size="11" opacity="0.75">20ms</text>
-<line x1="642.1" y1="38" x2="642.1" y2="336" stroke="#d4a017" stroke-width="1" stroke-dasharray="4,3"/>
-<text x="642.1" y="352" text-anchor="middle" font-size="11" opacity="0.75">33.3ms (30 FPS)</text>
-<text x="198" y="63" text-anchor="end">Bob-omb Battlefield</text>
-<text x="198" y="78" text-anchor="end" font-size="10.5" opacity="0.65">RDP 10.9ms</text>
-<rect x="210" y="51" width="393.1" height="12" rx="2" fill="currentColor" opacity="0.28"/>
-<rect x="210" y="66" width="236.4" height="13" rx="2" fill="#1f7a3a"/>
-<text x="610.1" y="61" font-size="11" opacity="0.75">30.3ms (33.0 fps)</text>
-<text x="453.4" y="77" font-size="11.5" font-weight="600">18.2ms (54.8 fps, 1.66&times;)</text>
-<text x="198" y="109" text-anchor="end">Whomp&#x27;s Fortress</text>
-<text x="198" y="124" text-anchor="end" font-size="10.5" opacity="0.65">RDP 9.0ms</text>
-<rect x="210" y="97" width="360.1" height="12" rx="2" fill="currentColor" opacity="0.28"/>
-<rect x="210" y="112" width="203.9" height="13" rx="2" fill="#1f7a3a"/>
-<text x="577.1" y="107" font-size="11" opacity="0.75">27.8ms (36.0 fps)</text>
-<text x="420.9" y="123" font-size="11.5" font-weight="600">15.7ms (63.6 fps, 1.77&times;)</text>
-<text x="198" y="155" text-anchor="end">Jolly Roger Bay</text>
-<text x="198" y="170" text-anchor="end" font-size="10.5" opacity="0.65">RDP 20.3ms</text>
-<rect x="210" y="143" width="499.4" height="12" rx="2" fill="currentColor" opacity="0.28"/>
-<rect x="210" y="158" width="290.7" height="13" rx="2" fill="#1f7a3a"/>
-<text x="716.4" y="153" font-size="11" opacity="0.75">38.5ms (26.0 fps)</text>
-<text x="507.7" y="169" font-size="11.5" font-weight="600">22.4ms (44.6 fps, 1.72&times;)</text>
-<text x="198" y="201" text-anchor="end">Dire Dire Docks (Sub)</text>
-<text x="198" y="216" text-anchor="end" font-size="10.5" opacity="0.65">RDP 11.2ms</text>
-<rect x="210" y="189" width="364.9" height="12" rx="2" fill="currentColor" opacity="0.28"/>
-<rect x="210" y="204" width="219.6" height="13" rx="2" fill="#1f7a3a"/>
-<text x="581.9" y="199" font-size="11" opacity="0.75">28.1ms (35.5 fps)</text>
-<text x="436.6" y="215" font-size="11.5" font-weight="600">16.9ms (59.0 fps, 1.66&times;)</text>
-<text x="198" y="247" text-anchor="end">Bowser in the Fire Sea</text>
-<text x="198" y="262" text-anchor="end" font-size="10.5" opacity="0.65">RDP 6.1ms</text>
-<rect x="210" y="235" width="334.8" height="12" rx="2" fill="currentColor" opacity="0.28"/>
-<rect x="210" y="250" width="218.5" height="13" rx="2" fill="#1f7a3a"/>
-<text x="551.8" y="245" font-size="11" opacity="0.75">25.8ms (38.7 fps)</text>
-<text x="435.5" y="261" font-size="11.5" font-weight="600">16.9ms (59.3 fps, 1.53&times;)</text>
-<text x="198" y="293" text-anchor="end">Rainbow Ride</text>
-<text x="198" y="308" text-anchor="end" font-size="10.5" opacity="0.65">RDP 6.0ms</text>
-<rect x="210" y="281" width="366.0" height="12" rx="2" fill="currentColor" opacity="0.28"/>
-<rect x="210" y="296" width="213.3" height="13" rx="2" fill="#1f7a3a"/>
-<text x="583.0" y="291" font-size="11" opacity="0.75">28.2ms (35.4 fps)</text>
-<text x="430.3" y="307" font-size="11.5" font-weight="600">16.5ms (60.8 fps, 1.72&times;)</text>
-</g></svg></div>
-<div class="table-wrap">
-<table><tr><th>patch</th><th>status</th><th class="num">console</th><th class="num">stutter</th><th class="num">speed</th><th class="num">rdp</th><th class="num">rsp</th><th class="num">traffic</th><th class="num">memory</th><th class="num">console&times;</th><th class="num">FPS</th><th>caught by</th></tr>
-<tr><td><a href="/mario-eval/calibration/#sm64-r0-unchanged">Unchanged 1996 IDO rebuild</a></td><td><span class="tag valid">valid</span></td><td class="num " title="speedup: 1.000x">-0.000</td><td class="num " title="speedup: 1.000x">-0.000</td><td class="num " title="speedup: 1.000x">-0.000</td><td class="num " title="speedup: 1.000x">-0.000</td><td class="num " title="speedup: 1.000x">-0.000</td><td class="num " title="speedup: 1.000x">-0.000</td><td class="num " title="speedup: 1.000x">-0.000</td><td class="num" title="vs -O2: 0.724x">1.00&times;</td><td class="num">34.1</td><td class=small></td></tr>
-<tr><td><a href="/mario-eval/calibration/#sm64-r1-gcc-o2">Switch to GCC <code>-O2 -fno-fast-math</code></a></td><td><span class="tag valid">valid</span></td><td class="num pos" title="speedup: 1.382x">+0.117</td><td class="num pos" title="speedup: 1.381x">+0.116</td><td class="num pos" title="speedup: 1.395x">+0.120</td><td class="num " title="speedup: 0.999x">-0.000</td><td class="num " title="speedup: 1.000x">-0.000</td><td class="num pos" title="speedup: 1.112x">+0.038</td><td class="num pos" title="speedup: 1.022x">+0.008</td><td class="num" title="vs -O2: 1.000x">1.38&times;</td><td class="num">47.1</td><td class=small></td></tr>
-<tr><td><a href="/mario-eval/calibration/#sm64-r2-kaze-mtx">Kaze's in-place <code>mtxf_mul</code> + 32-bit <code>mtxf_to_mtx</code></a></td><td><span class="tag valid">valid</span></td><td class="num pos" title="speedup: 1.064x">+0.023</td><td class="num pos" title="speedup: 1.067x">+0.023</td><td class="num pos" title="speedup: 1.064x">+0.023</td><td class="num " title="speedup: 1.000x">-0.000</td><td class="num " title="speedup: 1.000x">-0.000</td><td class="num pos" title="speedup: 1.016x">+0.006</td><td class="num neg" title="footprint_bytes regressed 0.0209% on bob (limit 0%)">&minus;1*</td><td class="num" title="vs -O2: 0.770x">1.06&times;</td><td class="num">36.2</td><td class=small></td></tr>
-<tr><td><a href="/mario-eval/calibration/#sm64-r3-kaze-full-detail-lod">Always draw high-poly Mario (<code>actors/mario/geo.inc.c</code>)</a></td><td><span class="tag valid">valid</span></td><td class="num " title="speedup: 0.999x">-0.000</td><td class="num neg" title="speedup: 0.999x">-0.001</td><td class="num " title="speedup: 0.999x">-0.000</td><td class="num neg" title="speedup: 0.988x">-0.004</td><td class="num neg" title="rsp_busy regressed 13.6% on bitfs (limit 5%)">&minus;1*</td><td class="num neg" title="speedup: 0.988x">-0.004</td><td class="num neg" title="footprint_bytes regressed 0.495% on rr (limit 0%)">&minus;1*</td><td class="num" title="vs -O2: 0.723x">1.00&times;</td><td class="num">34.1</td><td class=small></td></tr>
-<tr><td><a href="/mario-eval/calibration/#sm64-r4-kaze-rdp-opa">Kaze's <code>G_RM_RA_ZB_OPA_SURF</code> reduced-aliasing opaque modes</a></td><td><span class="tag valid">valid</span></td><td class="num pos" title="speedup: 1.012x">+0.004</td><td class="num pos" title="speedup: 1.014x">+0.005</td><td class="num pos" title="speedup: 1.012x">+0.004</td><td class="num pos" title="speedup: 1.148x">+0.050</td><td class="num " title="speedup: 1.000x">+0.000</td><td class="num pos" title="speedup: 1.065x">+0.023</td><td class="num neg" title="footprint_bytes regressed 0.00996% on jrb (limit 0%)">&minus;1*</td><td class="num" title="vs -O2: 0.732x">1.01&times;</td><td class="num">34.5</td><td class=small></td></tr>
-<tr><td><a href="/mario-eval/calibration/#sm64-r5-double-buffer">Double-buffer 16bpp framebuffers instead of triple-buffering</a></td><td><span class="tag valid">valid</span></td><td class="num " title="speedup: 1.000x">-0.000</td><td class="num " title="speedup: 1.000x">-0.000</td><td class="num " title="speedup: 1.000x">-0.000</td><td class="num " title="speedup: 1.000x">-0.000</td><td class="num " title="speedup: 1.000x">-0.000</td><td class="num " title="speedup: 1.000x">-0.000</td><td class="num pos" title="speedup: 1.056x">+0.020</td><td class="num" title="vs -O2: 0.724x">1.00&times;</td><td class="num">34.1</td><td class=small></td></tr>
-<tr><td><a href="/mario-eval/calibration/#sm64-r6-kaze-super">GCC <code>-O2</code> + Kaze matrix math + <code>CACHE 0x0d</code> + skybox cull + double-buffer</a></td><td><span class="tag valid">valid</span></td><td class="num pos" title="speedup: 1.447x">+0.133</td><td class="num pos" title="speedup: 1.434x">+0.130</td><td class="num pos" title="speedup: 1.474x">+0.140</td><td class="num pos" title="speedup: 1.147x">+0.049</td><td class="num " title="speedup: 1.000x">+0.000</td><td class="num pos" title="speedup: 1.203x">+0.067</td><td class="num pos" title="speedup: 1.080x">+0.028</td><td class="num" title="vs -O2: 1.047x">1.45&times;</td><td class="num">49.3</td><td class=small></td></tr>
-<tr><td><a href="/mario-eval/calibration/#sm64-r7-kaze-icache-trig">Kaze Rung 1: 16 KB I-cache de-aliasing + 1-ULP polynomial trig + bit-exact 256 B <code>atan2s</code></a></td><td><span class="tag valid">valid</span></td><td class="num pos" title="speedup: 1.396x">+0.120</td><td class="num pos" title="speedup: 1.398x">+0.121</td><td class="num pos" title="speedup: 1.412x">+0.124</td><td class="num " title="speedup: 0.999x">-0.000</td><td class="num " title="speedup: 1.000x">-0.000</td><td class="num pos" title="speedup: 1.119x">+0.041</td><td class="num pos" title="speedup: 1.017x">+0.006</td><td class="num" title="vs -O2: 1.010x">1.40&times;</td><td class="num">47.5</td><td class=small></td></tr>
-<tr><td><a href="/mario-eval/calibration/#sm64-r8-kaze-collision-objects">Kaze Rung 2: 3-cache-line <code>struct Surface</code> + Bowser's Sub surface cache + single-floor shadows</a></td><td><span class="tag valid">valid</span></td><td class="num pos" title="speedup: 1.462x">+0.137</td><td class="num pos" title="speedup: 1.443x">+0.132</td><td class="num pos" title="speedup: 1.495x">+0.145</td><td class="num " title="speedup: 0.999x">-0.000</td><td class="num " title="speedup: 1.000x">+0.000</td><td class="num pos" title="speedup: 1.128x">+0.043</td><td class="num pos" title="speedup: 1.017x">+0.006</td><td class="num" title="vs -O2: 1.058x">1.46&times;</td><td class="num">49.8</td><td class=small></td></tr>
-<tr><td><a href="/mario-eval/calibration/#sm64-r9-kaze-partial">Kaze Rung 3 (partial reference): lazy <code>Mtx</code> + fast frustum cull + coin TMEM batch + <code>&minus;304 KB</code> RAM</a></td><td><span class="tag valid">valid</span></td><td class="num pos" title="speedup: 1.474x">+0.140</td><td class="num pos" title="speedup: 1.433x">+0.130</td><td class="num pos" title="speedup: 1.511x">+0.149</td><td class="num pos" title="speedup: 1.149x">+0.050</td><td class="num pos" title="speedup: 1.006x">+0.002</td><td class="num pos" title="speedup: 1.198x">+0.065</td><td class="num pos" title="speedup: 1.096x">+0.033</td><td class="num" title="vs -O2: 1.067x">1.47&times;</td><td class="num">50.4</td><td class=small></td></tr>
-<tr class="ceiling-row"><td><a href="/mario-eval/calibration/#sm64-r10-kaze-master">Kaze master reference: reconstructed optimizations from Kaze Emanuar's public work</a></td><td><span class="tag valid">valid</span></td><td class="num pos" title="speedup: 1.675x">+0.186</td><td class="num pos" title="speedup: 1.688x">+0.189</td><td class="num pos" title="speedup: 1.676x">+0.186</td><td class="num pos" title="speedup: 1.140x">+0.047</td><td class="num pos" title="speedup: 1.658x">+0.182</td><td class="num pos" title="speedup: 1.275x">+0.088</td><td class="num pos" title="speedup: 1.048x">+0.017</td><td class="num" title="vs -O2: 1.212x">1.67&times;</td><td class="num">57.0</td><td class=small></td></tr>
-<tr><td><a href="/mario-eval/calibration/#sm64-r11-beyond-kaze">Beyond Kaze: r10-style build plus our own cache-layout work</a></td><td><span class="tag valid">valid</span></td><td class="num pos" title="speedup: 1.650x">+0.181</td><td class="num pos" title="speedup: 1.662x">+0.183</td><td class="num pos" title="speedup: 1.652x">+0.181</td><td class="num pos" title="speedup: 1.149x">+0.050</td><td class="num pos" title="speedup: 1.730x">+0.198</td><td class="num pos" title="speedup: 1.277x">+0.088</td><td class="num pos" title="speedup: 1.106x">+0.036</td><td class="num" title="vs -O2: 1.194x">1.65&times;</td><td class="num">56.1</td><td class=small></td></tr>
-<tr class="invalid"><td><a href="/mario-eval/calibration/#sm64-i0-gcc-fastmath">GCC <code>-O2 -ffast-math</code></a></td><td><span class="tag invalid">invalid</span></td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num muted">&mdash;</td><td class="num muted">&mdash;</td><td class=small>gameplay, video</td></tr>
-<tr class="invalid"><td><a href="/mario-eval/calibration/#sm64-i1-mute-audio">Disable audio synthesis (<code>sAudioEnabled = FALSE</code>)</a></td><td><span class="tag invalid">invalid</span></td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num muted">&mdash;</td><td class="num muted">&mdash;</td><td class=small>audio</td></tr>
-<tr class="invalid"><td><a href="/mario-eval/calibration/#sm64-i2-low-poly-mario">Force low-poly Mario at all distances</a></td><td><span class="tag invalid">invalid</span></td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num muted">&mdash;</td><td class="num muted">&mdash;</td><td class=small>video</td></tr>
-<tr class="invalid"><td><a href="/mario-eval/calibration/#sm64-i3-half-physics-step">Two quarter-steps instead of four in <code>mario_step.c</code></a></td><td><span class="tag invalid">invalid</span></td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num muted">&mdash;</td><td class="num muted">&mdash;</td><td class=small>gameplay, video, audio</td></tr>
-<tr class="invalid"><td><a href="/mario-eval/calibration/#sm64-i4-tamper">Modify <code>src/game/mev.h</code></a></td><td><span class="tag invalid">invalid</span></td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num muted">&mdash;</td><td class="num muted">&mdash;</td><td class=small>integrity</td></tr>
-</table></div>
-<p class="small muted">Rewards on public + held-out routes. <b>console</b> is the headline real-hardware frame-time profile (<code>max(CPU_ms, RSP_ms, RDP_ms)</code> per frame within 4 MB RDRAM). <b>&minus;1*</b>: valid submission, but it breaks that diagnostic profile's cross-budget (hover for reason or speedup vs <code>-O2</code>).</p>
-<h3>Super Mario 64 baseline (1996 IDO <code>-O0</code>)</h3>
-<div class="table-wrap"><table><tr><th>workload</th><th class="num">console (ms)</th><th class="num">FPS</th><th class="num">CPU (ms)</th><th class="num">RSP (ms)</th><th class="num">RDP (ms)</th><th class="num">RDRAM KB</th><th class="num">footprint KiB</th></tr>
-<tr><td>bob</td><td class=num>30.3</td><td class=num>33.0</td><td class=num>48.2</td><td class=num>22.4</td><td class=num>12.6</td><td class=num>2678</td><td class=num>2918</td></tr>
-<tr><td>wf</td><td class=num>27.8</td><td class=num>36.0</td><td class=num>39.2</td><td class=num>15.2</td><td class=num>10.5</td><td class=num>2504</td><td class=num>2857</td></tr>
-<tr><td>jrb</td><td class=num>38.5</td><td class=num>26.0</td><td class=num>53.6</td><td class=num>23.3</td><td class=num>23.2</td><td class=num>3794</td><td class=num>2823</td></tr>
-<tr><td>ddd</td><td class=num>28.1</td><td class=num>35.5</td><td class=num>41.1</td><td class=num>17.4</td><td class=num>12.5</td><td class=num>2693</td><td class=num>2821</td></tr>
-<tr><td>bitfs</td><td class=num>25.8</td><td class=num>38.7</td><td class=num>35.1</td><td class=num>11.3</td><td class=num>6.7</td><td class=num>1743</td><td class=num>2710</td></tr>
-<tr><td>rr</td><td class=num>28.2</td><td class=num>35.4</td><td class=num>43.8</td><td class=num>18.5</td><td class=num>6.9</td><td class=num>2001</td><td class=num>2842</td></tr>
-</table></div>
-
-
-<h2>Pip's Garden calibration (zero-ROM open-source game)</h2>
-<p>Pip's Garden ships complete in-repo (<code>workload/</code>) so anyone can run the full 24-hour harness without an
-external ROM:</p>
-<div class="frame-grid"><div class="frame-card"><img src="/mario-eval/assets/frames/meadow.png" width="320" height="240" alt="Pip's Garden Meadow route frame" loading="lazy"><div class="cap"><b>Meadow</b><span>11.2 fps</span></div><div class="cap"><span class="small">Terrain heightfield, crystals &amp; shadow decals</span></div></div><div class="frame-card"><img src="/mario-eval/assets/frames/fortress.png" width="320" height="240" alt="Pip's Garden Fortress route frame" loading="lazy"><div class="cap"><b>Fortress</b><span>9.1 fps</span></div><div class="cap"><span class="small">Dense wall/floor collision &amp; patrolling hazards</span></div></div><div class="frame-card"><img src="/mario-eval/assets/frames/concert.png" width="320" height="240" alt="Pip's Garden Concert route frame" loading="lazy"><div class="cap"><b>Concert</b><span>12.3 fps</span></div><div class="cap"><span class="small">Multi-channel audio synthesis &amp; jump arcs</span></div></div><div class="frame-card"><img src="/mario-eval/assets/frames/storm.png" width="320" height="240" alt="Pip's Garden Storm route frame" loading="lazy"><div class="cap"><b>Storm</b><span>8.6 fps</span></div><div class="cap"><span class="small">Heavy rain alpha particles &amp; dash trails</span></div></div></div>
-<div class="table-wrap">
-<table><tr><th>patch</th><th>status</th><th class="num">console</th><th class="num">stutter</th><th class="num">speed</th><th class="num">rdp</th><th class="num">rsp</th><th class="num">traffic</th><th class="num">memory</th><th class="num">console&times;</th><th class="num">FPS</th><th>caught by</th></tr>
-<tr><td><a href="/mario-eval/calibration/#r0-unchanged">Unchanged rebuild</a></td><td><span class="tag valid">valid</span></td><td class="num " title="speedup: 1.000x">-0.000</td><td class="num muted">&mdash;</td><td class="num " title="speedup: 1.000x">-0.000</td><td class="num " title="speedup: 1.000x">-0.000</td><td class="num " title="speedup: 1.000x">-0.000</td><td class="num " title="speedup: 1.000x">-0.000</td><td class="num " title="speedup: 1.000x">-0.000</td><td class="num" title="vs -O2: 0.592x">1.00&times;</td><td class="num">10.3</td><td class=small></td></tr>
-<tr><td><a href="/mario-eval/calibration/#r1-o2-ieee"><code>-O2 -fno-fast-math</code></a></td><td><span class="tag valid">valid</span></td><td class="num pos" title="speedup: 1.690x">+0.189</td><td class="num muted">&mdash;</td><td class="num pos" title="speedup: 1.690x">+0.189</td><td class="num pos" title="speedup: 1.004x">+0.001</td><td class="num pos" title="speedup: 1.006x">+0.002</td><td class="num pos" title="speedup: 1.278x">+0.088</td><td class="num pos" title="speedup: 1.010x">+0.004</td><td class="num" title="vs -O2: 1.000x">1.69&times;</td><td class="num">17.3</td><td class=small></td></tr>
-<tr><td><a href="/mario-eval/calibration/#r2-engine">View-projection once per frame, terrain heights precomputed</a></td><td><span class="tag valid">valid</span></td><td class="num pos" title="speedup: 1.165x">+0.055</td><td class="num muted">&mdash;</td><td class="num pos" title="speedup: 1.165x">+0.055</td><td class="num " title="speedup: 1.000x">-0.000</td><td class="num " title="speedup: 1.000x">+0.000</td><td class="num pos" title="speedup: 1.262x">+0.084</td><td class="num neg" title="footprint_bytes regressed 0.0374% on concert (limit 0%)">&minus;1*</td><td class="num" title="vs -O2: 0.689x">1.16&times;</td><td class="num">11.9</td><td class=small></td></tr>
-<tr><td><a href="/mario-eval/calibration/#r3-cde">Create Dirty Exclusive on the audio block</a></td><td><span class="tag valid">valid</span></td><td class="num " title="speedup: 1.001x">+0.000</td><td class="num muted">&mdash;</td><td class="num " title="speedup: 1.001x">+0.000</td><td class="num " title="speedup: 1.000x">-0.000</td><td class="num " title="speedup: 1.000x">-0.000</td><td class="num " title="speedup: 1.000x">-0.000</td><td class="num neg" title="footprint_bytes regressed 0.0065% on concert (limit 0%)">&minus;1*</td><td class="num" title="vs -O2: 0.592x">1.00&times;</td><td class="num">10.3</td><td class=small></td></tr>
-<tr><td><a href="/mario-eval/calibration/#r4-memory">Delete an unused 256 KiB buffer</a></td><td><span class="tag valid">valid</span></td><td class="num " title="speedup: 1.000x">-0.000</td><td class="num muted">&mdash;</td><td class="num " title="speedup: 1.000x">-0.000</td><td class="num neg" title="speedup: 0.963x">-0.013</td><td class="num " title="speedup: 1.000x">+0.000</td><td class="num " title="speedup: 1.000x">+0.000</td><td class="num pos" title="speedup: 1.351x">+0.108</td><td class="num" title="vs -O2: 0.592x">1.00&times;</td><td class="num">10.3</td><td class=small></td></tr>
-<tr><td><a href="/mario-eval/calibration/#r5-reassoc"><code>(P&middot;V)&middot;M</code> instead of <code>P&middot;(V&middot;M)</code></a></td><td><span class="tag valid">valid</span></td><td class="num pos" title="speedup: 1.020x">+0.007</td><td class="num muted">&mdash;</td><td class="num pos" title="speedup: 1.020x">+0.007</td><td class="num pos" title="speedup: 1.004x">+0.002</td><td class="num " title="speedup: 1.000x">+0.000</td><td class="num pos" title="speedup: 1.048x">+0.017</td><td class="num neg" title="footprint_bytes regressed 0.00162% on concert (limit 0%)">&minus;1*</td><td class="num" title="vs -O2: 0.603x">1.02&times;</td><td class="num">10.5</td><td class=small></td></tr>
-<tr><td><a href="/mario-eval/calibration/#r6-sine-table">Sine table and closed-form triangle wave in the synth</a></td><td><span class="tag valid">valid</span></td><td class="num pos" title="speedup: 1.019x">+0.007</td><td class="num muted">&mdash;</td><td class="num pos" title="speedup: 1.019x">+0.007</td><td class="num pos" title="speedup: 1.004x">+0.002</td><td class="num " title="speedup: 1.000x">-0.000</td><td class="num neg" title="rdram_bytes regressed 14.4% on storm (limit 5%)">&minus;1*</td><td class="num neg" title="footprint_bytes regressed 0.34% on concert (limit 0%)">&minus;1*</td><td class="num" title="vs -O2: 0.603x">1.02&times;</td><td class="num">10.5</td><td class=small></td></tr>
-<tr><td><a href="/mario-eval/calibration/#r7-full-detail">Always draw Pip at full detail</a></td><td><span class="tag valid">valid</span></td><td class="num pos" title="speedup: 1.035x">+0.013</td><td class="num muted">&mdash;</td><td class="num pos" title="speedup: 1.035x">+0.013</td><td class="num pos" title="speedup: 1.003x">+0.001</td><td class="num neg" title="speedup: 0.996x">-0.001</td><td class="num pos" title="speedup: 1.115x">+0.039</td><td class="num " title="speedup: 1.000x">+0.000</td><td class="num" title="vs -O2: 0.613x">1.04&times;</td><td class="num">10.6</td><td class=small></td></tr>
-<tr><td><a href="/mario-eval/calibration/#r8-full-detail-shifted">Always draw Pip at full detail, deleting the distance check</a></td><td><span class="tag valid">valid</span></td><td class="num pos" title="speedup: 1.045x">+0.016</td><td class="num muted">&mdash;</td><td class="num pos" title="speedup: 1.045x">+0.016</td><td class="num pos" title="speedup: 1.003x">+0.001</td><td class="num neg" title="speedup: 0.996x">-0.001</td><td class="num pos" title="speedup: 1.142x">+0.048</td><td class="num " title="speedup: 1.000x">+0.000</td><td class="num" title="vs -O2: 0.618x">1.04&times;</td><td class="num">10.7</td><td class=small></td></tr>
-<tr><td><a href="/mario-eval/calibration/#r9-rdp-batch">1-cycle RDP combiner + material-batched TMEM uploads</a></td><td><span class="tag valid">valid</span></td><td class="num pos" title="speedup: 1.018x">+0.006</td><td class="num muted">&mdash;</td><td class="num pos" title="speedup: 1.018x">+0.006</td><td class="num pos" title="speedup: 1.492x">+0.144</td><td class="num pos" title="speedup: 1.994x">+0.249</td><td class="num pos" title="speedup: 1.013x">+0.005</td><td class="num neg" title="footprint_bytes regressed 0.00468% on storm (limit 0%)">&minus;1*</td><td class="num" title="vs -O2: 0.602x">1.02&times;</td><td class="num">10.5</td><td class=small></td></tr>
-<tr class="invalid"><td><a href="/mario-eval/calibration/#i0-o2-fastmath"><code>-O2</code> with libdragon's default <code>-ffast-math</code></a></td><td><span class="tag invalid">invalid</span></td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num muted">&mdash;</td><td class="num muted">&mdash;</td><td class=small>gameplay</td></tr>
-<tr class="invalid"><td><a href="/mario-eval/calibration/#i1-mute">Skip audio synthesis</a></td><td><span class="tag invalid">invalid</span></td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num muted">&mdash;</td><td class="num muted">&mdash;</td><td class=small>gameplay, audio</td></tr>
-<tr class="invalid"><td><a href="/mario-eval/calibration/#i2-no-particles">Skip drawing particles</a></td><td><span class="tag invalid">invalid</span></td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num muted">&mdash;</td><td class="num muted">&mdash;</td><td class=small>video</td></tr>
-<tr class="invalid"><td><a href="/mario-eval/calibration/#i3-physics">Two physics substeps instead of four</a></td><td><span class="tag invalid">invalid</span></td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num muted">&mdash;</td><td class="num muted">&mdash;</td><td class=small>gameplay, video</td></tr>
-<tr class="invalid"><td><a href="/mario-eval/calibration/#i4-tamper">Edit the harness</a></td><td><span class="tag invalid">invalid</span></td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num muted">&mdash;</td><td class="num muted">&mdash;</td><td class=small>integrity</td></tr>
-<tr class="invalid"><td><a href="/mario-eval/calibration/#i5-low-detail">Always draw Pip at the lowest detail</a></td><td><span class="tag invalid">invalid</span></td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num neg">&minus;1</td><td class="num muted">&mdash;</td><td class="num muted">&mdash;</td><td class=small>video</td></tr>
-</table></div>
-<p class="small muted">Rewards on public + held-out routes. <b>console</b> is the headline real-hardware frame-time profile (<code>max(CPU_ms, RSP_ms, RDP_ms)</code> per frame within 4 MB RDRAM). <b>&minus;1*</b>: valid submission, but it breaks that diagnostic profile's cross-budget (hover for reason or speedup vs <code>-O2</code>).</p>
-
-<h3>Pip's Garden baseline</h3>
-<div class="table-wrap"><table><tr><th>workload</th><th class="num">console (ms)</th><th class="num">FPS</th><th class="num">CPU (ms)</th><th class="num">RSP (ms)</th><th class="num">RDP (ms)</th><th class="num">RDRAM KB</th><th class="num">footprint KiB</th></tr>
-<tr><td>meadow</td><td class=num>89.2</td><td class=num>11.2</td><td class=num>84.6</td><td class=num>3.8</td><td class=num>4.1</td><td class=num>1898</td><td class=num>981</td></tr>
-<tr><td>fortress</td><td class=num>110.4</td><td class=num>9.1</td><td class=num>104.0</td><td class=num>4.4</td><td class=num>6.3</td><td class=num>2330</td><td class=num>1001</td></tr>
-<tr><td>storm</td><td class=num>116.8</td><td class=num>8.6</td><td class=num>109.9</td><td class=num>6.4</td><td class=num>5.1</td><td class=num>2351</td><td class=num>1001</td></tr>
-<tr><td>concert</td><td class=num>81.2</td><td class=num>12.3</td><td class=num>77.7</td><td class=num>3.2</td><td class=num>3.7</td><td class=num>1567</td><td class=num>962</td></tr>
-</table></div>
+<h2>Pip's Garden (open-source zero-ROM target)</h2>
+<p class="muted">Ships complete in-repo (<code>workload/</code>) so anyone can run the full 24-hour harness without an external ROM:</p>
+<div class="frame-grid"><div class="frame-card"><img src="/mario-eval/assets/frames/meadow.png" width="320" height="240" alt="Pip's Garden Meadow route frame" loading="lazy"><div class="cap"><b>Meadow</b><span>11.2 fps</span></div><div class="cap desc"><span>Terrain heightfield, crystals &amp; shadow decals</span></div></div><div class="frame-card"><img src="/mario-eval/assets/frames/fortress.png" width="320" height="240" alt="Pip's Garden Fortress route frame" loading="lazy"><div class="cap"><b>Fortress</b><span>9.1 fps</span></div><div class="cap desc"><span>Dense wall/floor collision &amp; patrolling hazards</span></div></div><div class="frame-card"><img src="/mario-eval/assets/frames/concert.png" width="320" height="240" alt="Pip's Garden Concert route frame" loading="lazy"><div class="cap"><b>Concert</b><span>12.3 fps</span></div><div class="cap desc"><span>Multi-channel audio synthesis &amp; jump arcs</span></div></div><div class="frame-card"><img src="/mario-eval/assets/frames/storm.png" width="320" height="240" alt="Pip's Garden Storm route frame" loading="lazy"><div class="cap"><b>Storm</b><span>8.6 fps</span></div><div class="cap desc"><span>Heavy rain alpha particles &amp; dash trails</span></div></div></div>
 
 <h2>Writing</h2>
-<ul class="post-list"><li><a href="/mario-eval/blog/kaze-master-reference/">The Kaze master reference: what an expert does with SM64</a> <span class=date>2026-11-20</span><br><span class="small muted">A reconstruction of Kaze Emanuar&#x27;s published optimizations on vanilla SM64: 1.67x on the updated N64 console model (1.21x vs GCC -O2, 1.65x across all 25 private routes). What made it in, what did not, and why the grader got stricter along the way.</span></li><li><a href="/mario-eval/blog/kaze-techniques-on-super-mario-64/">Kaze Emanuar techniques on Super Mario 64 (partial reference)</a> <span class=date>2026-11-18</span><br><span class="small muted">Auditing 26 Kaze Emanuar optimization deep-dives to engineer a 3-rung N64 hardware reference ceiling — and catching Hyrum&#x27;s Law in the wild.</span></li><li><a href="/mario-eval/blog/road-to-super-mario-64/">Wiring Super Mario 64 into Mario Eval</a> <span class=date>2026-11-17</span><br><span class="small muted">How we wired n64decomp/sm64 across 12 courses with zero distributed Nintendo assets, deterministic audio/RDP sync, and Hyrum&#x27;s Law.</span></li><li><a href="/mario-eval/blog/calibrating-the-grader/">Calibrating the grader</a> <span class=date>2026-11-16</span><br><span class="small muted">Thirty-one known patches across Pip&#x27;s Garden and Super Mario 64: shortcuts, whole-frame visual variants, budgets, and the direct-mapped cache lottery.</span></li><li><a href="/mario-eval/blog/what-the-emulator-measures/">What the emulator measures (and how we closed the RDP gap)</a> <span class=date>2026-11-16</span><br><span class="small muted">How our instrumented ares build models VR4300 caches, CACHE 0x0d, RSP microcode, 62.5 MHz RDP cycles, and RDRAM traffic.</span></li><li><a href="/mario-eval/blog/building-mario-eval/">Building Mario Eval</a> <span class=date>2026-11-14</span><br><span class="small muted">Why a 24-hour optimization eval for the N64, why the grader came before the game, and how the console reward is verified.</span></li></ul>
+<ul class="post-list"><li><a href="/mario-eval/blog/kaze-master-reference/"><b>The Kaze master reference: what an expert does with SM64</b></a><span class="date">2026-11-20</span><br><span class="small muted">A reconstruction of Kaze Emanuar&#x27;s published optimizations on vanilla SM64: 1.67x on the updated N64 console model (1.21x vs GCC -O2, 1.65x across all 25 private routes). What made it in, what did not, and why the grader got stricter along the way.</span></li><li><a href="/mario-eval/blog/kaze-techniques-on-super-mario-64/"><b>Kaze Emanuar techniques on Super Mario 64 (partial reference)</b></a><span class="date">2026-11-18</span><br><span class="small muted">Auditing 26 Kaze Emanuar optimization deep-dives to engineer a 3-rung N64 hardware reference ceiling — and catching Hyrum&#x27;s Law in the wild.</span></li><li><a href="/mario-eval/blog/road-to-super-mario-64/"><b>Wiring Super Mario 64 into Mario Eval</b></a><span class="date">2026-11-17</span><br><span class="small muted">How we wired n64decomp/sm64 across 12 courses with zero distributed Nintendo assets, deterministic audio/RDP sync, and Hyrum&#x27;s Law.</span></li><li><a href="/mario-eval/blog/calibrating-the-grader/"><b>Calibrating the grader</b></a><span class="date">2026-11-16</span><br><span class="small muted">Thirty-one known patches across Pip&#x27;s Garden and Super Mario 64: shortcuts, whole-frame visual variants, budgets, and the direct-mapped cache lottery.</span></li><li><a href="/mario-eval/blog/what-the-emulator-measures/"><b>What the emulator measures (and how we closed the RDP gap)</b></a><span class="date">2026-11-16</span><br><span class="small muted">How our instrumented ares build models VR4300 caches, CACHE 0x0d, RSP microcode, 62.5 MHz RDP cycles, and RDRAM traffic.</span></li><li><a href="/mario-eval/blog/building-mario-eval/"><b>Building Mario Eval</b></a><span class="date">2026-11-14</span><br><span class="small muted">Why a 24-hour optimization eval for the N64, why the grader came before the game, and how the console reward is verified.</span></li></ul>
 </main>
 <footer class="site"><div class="wrap">
-Built by <a href="https://ilya.as/">Ilyaas Kapadia</a>, modelled on Mechanize's
+Built by <a href="https://ilya.as/">Ilyaas Kapadia</a>, inspired by Mechanize's
 <a href="https://gbaeval.com/">GBA Eval</a>. Not affiliated with or endorsed by Nintendo.
 No Nintendo code or assets are distributed; Super Mario 64 support requires your own legally obtained ROM.
 </div></footer>

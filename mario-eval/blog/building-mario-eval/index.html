@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0a0a0d">
 <title>Building Mario Eval | Mario Eval</title>
 <meta name="description" content="Why a 24-hour optimization eval for the N64, why the grader came before the game, and how the console reward is verified.">
 <meta property="og:title" content="Building Mario Eval | Mario Eval"><meta property="og:description" content="Why a 24-hour optimization eval for the N64, why the grader came before the game, and how the console reward is verified.">
@@ -8,8 +9,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/mario-eval/style.css">
 </head><body>
-<header class="site"><div class="wrap"><a class="logo" href="/mario-eval/">MARIO<span>EVAL</span></a>
-<nav class="site"><a href="/mario-eval/">Overview</a> <a href="/mario-eval/leaderboard/">Leaderboard</a> <a href="/mario-eval/calibration/">Calibration</a> <a href="/mario-eval/blog/" class=on>Blog</a> <a href="https://github.com/IlyaasK/mario-eval">GitHub</a></nav></div></header>
+<header class="site"><div class="wrap">
+  <div class="brand">
+    <span class="n64-leds" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    <a class="logo" href="/mario-eval/">MARIO<span>EVAL</span></a>
+    <span class="brand-sep" aria-hidden="true">&middot;</span>
+    <span class="brand-sub">By <a href="https://ilya.as/">Ilyaas Kapadia</a></span>
+  </div>
+  <nav class="site"><a href="/mario-eval/">About</a><a href="/mario-eval/leaderboard/">Leaderboard</a><a href="/mario-eval/calibration/">Calibration</a><a href="/mario-eval/blog/" class=on>Blog</a><a class="cta" href="https://github.com/IlyaasK/mario-eval" target="_blank" rel="noreferrer noopener">GitHub &rarr;</a></nav>
+</div></header>
 <main class="wrap"><article class="prose"><h1>Building Mario Eval</h1><p class="meta">2026-11-14</p>
 <p>Mario Eval asks a coding agent to do what N64 developers and, decades later, engineers like
 <a href="https://www.youtube.com/@KazeEmanuar">Kaze Emanuar</a> have spent years on: make a Nintendo 64 game
@@ -81,7 +89,7 @@ tampering, network egress is default-deny except model API endpoints, and held-o
 for checkpoint and final grading.</p>
 </article></main>
 <footer class="site"><div class="wrap">
-Built by <a href="https://ilya.as/">Ilyaas Kapadia</a>, modelled on Mechanize's
+Built by <a href="https://ilya.as/">Ilyaas Kapadia</a>, inspired by Mechanize's
 <a href="https://gbaeval.com/">GBA Eval</a>. Not affiliated with or endorsed by Nintendo.
 No Nintendo code or assets are distributed; Super Mario 64 support requires your own legally obtained ROM.
 </div></footer>

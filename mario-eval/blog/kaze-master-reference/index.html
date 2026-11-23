@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0a0a0d">
 <title>The Kaze master reference: what an expert does with SM64 | Mario Eval</title>
 <meta name="description" content="A reconstruction of Kaze Emanuar&#x27;s published optimizations on vanilla SM64: 1.67x on the updated N64 console model (1.21x vs GCC -O2, 1.65x across all 25 private routes). What made it in, what did not, and why the grader got stricter along the way.">
 <meta property="og:title" content="The Kaze master reference: what an expert does with SM64 | Mario Eval"><meta property="og:description" content="A reconstruction of Kaze Emanuar&#x27;s published optimizations on vanilla SM64: 1.67x on the updated N64 console model (1.21x vs GCC -O2, 1.65x across all 25 private routes). What made it in, what did not, and why the grader got stricter along the way.">
@@ -8,8 +9,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/mario-eval/style.css">
 </head><body>
-<header class="site"><div class="wrap"><a class="logo" href="/mario-eval/">MARIO<span>EVAL</span></a>
-<nav class="site"><a href="/mario-eval/">Overview</a> <a href="/mario-eval/leaderboard/">Leaderboard</a> <a href="/mario-eval/calibration/">Calibration</a> <a href="/mario-eval/blog/" class=on>Blog</a> <a href="https://github.com/IlyaasK/mario-eval">GitHub</a></nav></div></header>
+<header class="site"><div class="wrap">
+  <div class="brand">
+    <span class="n64-leds" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    <a class="logo" href="/mario-eval/">MARIO<span>EVAL</span></a>
+    <span class="brand-sep" aria-hidden="true">&middot;</span>
+    <span class="brand-sub">By <a href="https://ilya.as/">Ilyaas Kapadia</a></span>
+  </div>
+  <nav class="site"><a href="/mario-eval/">About</a><a href="/mario-eval/leaderboard/">Leaderboard</a><a href="/mario-eval/calibration/">Calibration</a><a href="/mario-eval/blog/" class=on>Blog</a><a class="cta" href="https://github.com/IlyaasK/mario-eval" target="_blank" rel="noreferrer noopener">GitHub &rarr;</a></nav>
+</div></header>
 <main class="wrap"><article class="prose"><h1>The Kaze master reference: what an expert does with SM64</h1><p class="meta">2026-11-20</p>
 <p>The question this eval asks is how much cheaper Super Mario 64 can run on the original Nintendo 64 when it is
 engineered well for that hardware, while the player gets exactly the same game. To judge an agent's answer we need a
@@ -111,7 +119,7 @@ and double buffering. Its measured 1.62&times; is below the expert reference, no
 water costs about 4 ms of modeled RDP time on its own. Removing it changes what the player sees, so the reference keeps it.</p>
 </article></main>
 <footer class="site"><div class="wrap">
-Built by <a href="https://ilya.as/">Ilyaas Kapadia</a>, modelled on Mechanize's
+Built by <a href="https://ilya.as/">Ilyaas Kapadia</a>, inspired by Mechanize's
 <a href="https://gbaeval.com/">GBA Eval</a>. Not affiliated with or endorsed by Nintendo.
 No Nintendo code or assets are distributed; Super Mario 64 support requires your own legally obtained ROM.
 </div></footer>
