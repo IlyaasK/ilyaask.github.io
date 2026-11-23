@@ -353,7 +353,7 @@ th {
 tbody tr:hover td { background: color-mix(in srgb, var(--indigo-dim) 28%, transparent); }
 td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 tr.invalid td { color: var(--text-dim); opacity: 0.78; }
-tr.ceiling-row td { background: color-mix(in srgb, var(--pcb) 8%, transparent); }
+tr.expert-row td { background: color-mix(in srgb, var(--pcb) 8%, transparent); }
 tr.trial-row td { background: color-mix(in srgb, var(--amber) 7%, transparent); }
 
 .tag {
@@ -384,7 +384,7 @@ tr.trial-row td { background: color-mix(in srgb, var(--amber) 7%, transparent); 
   margin-top: 5px;
 }
 .bar-fill { height: 100%; background: var(--indigo-lit); border-radius: 2px; transition: width 260ms ease; }
-.bar-fill.ceiling { background: var(--pcb); }
+.bar-fill.expert { background: var(--pcb); }
 .bar-fill.compiler { background: var(--amber); }
 .bar-fill.trial { background: var(--cyan); }
 
