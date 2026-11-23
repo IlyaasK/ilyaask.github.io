@@ -76,6 +76,7 @@ tr.ceiling-row { background: var(--surface); }
 .tag.valid { color: var(--good); border-color: var(--good); }
 .tag.invalid { color: var(--bad); border-color: var(--bad); }
 .tag.ref { color: var(--accent); border-color: var(--accent); }
+.tag.trial { color: var(--mid); border-color: var(--mid); }
 .pos { color: var(--good); }
 .neg { color: var(--bad); }
 .diagram, .chart-box { margin: 18px 0 24px; border: 1px solid var(--border); background: var(--surface); border-radius: 4px; padding: 14px 16px; }

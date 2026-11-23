@@ -13,62 +13,91 @@
 <main class="wrap">
 <div class="prose">
 <h1>Leaderboard</h1>
-<p>Every submission is graded on <b>6 Super Mario 64 courses</b> (240 frames each) on an instrumented
+<p>The reference table uses <b>6 public Super Mario 64 courses</b> (240 frames each) on an instrumented
 <code>ares</code> N64 console model (93.75 MHz VR4300 + 16 KB I$ / 8 KB D$, 62.5 MHz RSP &amp; RDP, 4 MB RDRAM).
-The human-expert yardstick is the <a href="/mario-eval/blog/kaze-master-reference/">Kaze master reference</a>: every
-optimization from Kaze Emanuar's videos and code that keeps the game the same, built under the exact same gates and
-toolchain given to 24-hour agents.</p>
+Agent checkpoint curves include only host grades, and reference lines appear only when graded on the same replay set.
+The human-expert yardstick is the <a href="/mario-eval/blog/kaze-master-reference/">Kaze master reference</a>.</p>
 </div>
 
-<div class="table-wrap"><table><tr><th>entry</th><th>type</th><th class="bar-cell">console speedup</th><th class="num">console</th><th class="num">vs -O2</th><th class="num">mean FPS</th><th class="num">bus&times;</th><th class="num">RAM &Delta;</th></tr><tr class=ceiling-row><td><a href="/mario-eval/calibration/#sm64-r10-kaze-master">Kaze master reference (R10)</a><br><span class="small muted">Reconstructed techniques from Kaze Emanuar&#x27;s public work, checked against the vanilla game</span></td><td><span class="tag valid">ceiling</span></td><td class="bar-cell"><b>1.67&times;</b><div class="bar-track"><div class="bar-fill ceiling" style="width:100.0%"></div></div></td><td class="num pos">+0.185</td><td class="num">1.20&times;</td><td class="num">51.7</td><td class="num">1.27&times;</td><td class="num">-133 KiB</td></tr><tr><td><a href="/mario-eval/calibration/#sm64-r11-beyond-kaze">Beyond Kaze (R11)</a><br><span class="small muted">Earlier Kaze-style build with additional D-cache experiments; scores below the current expert reference</span></td><td><span class="tag ref">ref</span></td><td class="bar-cell"><b>1.62&times;</b><div class="bar-track"><div class="bar-fill " style="width:96.7%"></div></div></td><td class="num pos">+0.173</td><td class="num">1.16&times;</td><td class="num">50.0</td><td class="num">1.26&times;</td><td class="num">-272 KiB</td></tr><tr><td><a href="/mario-eval/calibration/#sm64-r8-kaze-collision-objects">Kaze Rung 2: Collision &amp; Objects (R8)</a><br><span class="small muted">R7 + 3-cache-line struct Surface + Bowser&#x27;s Sub stationary surface cache + single-floor shadows + watermark pool</span></td><td><span class="tag ref">ref</span></td><td class="bar-cell"><b>1.49&times;</b><div class="bar-track"><div class="bar-fill " style="width:89.5%"></div></div></td><td class="num pos">+0.145</td><td class="num">1.07&times;</td><td class="num">46.2</td><td class="num">1.12&times;</td><td class="num">-48 KiB</td></tr><tr><td><a href="/mario-eval/calibration/#sm64-r9-kaze-partial">partial Kaze reference (R9)</a><br><span class="small muted">Partial expert reference (I-cache + 1-ULP trig + 3-line Surface + Sub cache + lazy Mtx + RA_ZB_OPA + coin batch + -304 KB)</span></td><td><span class="tag ref">ref</span></td><td class="bar-cell"><b>1.47&times;</b><div class="bar-track"><div class="bar-fill " style="width:88.0%"></div></div></td><td class="num pos">+0.139</td><td class="num">1.05&times;</td><td class="num">45.6</td><td class="num">1.19&times;</td><td class="num">-249 KiB</td></tr><tr><td><a href="/mario-eval/calibration/#sm64-r6-kaze-super">Early Multi-Subsystem Rung (R6)</a><br><span class="small muted">GCC -O2 + Kaze matrix math + CACHE 0x0d + skybox cull + double-buffer</span></td><td><span class="tag ref">ref</span></td><td class="bar-cell"><b>1.45&times;</b><div class="bar-track"><div class="bar-fill " style="width:86.6%"></div></div></td><td class="num pos">+0.133</td><td class="num">1.04&times;</td><td class="num">44.8</td><td class="num">1.19&times;</td><td class="num">-211 KiB</td></tr><tr><td><a href="/mario-eval/calibration/#sm64-r7-kaze-icache-trig">Kaze Rung 1: I-Cache &amp; Table-Free Math (R7)</a><br><span class="small muted">sm64.ld 16 KB I-cache de-aliasing + 1-ULP polynomial sins/coss + bit-exact 256 B atan2s + IEEE random_float</span></td><td><span class="tag ref">ref</span></td><td class="bar-cell"><b>1.42&times;</b><div class="bar-track"><div class="bar-fill " style="width:84.8%"></div></div></td><td class="num pos">+0.126</td><td class="num">1.02&times;</td><td class="num">43.8</td><td class="num">1.12&times;</td><td class="num">-48 KiB</td></tr><tr><td><a href="/mario-eval/calibration/#sm64-r1-gcc-o2">Compiler Only: GCC -O2 -fno-fast-math (R1)</a><br><span class="small muted">Zero C edits: switch Makefile from 1996 IDO -O0 to modern mips64-elf-gcc -O2</span></td><td><span class="tag ref">compiler</span></td><td class="bar-cell"><b>1.39&times;</b><div class="bar-track"><div class="bar-fill compiler" style="width:83.5%"></div></div></td><td class="num pos">+0.120</td><td class="num">1.00&times;</td><td class="num">43.2</td><td class="num">1.11&times;</td><td class="num">-61 KiB</td></tr><tr><td><a href="/mario-eval/calibration/#sm64-r2-kaze-mtx">IDO -O0 + Kaze Matrix Math (R2)</a><br><span class="small muted">Stackless mtxf_mul + packed 32-bit mtxf_to_mtx under original IDO compiler</span></td><td><span class="tag ref">ref</span></td><td class="bar-cell"><b>1.05&times;</b><div class="bar-track"><div class="bar-fill " style="width:63.0%"></div></div></td><td class="num pos">+0.019</td><td class="num">0.75&times;</td><td class="num">32.6</td><td class="num">1.01&times;</td><td class="num">0 KiB</td></tr><tr><td><a href="/mario-eval/calibration/#sm64-r4-kaze-rdp-opa">IDO -O0 + G_RM_RA_ZB_OPA_SURF (R4)</a><br><span class="small muted">Drop per-pixel IM_RD framebuffer reads on opaque surfaces under original IDO compiler</span></td><td><span class="tag ref">ref</span></td><td class="bar-cell"><b>1.02&times;</b><div class="bar-track"><div class="bar-fill " style="width:61.0%"></div></div></td><td class="num pos">+0.007</td><td class="num">0.73&times;</td><td class="num">31.6</td><td class="num">1.07&times;</td><td class="num">-1 KiB</td></tr><tr><td><a href="/mario-eval/calibration/#sm64-r0-unchanged">1996 Retail US Baseline (IDO -O0)</a><br><span class="small muted">Unmodified n64decomp/sm64 matching the 8 MB retail US cartridge</span></td><td><span class="tag ref">ref</span></td><td class="bar-cell"><b>1.00&times;</b><div class="bar-track"><div class="bar-fill " style="width:59.9%"></div></div></td><td class="num ">-0.000</td><td class="num">0.72&times;</td><td class="num">31.0</td><td class="num">1.00&times;</td><td class="num">0 KiB</td></tr></table></div>
+<div class="table-wrap"><table><tr><th>entry</th><th>type</th><th class="bar-cell">console speedup</th><th class="num">console</th><th class="num">vs -O2</th><th class="num">mean FPS</th><th class="num">bus&times;</th><th class="num">RAM &Delta;</th></tr><tr class=ceiling-row><td><a href="/mario-eval/calibration/#sm64-r10-kaze-master">Kaze master reference (R10)</a><br><span class="small muted">Reconstructed techniques from Kaze Emanuar&#x27;s public work, checked against the vanilla game</span></td><td><span class="tag valid">ceiling</span></td><td class="bar-cell"><b>1.67&times;</b><div class="bar-track"><div class="bar-fill ceiling" style="width:100.0%"></div></div></td><td class="num pos">+0.186</td><td class="num">1.21&times;</td><td class="num">57.0</td><td class="num">1.27&times;</td><td class="num">-131 KiB</td></tr><tr><td><a href="/mario-eval/calibration/#sm64-r11-beyond-kaze">Beyond Kaze (R11)</a><br><span class="small muted">Earlier Kaze-style build with additional D-cache experiments; scores below the current expert reference</span></td><td><span class="tag ref">ref</span></td><td class="bar-cell"><b>1.65&times;</b><div class="bar-track"><div class="bar-fill " style="width:98.5%"></div></div></td><td class="num pos">+0.181</td><td class="num">1.19&times;</td><td class="num">56.1</td><td class="num">1.28&times;</td><td class="num">-272 KiB</td></tr><tr><td><a href="/mario-eval/calibration/#sm64-r9-kaze-partial">partial Kaze reference (R9)</a><br><span class="small muted">Partial expert reference (I-cache + 1-ULP trig + 3-line Surface + Sub cache + lazy Mtx + RA_ZB_OPA + coin batch + -304 KB)</span></td><td><span class="tag ref">ref</span></td><td class="bar-cell"><b>1.47&times;</b><div class="bar-track"><div class="bar-fill " style="width:88.0%"></div></div></td><td class="num pos">+0.140</td><td class="num">1.07&times;</td><td class="num">50.4</td><td class="num">1.20&times;</td><td class="num">-248 KiB</td></tr><tr><td><a href="/mario-eval/calibration/#sm64-r8-kaze-collision-objects">Kaze Rung 2: Collision &amp; Objects (R8)</a><br><span class="small muted">R7 + 3-cache-line struct Surface + Bowser&#x27;s Sub stationary surface cache + single-floor shadows + watermark pool</span></td><td><span class="tag ref">ref</span></td><td class="bar-cell"><b>1.46&times;</b><div class="bar-track"><div class="bar-fill " style="width:87.3%"></div></div></td><td class="num pos">+0.137</td><td class="num">1.06&times;</td><td class="num">49.8</td><td class="num">1.13&times;</td><td class="num">-47 KiB</td></tr><tr><td><a href="/mario-eval/calibration/#sm64-r6-kaze-super">Early Multi-Subsystem Rung (R6)</a><br><span class="small muted">GCC -O2 + Kaze matrix math + CACHE 0x0d + skybox cull + double-buffer</span></td><td><span class="tag ref">ref</span></td><td class="bar-cell"><b>1.45&times;</b><div class="bar-track"><div class="bar-fill " style="width:86.4%"></div></div></td><td class="num pos">+0.133</td><td class="num">1.05&times;</td><td class="num">49.3</td><td class="num">1.20&times;</td><td class="num">-210 KiB</td></tr><tr><td><a href="/mario-eval/calibration/#sm64-r7-kaze-icache-trig">Kaze Rung 1: I-Cache &amp; Table-Free Math (R7)</a><br><span class="small muted">sm64.ld 16 KB I-cache de-aliasing + 1-ULP polynomial sins/coss + bit-exact 256 B atan2s + IEEE random_float</span></td><td><span class="tag ref">ref</span></td><td class="bar-cell"><b>1.40&times;</b><div class="bar-track"><div class="bar-fill " style="width:83.4%"></div></div></td><td class="num pos">+0.120</td><td class="num">1.01&times;</td><td class="num">47.5</td><td class="num">1.12&times;</td><td class="num">-47 KiB</td></tr><tr><td><a href="/mario-eval/calibration/#sm64-r1-gcc-o2">Compiler Only: GCC -O2 -fno-fast-math (R1)</a><br><span class="small muted">Zero C edits: switch Makefile from 1996 IDO -O0 to modern mips64-elf-gcc -O2</span></td><td><span class="tag ref">compiler</span></td><td class="bar-cell"><b>1.38&times;</b><div class="bar-track"><div class="bar-fill compiler" style="width:82.5%"></div></div></td><td class="num pos">+0.117</td><td class="num">1.00&times;</td><td class="num">47.1</td><td class="num">1.11&times;</td><td class="num">-60 KiB</td></tr><tr><td><a href="/mario-eval/calibration/#sm64-r2-kaze-mtx">IDO -O0 + Kaze Matrix Math (R2)</a><br><span class="small muted">Stackless mtxf_mul + packed 32-bit mtxf_to_mtx under original IDO compiler</span></td><td><span class="tag ref">ref</span></td><td class="bar-cell"><b>1.06&times;</b><div class="bar-track"><div class="bar-fill " style="width:63.6%"></div></div></td><td class="num pos">+0.023</td><td class="num">0.77&times;</td><td class="num">36.2</td><td class="num">1.02&times;</td><td class="num">0 KiB</td></tr><tr><td><a href="/mario-eval/calibration/#sm64-r4-kaze-rdp-opa">IDO -O0 + G_RM_RA_ZB_OPA_SURF (R4)</a><br><span class="small muted">Drop per-pixel IM_RD framebuffer reads on opaque surfaces under original IDO compiler</span></td><td><span class="tag ref">ref</span></td><td class="bar-cell"><b>1.01&times;</b><div class="bar-track"><div class="bar-fill " style="width:60.4%"></div></div></td><td class="num pos">+0.004</td><td class="num">0.73&times;</td><td class="num">34.5</td><td class="num">1.06&times;</td><td class="num">0 KiB</td></tr><tr><td><a href="/mario-eval/calibration/#sm64-r0-unchanged">1996 Retail US Baseline (IDO -O0)</a><br><span class="small muted">Unmodified n64decomp/sm64 matching the 8 MB retail US cartridge</span></td><td><span class="tag ref">ref</span></td><td class="bar-cell"><b>1.00&times;</b><div class="bar-track"><div class="bar-fill " style="width:59.7%"></div></div></td><td class="num ">-0.000</td><td class="num">0.72&times;</td><td class="num">34.1</td><td class="num">1.00&times;</td><td class="num">0 KiB</td></tr></table></div>
+
+<div class="prose"><h2>Trial runs (harness &amp; grader bring-up)</h2><p>Early bring-up runs used to stress-test the v2 hardware cost model, profiler, and private held-out gates and iron out harness bugs. Kept separate from standardized leaderboard entries because the environment evolved mid-run.</p></div>
+<div class="table-wrap"><table>
+<tr><th>trial run</th><th>type</th><th class="num">routes</th><th class="num">best valid&times;</th><th class="num">console</th><th class="num">vs -O2</th><th class="num">mean FPS</th><th class="num">attempt repo</th></tr>
+<tr><td><a href="https://github.com/IlyaasK/mario-eval-attempt-kimi-k3.1-pro-trial"><b>Kimi K3.1 Pro (Cerebras, Trial Run)</b></a> (~26h)<br><span class="small muted">Bring-up trial run (omp) used to iron out v2 harness, profiler &amp; held-out bugs; migrated mid-run from v1 to v2. Best 100%-valid 25-route checkpoint (4b54858) beat Kaze master (1.646x) at 1.695x (+2.9%) with PLAY=1 runtime smoke passing. Final commit d6af2f6 reached 1.82x public / 1.79x raw 25-route before Cerebras deactivated the trial model (404), but tripped 7/19 held-out video gates due to a 1-line 4-vert shadow LUT typo (253312a; fixing that typo alone makes d6af2f6 pass all 25 routes + PLAY=1 at 1.792x).</span></td><td><span class="tag trial">trial</span></td><td class="num">25</td><td class="num"><b>1.69&times;</b></td><td class="num pos">+0.190</td><td class="num">1.24&times;</td><td class="num">59.3</td><td class="num"><a href="https://github.com/IlyaasK/mario-eval-attempt-kimi-k3.1-pro-trial">GitHub</a></td></tr>
+</table></div>
 
 <div class="chart-box"><svg viewBox="0 0 920 270" role="img" aria-label="Super Mario 64 hardware optimization ladder">
 <g font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor">
 <text x="68" y="20" font-weight="600">Super Mario 64 hardware optimization ladder &mdash; console speedup across 6 courses</text>
 <line x1="68" y1="211.2" x2="884" y2="211.2" stroke="currentColor" opacity="0.16"/>
 <text x="60" y="215.2" text-anchor="end" opacity="0.75">1.00&times;</text>
-<line x1="68" y1="177.5" x2="884" y2="177.5" stroke="currentColor" opacity="0.16"/>
-<text x="60" y="181.5" text-anchor="end" opacity="0.75">1.14&times;</text>
-<line x1="68" y1="143.9" x2="884" y2="143.9" stroke="currentColor" opacity="0.16"/>
-<text x="60" y="147.9" text-anchor="end" opacity="0.75">1.28&times;</text>
-<line x1="68" y1="110.3" x2="884" y2="110.3" stroke="currentColor" opacity="0.16"/>
-<text x="60" y="114.3" text-anchor="end" opacity="0.75">1.42&times;</text>
-<line x1="68" y1="76.6" x2="884" y2="76.6" stroke="currentColor" opacity="0.16"/>
-<text x="60" y="80.6" text-anchor="end" opacity="0.75">1.56&times;</text>
-<line x1="68" y1="43.0" x2="884" y2="43.0" stroke="currentColor" opacity="0.16"/>
-<text x="60" y="47.0" text-anchor="end" opacity="0.75">1.70&times;</text>
-<polyline fill="none" stroke="#1f5fbf" stroke-width="2.5" points="68.0,211.2 170.0,198.5 272.0,206.7 374.0,116.4 476.0,111.2 578.0,92.4 680.0,98.1 782.0,50.0 884.0,63.1"/>
+<line x1="68" y1="177.7" x2="884" y2="177.7" stroke="currentColor" opacity="0.16"/>
+<text x="60" y="181.7" text-anchor="end" opacity="0.75">1.14&times;</text>
+<line x1="68" y1="144.3" x2="884" y2="144.3" stroke="currentColor" opacity="0.16"/>
+<text x="60" y="148.3" text-anchor="end" opacity="0.75">1.28&times;</text>
+<line x1="68" y1="110.8" x2="884" y2="110.8" stroke="currentColor" opacity="0.16"/>
+<text x="60" y="114.8" text-anchor="end" opacity="0.75">1.42&times;</text>
+<line x1="68" y1="77.3" x2="884" y2="77.3" stroke="currentColor" opacity="0.16"/>
+<text x="60" y="81.3" text-anchor="end" opacity="0.75">1.56&times;</text>
+<line x1="68" y1="43.9" x2="884" y2="43.9" stroke="currentColor" opacity="0.16"/>
+<text x="60" y="47.9" text-anchor="end" opacity="0.75">1.70&times;</text>
+<polyline fill="none" stroke="#1f5fbf" stroke-width="2.5" points="68.0,211.2 170.0,195.8 272.0,208.3 374.0,119.9 476.0,116.5 578.0,100.9 680.0,97.9 782.0,50.0 884.0,55.8"/>
 <circle cx="68.0" cy="211.2" r="4" fill="#1f5fbf"/>
-<text x="68.0" y="201.2" text-anchor="start" font-weight="400">1.00&times; (31.0 fps)</text>
+<text x="68.0" y="201.2" text-anchor="start" font-weight="400">1.00&times; (34.1 fps)</text>
 <text x="68.0" y="236" text-anchor="start" font-size="10.5" opacity="0.8">1996 IDO -O0</text>
-<circle cx="170.0" cy="198.5" r="4" fill="#1f5fbf"/>
-<text x="170.0" y="214.5" text-anchor="middle" font-weight="400">1.05&times; (32.6 fps)</text>
+<circle cx="170.0" cy="195.8" r="4" fill="#1f5fbf"/>
+<text x="170.0" y="211.8" text-anchor="middle" font-weight="400">1.06&times; (36.2 fps)</text>
 <text x="170.0" y="250" text-anchor="middle" font-size="10.5" opacity="0.8">IDO + Kaze Mtx</text>
-<circle cx="272.0" cy="206.7" r="4" fill="#1f5fbf"/>
-<text x="272.0" y="196.7" text-anchor="middle" font-weight="400">1.02&times; (31.6 fps)</text>
+<circle cx="272.0" cy="208.3" r="4" fill="#1f5fbf"/>
+<text x="272.0" y="198.3" text-anchor="middle" font-weight="400">1.01&times; (34.5 fps)</text>
 <text x="272.0" y="236" text-anchor="middle" font-size="10.5" opacity="0.8">IDO + RA_ZB_OPA</text>
-<circle cx="374.0" cy="116.4" r="4" fill="#d4a017"/>
-<text x="374.0" y="132.4" text-anchor="middle" font-weight="400">1.39&times; (43.2 fps)</text>
+<circle cx="374.0" cy="119.9" r="4" fill="#d4a017"/>
+<text x="374.0" y="135.9" text-anchor="middle" font-weight="400">1.38&times; (47.1 fps)</text>
 <text x="374.0" y="250" text-anchor="middle" font-size="10.5" opacity="0.8">GCC -O2</text>
-<circle cx="476.0" cy="111.2" r="4" fill="#1f5fbf"/>
-<text x="476.0" y="101.2" text-anchor="middle" font-weight="400">1.42&times; (43.8 fps)</text>
+<circle cx="476.0" cy="116.5" r="4" fill="#1f5fbf"/>
+<text x="476.0" y="106.5" text-anchor="middle" font-weight="400">1.40&times; (47.5 fps)</text>
 <text x="476.0" y="236" text-anchor="middle" font-size="10.5" opacity="0.8">R7: I$ + 1-ULP Trig</text>
-<circle cx="578.0" cy="92.4" r="4" fill="#1f5fbf"/>
-<text x="578.0" y="108.4" text-anchor="middle" font-weight="400">1.49&times; (46.2 fps)</text>
+<circle cx="578.0" cy="100.9" r="4" fill="#1f5fbf"/>
+<text x="578.0" y="116.9" text-anchor="middle" font-weight="400">1.46&times; (49.8 fps)</text>
 <text x="578.0" y="250" text-anchor="middle" font-size="10.5" opacity="0.8">R8: 3-Line Surf + Sub</text>
-<circle cx="680.0" cy="98.1" r="4" fill="#1f5fbf"/>
-<text x="680.0" y="88.1" text-anchor="middle" font-weight="400">1.47&times; (45.6 fps)</text>
+<circle cx="680.0" cy="97.9" r="4" fill="#1f5fbf"/>
+<text x="680.0" y="87.9" text-anchor="middle" font-weight="400">1.47&times; (50.4 fps)</text>
 <text x="680.0" y="236" text-anchor="middle" font-size="10.5" opacity="0.8">R9: partial Kaze</text>
 <circle cx="782.0" cy="50.0" r="5" fill="#1f7a3a"/>
-<text x="782.0" y="40.0" text-anchor="middle" font-weight="600">1.67&times; (51.7 fps)</text>
+<text x="782.0" y="40.0" text-anchor="middle" font-weight="600">1.67&times; (57.0 fps)</text>
 <text x="782.0" y="250" text-anchor="middle" font-size="10.5" opacity="0.8">R10: Kaze master</text>
-<circle cx="884.0" cy="63.1" r="4" fill="#1f5fbf"/>
-<text x="884.0" y="53.1" text-anchor="end" font-weight="400">1.62&times; (50.0 fps)</text>
+<circle cx="884.0" cy="55.8" r="4" fill="#1f5fbf"/>
+<text x="884.0" y="45.8" text-anchor="end" font-weight="400">1.65&times; (56.1 fps)</text>
 <text x="884.0" y="236" text-anchor="end" font-size="10.5" opacity="0.8">R11: beyond Kaze</text>
+</g></svg></div><div class="chart-box"><h2>Trial run checkpoints (25 routes)</h2><svg viewBox="0 0 920 270" role="img" aria-label="24-hour optimization scaling curve">
+<g font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor">
+<text x="68" y="20" font-weight="600">Best valid host-graded console speedup vs wall-clock hours</text>
+<line x1="68.0" y1="38" x2="68.0" y2="216" stroke="currentColor" opacity="0.15"/>
+<text x="68.0" y="234" text-anchor="middle" opacity="0.75">0h</text>
+<line x1="204.0" y1="38" x2="204.0" y2="216" stroke="currentColor" opacity="0.15"/>
+<text x="204.0" y="234" text-anchor="middle" opacity="0.75">4h</text>
+<line x1="340.0" y1="38" x2="340.0" y2="216" stroke="currentColor" opacity="0.15"/>
+<text x="340.0" y="234" text-anchor="middle" opacity="0.75">8h</text>
+<line x1="476.0" y1="38" x2="476.0" y2="216" stroke="currentColor" opacity="0.15"/>
+<text x="476.0" y="234" text-anchor="middle" opacity="0.75">12h</text>
+<line x1="612.0" y1="38" x2="612.0" y2="216" stroke="currentColor" opacity="0.15"/>
+<text x="612.0" y="234" text-anchor="middle" opacity="0.75">16h</text>
+<line x1="748.0" y1="38" x2="748.0" y2="216" stroke="currentColor" opacity="0.15"/>
+<text x="748.0" y="234" text-anchor="middle" opacity="0.75">20h</text>
+<line x1="884.0" y1="38" x2="884.0" y2="216" stroke="currentColor" opacity="0.15"/>
+<text x="884.0" y="234" text-anchor="middle" opacity="0.75">24h</text>
+<line x1="68" y1="127.1" x2="884" y2="127.1" stroke="#d4a017" stroke-dasharray="5,4" stroke-width="1.5"/>
+<text x="880" y="122.1" text-anchor="end" fill="#d4a017">GCC -O2 (1.37&times;)</text>
+<line x1="68" y1="64.4" x2="884" y2="64.4" stroke="#1f7a3a" stroke-dasharray="5,4" stroke-width="1.5"/>
+<text x="880" y="59.4" text-anchor="end" fill="#1f7a3a">Kaze master (1.65&times;)</text>
+<polyline fill="none" stroke="#1f5fbf" stroke-width="2.5" points="68.0,211.4 396.2,66.2 465.1,59.2 534.1,54.7 602.9,53.4"/>
+<circle cx="602.9" cy="53.4" r="4" fill="#1f5fbf"/>
+<text x="594.9" y="45.4" text-anchor="end" fill="#1f5fbf" font-weight="600">Kimi K3.1 Pro (trial)</text>
 </g></svg></div>
-<div class="chart-box"><svg viewBox="0 0 920 360" role="img" aria-label="Super Mario 64 per-course console frame time: 1996 IDO baseline vs partial Kaze reference">
+<div class="chart-box"><svg viewBox="0 0 920 360" role="img" aria-label="Super Mario 64 per-course console frame time: original IDO baseline vs Kaze master reference">
 <g font-family="IBM Plex Mono, monospace" font-size="12" fill="currentColor">
-<text x="210" y="20" font-weight="600">Console frame time per course (ms, lower is faster) &mdash; 1996 IDO -O0 vs partial Kaze reference</text>
+<text x="210" y="20" font-weight="600">Console frame time per course (ms, lower is faster) &mdash; original IDO vs Kaze master</text>
 <line x1="210.0" y1="38" x2="210.0" y2="336" stroke="currentColor" stroke-width="1" opacity="0.18"/>
 <text x="210.0" y="352" text-anchor="middle" font-size="11" opacity="0.75">0ms</text>
 <line x1="469.3" y1="38" x2="469.3" y2="336" stroke="currentColor" stroke-width="1" opacity="0.18"/>
@@ -76,58 +105,63 @@ toolchain given to 24-hour agents.</p>
 <line x1="642.1" y1="38" x2="642.1" y2="336" stroke="#d4a017" stroke-width="1" stroke-dasharray="4,3"/>
 <text x="642.1" y="352" text-anchor="middle" font-size="11" opacity="0.75">33.3ms (30 FPS)</text>
 <text x="198" y="63" text-anchor="end">Bob-omb Battlefield</text>
-<text x="198" y="78" text-anchor="end" font-size="10.5" opacity="0.65">RDP 9.4ms</text>
-<rect x="210" y="51" width="427.3" height="12" rx="2" fill="currentColor" opacity="0.28"/>
-<rect x="210" y="66" width="260.5" height="13" rx="2" fill="#1f7a3a"/>
-<text x="644.3" y="61" font-size="11" opacity="0.75">33.0ms (30.3 fps)</text>
-<text x="477.5" y="77" font-size="11.5" font-weight="600">20.1ms (49.8 fps, 1.64&times;)</text>
+<text x="198" y="78" text-anchor="end" font-size="10.5" opacity="0.65">RDP 10.9ms</text>
+<rect x="210" y="51" width="393.1" height="12" rx="2" fill="currentColor" opacity="0.28"/>
+<rect x="210" y="66" width="236.4" height="13" rx="2" fill="#1f7a3a"/>
+<text x="610.1" y="61" font-size="11" opacity="0.75">30.3ms (33.0 fps)</text>
+<text x="453.4" y="77" font-size="11.5" font-weight="600">18.2ms (54.8 fps, 1.66&times;)</text>
 <text x="198" y="109" text-anchor="end">Whomp&#x27;s Fortress</text>
-<text x="198" y="124" text-anchor="end" font-size="10.5" opacity="0.65">RDP 7.8ms</text>
-<rect x="210" y="97" width="398.4" height="12" rx="2" fill="currentColor" opacity="0.28"/>
-<rect x="210" y="112" width="224.5" height="13" rx="2" fill="#1f7a3a"/>
-<text x="615.4" y="107" font-size="11" opacity="0.75">30.7ms (32.5 fps)</text>
-<text x="441.5" y="123" font-size="11.5" font-weight="600">17.3ms (57.7 fps, 1.77&times;)</text>
+<text x="198" y="124" text-anchor="end" font-size="10.5" opacity="0.65">RDP 9.0ms</text>
+<rect x="210" y="97" width="360.1" height="12" rx="2" fill="currentColor" opacity="0.28"/>
+<rect x="210" y="112" width="203.9" height="13" rx="2" fill="#1f7a3a"/>
+<text x="577.1" y="107" font-size="11" opacity="0.75">27.8ms (36.0 fps)</text>
+<text x="420.9" y="123" font-size="11.5" font-weight="600">15.7ms (63.6 fps, 1.77&times;)</text>
 <text x="198" y="155" text-anchor="end">Jolly Roger Bay</text>
-<text x="198" y="170" text-anchor="end" font-size="10.5" opacity="0.65">RDP 18.1ms</text>
-<rect x="210" y="143" width="509.2" height="12" rx="2" fill="currentColor" opacity="0.28"/>
-<rect x="210" y="158" width="292.1" height="13" rx="2" fill="#1f7a3a"/>
-<text x="726.2" y="153" font-size="11" opacity="0.75">39.3ms (25.5 fps)</text>
-<text x="509.1" y="169" font-size="11.5" font-weight="600">22.5ms (44.4 fps, 1.74&times;)</text>
+<text x="198" y="170" text-anchor="end" font-size="10.5" opacity="0.65">RDP 20.3ms</text>
+<rect x="210" y="143" width="499.4" height="12" rx="2" fill="currentColor" opacity="0.28"/>
+<rect x="210" y="158" width="290.7" height="13" rx="2" fill="#1f7a3a"/>
+<text x="716.4" y="153" font-size="11" opacity="0.75">38.5ms (26.0 fps)</text>
+<text x="507.7" y="169" font-size="11.5" font-weight="600">22.4ms (44.6 fps, 1.72&times;)</text>
 <text x="198" y="201" text-anchor="end">Dire Dire Docks (Sub)</text>
-<text x="198" y="216" text-anchor="end" font-size="10.5" opacity="0.65">RDP 9.5ms</text>
-<rect x="210" y="189" width="395.1" height="12" rx="2" fill="currentColor" opacity="0.28"/>
-<rect x="210" y="204" width="240.2" height="13" rx="2" fill="#1f7a3a"/>
-<text x="612.1" y="199" font-size="11" opacity="0.75">30.5ms (32.8 fps)</text>
-<text x="457.2" y="215" font-size="11.5" font-weight="600">18.5ms (54.0 fps, 1.65&times;)</text>
+<text x="198" y="216" text-anchor="end" font-size="10.5" opacity="0.65">RDP 11.2ms</text>
+<rect x="210" y="189" width="364.9" height="12" rx="2" fill="currentColor" opacity="0.28"/>
+<rect x="210" y="204" width="219.6" height="13" rx="2" fill="#1f7a3a"/>
+<text x="581.9" y="199" font-size="11" opacity="0.75">28.1ms (35.5 fps)</text>
+<text x="436.6" y="215" font-size="11.5" font-weight="600">16.9ms (59.0 fps, 1.66&times;)</text>
 <text x="198" y="247" text-anchor="end">Bowser in the Fire Sea</text>
-<text x="198" y="262" text-anchor="end" font-size="10.5" opacity="0.65">RDP 5.6ms</text>
-<rect x="210" y="235" width="384.0" height="12" rx="2" fill="currentColor" opacity="0.28"/>
-<rect x="210" y="250" width="254.7" height="13" rx="2" fill="#1f7a3a"/>
-<text x="601.0" y="245" font-size="11" opacity="0.75">29.6ms (33.8 fps)</text>
-<text x="471.7" y="261" font-size="11.5" font-weight="600">19.6ms (50.9 fps, 1.51&times;)</text>
+<text x="198" y="262" text-anchor="end" font-size="10.5" opacity="0.65">RDP 6.1ms</text>
+<rect x="210" y="235" width="334.8" height="12" rx="2" fill="currentColor" opacity="0.28"/>
+<rect x="210" y="250" width="218.5" height="13" rx="2" fill="#1f7a3a"/>
+<text x="551.8" y="245" font-size="11" opacity="0.75">25.8ms (38.7 fps)</text>
+<text x="435.5" y="261" font-size="11.5" font-weight="600">16.9ms (59.3 fps, 1.53&times;)</text>
 <text x="198" y="293" text-anchor="end">Rainbow Ride</text>
-<text x="198" y="308" text-anchor="end" font-size="10.5" opacity="0.65">RDP 4.9ms</text>
-<rect x="210" y="281" width="419.0" height="12" rx="2" fill="currentColor" opacity="0.28"/>
-<rect x="210" y="296" width="242.5" height="13" rx="2" fill="#1f7a3a"/>
-<text x="636.0" y="291" font-size="11" opacity="0.75">32.3ms (30.9 fps)</text>
-<text x="459.5" y="307" font-size="11.5" font-weight="600">18.7ms (53.5 fps, 1.73&times;)</text>
+<text x="198" y="308" text-anchor="end" font-size="10.5" opacity="0.65">RDP 6.0ms</text>
+<rect x="210" y="281" width="366.0" height="12" rx="2" fill="currentColor" opacity="0.28"/>
+<rect x="210" y="296" width="213.3" height="13" rx="2" fill="#1f7a3a"/>
+<text x="583.0" y="291" font-size="11" opacity="0.75">28.2ms (35.4 fps)</text>
+<text x="430.3" y="307" font-size="11.5" font-weight="600">16.5ms (60.8 fps, 1.72&times;)</text>
 </g></svg></div>
 
 <div class="prose">
 <h2>Run a 24-hour agent evaluation</h2>
-<p>Agent runs record every inner-loop <code>mev profile</code> milestone to <code>/task/.mev-history.jsonl</code> and
-emit <code>results/&lt;run&gt;/trajectory.json</code> automatically when graded. Copy any finished run directory into
-<code>results/agents/&lt;slug&gt;/</code> and rebuild the site to plot its 24-hour scaling curve above.</p>
-<pre><code># 1. Supply your legally dumped US Super Mario 64 .z64 ROM (never committed or shipped)
+<p><code>mev check</code> records public grades for agent feedback. The supervisor writes
+<code>trajectory.json</code> with separate host checkpoints. To publish a finished run, copy its
+<code>final/grade/summary.json</code> as <code>summary.json</code> alongside <code>trajectory.json</code>
+into <code>results/agents/&lt;slug&gt;/</code> and rebuild the site. Do not publish private replays.</p>
+Put same-split GCC and Kaze calibration summaries under <code>results/sm64-trial-calibration/</code>
+to add their reference lines to the agent chart.
+<pre><code># 1. Prepare the game and private controller inputs (set PRIVATE_SEED)
 ./sm64/setup.sh "/path/to/Super Mario 64 (USA).z64"
+python3 sm64/corpus/make_replays.py --heldout /private/replays --mash-seed "$PRIVATE_SEED"
+./scripts/build-images.sh --game sm64 --no-task
+./scripts/precompute.sh --game sm64 --heldout /private/replays
 ./scripts/build-images.sh --game sm64
-./scripts/precompute.sh --game sm64
-
-# 2. Verify container isolation, build, profiler, and grader end-to-end
 ./quickstart/smoke-test.sh --game sm64
 
-# 3. Launch a 24h isolated agent run + held-out grading + trajectory extraction
-./quickstart/run-agent.sh --game sm64 claude</code></pre>
+# 2. Install your agent CLI into the task environment and configure its endpoint
+docker compose --project-directory quickstart up -d
+AGENT_CMD='your-agent-command' ./quickstart/run-agent.sh --game sm64 \
+  --hours 24 --profile console --heldout /private/replays</code></pre>
 </div>
 </main>
 <footer class="site"><div class="wrap">
