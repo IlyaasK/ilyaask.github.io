@@ -19,7 +19,7 @@
   <nav class="site"><a href="/mario-eval/">About</a><a href="/mario-eval/leaderboard/">Leaderboard</a><a href="/mario-eval/calibration/">Calibration</a><a href="/mario-eval/blog/" class=on>Blog</a><a class="cta" href="https://github.com/IlyaasK/mario-eval" target="_blank" rel="noreferrer noopener">GitHub &rarr;</a></nav>
 </div></header>
 <main class="wrap"><article class="prose"><h1>Kaze Emanuar techniques on Super Mario 64 (partial reference)</h1><p class="meta">2026-11-18</p>
-<p class="small muted"><b>Update 2026-11-20:</b> numbers in this post predate the corrected console model (clock units, overlapped units, bus contention) and the log-scaled reward. Current figures: GCC <code>-O2</code> 1.40&times;, <code>r9-kaze-partial</code> 1.47&times;. The full human reference is now <a href="/mario-eval/blog/kaze-master-reference/"><code>r10-kaze-master</code></a> (1.68&times;).</p>
+<p class="small muted"><b>Update 2026-11-22:</b> numbers in this post predate the corrected console model (clock units, overlapped units, bus contention) and the log-scaled reward. Current figures: GCC <code>-O2</code> 1.38&times;, <code>r9-kaze-partial</code> 1.44&times;. The full human reference is now <a href="/mario-eval/blog/kaze-master-reference/"><code>r10-kaze-master</code></a> (1.73&times; public / 1.69&times; across all 25 routes).</p>
 
 <p>Before running 24-hour autonomous agents on Super Mario 64, we wanted to answer a basic benchmark question:
 <b>how much real-hardware speedup is actually achievable under strict gameplay, video, audio, and 4 MB RDRAM gates by an
