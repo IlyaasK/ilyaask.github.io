@@ -459,6 +459,111 @@ tr.trial-row td { background: color-mix(in srgb, var(--amber) 7%, transparent); 
 .meter-bar.mem { background: var(--cyan); }
 .meter-row.dom .meter-lbl, .meter-row.dom .meter-val { color: var(--pcb); font-weight: 600; }
 
+/* ── Interactive 3-Panel CRT Comparison Monitor (gbaeval.com style) ──── */
+.monitor {
+  border: 1px solid var(--bezel-lit);
+  background: var(--shell-grey);
+  border-radius: 8px;
+  padding: 16px 18px;
+  margin: 20px 0 28px;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.5);
+}
+.monitor-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px 14px;
+  margin-bottom: 12px;
+}
+.monitor-screen {
+  background: #000;
+  border: 1px solid var(--bezel);
+  border-radius: 5px;
+  overflow: hidden;
+}
+.monitor-screen video {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+  background: #06060a;
+}
+.screen-labels {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  text-align: center;
+  background: var(--shell);
+  border-top: 1px solid var(--bezel);
+  padding: 5px 0;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.9px;
+  color: var(--text-dim);
+}
+.screen-labels span:nth-child(2) { color: var(--text); }
+.screen-labels span:nth-child(3) { color: var(--red-soft); }
+.monitor-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin-top: 11px;
+  font-size: 12px;
+}
+.monitor-controls button {
+  font: inherit;
+  font-size: 12px;
+  color: var(--text);
+  background: var(--shell);
+  border: 1px solid var(--bezel);
+  border-radius: 4px;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+.monitor-controls button:hover { border-color: var(--indigo-lit); }
+.monitor-scrub {
+  flex: 1 1 180px;
+  accent-color: var(--indigo-lit);
+  cursor: pointer;
+}
+.monitor-readout {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+.monitor-readout b { color: var(--text); }
+.timeline-wrap {
+  margin-top: 10px;
+  background: var(--shell);
+  border: 1px solid var(--bezel);
+  border-radius: 5px;
+  padding: 8px 10px 6px;
+}
+.timeline-hdr {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+.timeline-wrap svg {
+  display: block;
+  width: 100%;
+  height: 44px;
+  cursor: crosshair;
+}
+.monitor-cap {
+  margin-top: 10px;
+  font-size: 12.8px;
+  color: #cbc5e3;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px 16px;
+}
+
 /* ── Charts & Diagrams ───────────────────────────────────────────────── */
 .chart-box {
   position: relative;
