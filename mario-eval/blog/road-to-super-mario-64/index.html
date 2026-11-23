@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#0a0a0d">
+<meta name="theme-color" content="#141318">
 <title>Wiring Super Mario 64 into Mario Eval | Mario Eval</title>
 <meta name="description" content="How we wired n64decomp/sm64 across 12 courses with zero distributed Nintendo assets, deterministic audio/RDP sync, and Hyrum&#x27;s Law.">
 <meta property="og:title" content="Wiring Super Mario 64 into Mario Eval | Mario Eval"><meta property="og:description" content="How we wired n64decomp/sm64 across 12 courses with zero distributed Nintendo assets, deterministic audio/RDP sync, and Hyrum&#x27;s Law.">
@@ -9,16 +9,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/mario-eval/style.css">
 </head><body>
-<header class="site"><div class="wrap">
+<header class="site"><div class="bar">
   <div class="brand">
-    <span class="n64-leds" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-    <a class="logo" href="/mario-eval/">MARIO<span>EVAL</span></a>
-    <span class="brand-sep" aria-hidden="true">&middot;</span>
-    <span class="brand-sub">By <a href="https://ilya.as/">Ilyaas Kapadia</a></span>
+    <a class="logo" href="/mario-eval/">Mario Eval</a>
+    <span class="sep">&middot;</span><span class="by">BY</span>
+    <span class="leds" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    <a class="org" href="https://ilya.as/">Ilyaas Kapadia</a>
   </div>
-  <nav class="site"><a href="/mario-eval/">About</a><a href="/mario-eval/leaderboard/">Leaderboard</a><a href="/mario-eval/calibration/">Calibration</a><a href="/mario-eval/blog/" class=on>Blog</a><a class="cta" href="https://github.com/IlyaasK/mario-eval" target="_blank" rel="noreferrer noopener">GitHub &rarr;</a></nav>
+  <nav class="site"><a href="/mario-eval/">About</a><a href="/mario-eval/leaderboard/">Leaderboard</a><a href="/mario-eval/watch/">Watch</a><a href="/mario-eval/blog/" class=on>Blog</a><a class="cta" href="https://github.com/IlyaasK/mario-eval" target="_blank" rel="noreferrer noopener">GitHub &rarr;</a></nav>
 </div></header>
-<main class="wrap"><article class="prose"><h1>Wiring Super Mario 64 into Mario Eval</h1><p class="meta">2026-11-17</p>
+<main><article class="col prose"><a class="back" href="/mario-eval/blog/">&larr; Blog</a><h1 class="px-h">Wiring Super Mario 64 into Mario Eval</h1><p class="meta">ILYAAS KAPADIA &middot; 2026-11-17</p>
 <p>Mario Eval was designed from day one for <b>Super Mario 64</b>: a launch-window 1996 N64 codebase famously shipped at
 IDO <code>-O0</code> in its core game engine, studied for decades by speedrunners and decompilers, and pushed to its
 hardware limits by <a href="https://www.youtube.com/@KazeEmanuar">Kaze Emanuar</a>. Wiring
@@ -57,9 +57,28 @@ and Mario action transitions, and tight sub-pixel L-infinity tolerances on Mario
 Lakitu's camera (<code>4.0</code> units), paired with whole-frame pixel verification and 40 dB audio SNR. Fixing engine
 C/memory undefined behavior is rewarded; changing how 1996 Mario plays scores &minus;1.</p>
 </article></main>
-<footer class="site"><div class="wrap">
-Built by <a href="https://ilya.as/">Ilyaas Kapadia</a>, inspired by Mechanize's
-<a href="https://gbaeval.com/">GBA Eval</a>. Not affiliated with or endorsed by Nintendo.
-No Nintendo code or assets are distributed; Super Mario 64 support requires your own legally obtained ROM.
-</div></footer>
+<footer class="site">
+  <div><span>Mario Eval &mdash; by Ilyaas Kapadia</span><span class="sep">&middot;</span>
+  <a href="/mario-eval/calibration/">Calibration</a><a href="https://github.com/IlyaasK/mario-eval">Repo</a><a href="/mario-eval/#acknowledgements">Acknowledgements</a></div>
+  <p>Not affiliated with or endorsed by Nintendo. No Nintendo code or assets are distributed; running Super Mario 64 requires your own legally obtained ROM.</p>
+</footer>
+<script>(function(){
+document.querySelectorAll(".chart").forEach(function(c){
+  var btns=c.querySelectorAll("[data-view]");
+  btns.forEach(function(b){b.addEventListener("click",function(){
+    btns.forEach(function(x){x.classList.toggle("on",x===b);});
+    c.querySelectorAll("[data-pane]").forEach(function(p){p.hidden=p.getAttribute("data-pane")!==b.getAttribute("data-view");});
+  });});
+});
+document.querySelectorAll(".lb-exp").forEach(function(b){b.addEventListener("click",function(){
+  var d=b.closest(".lb-card").querySelector(".lb-detail");d.hidden=!d.hidden;b.textContent=d.hidden?"Expand":"Collapse";
+});});
+document.querySelectorAll("[data-tabs]").forEach(function(t){
+  var btns=t.querySelectorAll("[data-tab]");
+  btns.forEach(function(b){b.addEventListener("click",function(){
+    btns.forEach(function(x){x.classList.toggle("on",x===b);});
+    document.querySelectorAll("[data-tabpane]").forEach(function(p){p.hidden=p.getAttribute("data-tabpane")!==b.getAttribute("data-tab");});
+  });});
+});
+})();</script>
 </body></html>
