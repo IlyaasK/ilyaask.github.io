@@ -3,8 +3,8 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#141318">
 <title>The Kaze master reference: what an expert does with SM64 | Mario Eval</title>
-<meta name="description" content="A reconstruction of Kaze Emanuar&#x27;s and ultrasm64&#x27;s published optimizations on vanilla SM64: 1.73x on the updated N64 console model (1.25x vs GCC -O2, 1.69x across all 25 private routes, PLAY=1 runtime smoke passing). What made it in, what did not, and why the grader got stricter along the way.">
-<meta property="og:title" content="The Kaze master reference: what an expert does with SM64 | Mario Eval"><meta property="og:description" content="A reconstruction of Kaze Emanuar&#x27;s and ultrasm64&#x27;s published optimizations on vanilla SM64: 1.73x on the updated N64 console model (1.25x vs GCC -O2, 1.69x across all 25 private routes, PLAY=1 runtime smoke passing). What made it in, what did not, and why the grader got stricter along the way.">
+<meta name="description" content="A reconstruction of Kaze Emanuar&#x27;s and ultrasm64&#x27;s published optimizations on vanilla SM64: 1.66x across all 25 routes under the v3.1 symmetric RDP bus model (1.24x vs GCC -O2, 2.04x graphics RSP, PLAY=1 runtime smoke passing), plus r11-beyond-kaze at 1.70x.">
+<meta property="og:title" content="The Kaze master reference: what an expert does with SM64 | Mario Eval"><meta property="og:description" content="A reconstruction of Kaze Emanuar&#x27;s and ultrasm64&#x27;s published optimizations on vanilla SM64: 1.66x across all 25 routes under the v3.1 symmetric RDP bus model (1.24x vs GCC -O2, 2.04x graphics RSP, PLAY=1 runtime smoke passing), plus r11-beyond-kaze at 1.70x.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/mario-eval/style.css">
@@ -18,7 +18,7 @@
   </div>
   <nav class="site"><a href="/mario-eval/">About</a><a href="/mario-eval/leaderboard/">Leaderboard</a><a href="/mario-eval/watch/">Watch</a><a href="/mario-eval/blog/" class=on>Blog</a><a class="cta" href="https://github.com/IlyaasK/mario-eval" target="_blank" rel="noreferrer noopener">GitHub &rarr;</a></nav>
 </div></header>
-<main><article class="col prose"><a class="back" href="/mario-eval/blog/">&larr; Blog</a><h1 class="px-h">The Kaze master reference: what an expert does with SM64</h1><p class="meta">ILYAAS KAPADIA &middot; 2026-11-20</p>
+<main><article class="col prose"><a class="back" href="/mario-eval/blog/">&larr; Blog</a><h1 class="px-h">The Kaze master reference: what an expert does with SM64</h1><p class="meta">ILYAAS KAPADIA &middot; 2026-11-25</p>
 <p>The question this eval asks is how much cheaper Super Mario 64 can run on the original Nintendo 64 when it is
 engineered well for that hardware, while the player gets exactly the same game. To judge an agent's answer we need a
 human one. <a href="https://www.youtube.com/@KazeEmanuar">Kaze Emanuar</a> has spent years doing this work and
@@ -111,10 +111,9 @@ FazanaJ's fork, and overlapping the framebuffers' unused border rows (10 KB of R
   <li>The reward is now <code>log2(speedup)/4</code>: each doubling is worth the same, with no ceiling.</li>
 </ul>
 
-<h2>Beyond Kaze</h2>
-<p><a href="/mario-eval/calibration/#sm64-r11-beyond-kaze"><code>r11-beyond-kaze</code></a> is an older build with
-our own D-cache experiments: object field ordering, skipped stores of unchanged values, an audio struct reorder,
-and double buffering. Its measured 1.62&times; is below the expert reference, not a result beyond it.</p>
+<h2>Beyond Kaze &amp; v3.1 Symmetric RDP Update (2026-11-25)</h2>
+<p>Under the <b>v3.1</b> symmetric RDRAM bus model (which charges RDP 32-byte <code>DP_DMA</code>/<code>DP_DRAW</code> burst turnarounds alongside CPU cache-miss contention, plus GBA-Eval 16&times;16 block-SSIM, log-mel audio, and active <code>PLAY=1</code> RSP audio verification), we re-audited 24 additional Kaze trials and folded seven clean, vanilla-preserving wins into <a href="/mario-eval/calibration/#sm64-r10-kaze-master"><code>r10-kaze-master</code></a>: deduplicating the redundant <code>gGfxPool-&gt;buffer</code> writeback in <code>writeback_sp_task</code>, a 9-TU <code>sequence_unity.c</code> audio unity build, outlining <code>geo_finish_transform</code>'s tail, skipping redundant Mario LOD nodes, Kaze's single-raycast planar shadow projection, early-Z draw ordering on Bob-omb Battlefield's ground mesh, and inline <code>gSP2Triangles</code> skybox quads. Across all 25 public + private + button-mash routes, <code>r10-kaze-master</code> scores <b>1.663&times;</b> (<b>39.9%</b> console frame time saved, <b>1.238&times;</b> over GCC <code>-O2</code>'s 1.343&times;, and <b>2.043&times;</b> graphics RSP speedup).</p>
+<p><a href="/mario-eval/calibration/#sm64-r11-beyond-kaze"><code>r11-beyond-kaze</code></a> was also rebuilt cleanly on top of <code>r10-kaze-master</code> (fixing an earlier prototype that had renumbered <code>object_fields.h</code> slots and compiled hot TUs with <code>-Os</code>): packing named <code>struct Object</code> members onto 16-byte D-cache lines, skipping unchanged <code>header.gfx.pos</code>/<code>angle</code> and collision stores on stationary objects so D-cache lines stay clean, and unpacking 1-bit audio channel bitfields into bytes lifts 25-route performance to <b>1.697&times;</b> (<b>41.1%</b> console frame time saved, <b>1.263&times;</b> vs GCC <code>-O2</code>, <b>1.780&times;</b> CPU).</p>
 
 <p>Jolly Roger Bay was still above the 16.7 ms budget for 60 FPS in this build. Its translucent fog plane over the
 water costs about 4 ms of modeled RDP time on its own. Removing it changes what the player sees, so the reference keeps it.</p>

@@ -29,30 +29,31 @@ RDP draws instantaneously. Before wiring the leaderboard profiles, we audited ar
 <li><b>VR4300 CPU timing and direct-mapped caches.</b> Running ares's pure interpreter sends every instruction fetch
 through the 16 KB (32-byte line) direct-mapped I-cache and every load/store through the 8 KB (16-byte line) write-back
 D-cache. Misses stall the CPU and transfer exact cache lines over RDRAM.</li>
-<li><b><code>CACHE 0x0d</code> (Create Dirty Exclusive).</b> Every VR4300 <code>CACHE</code> opcode is active. Marking a
+<li><b><code>CACHE 0x0d</code> (Create Dirty Exclusive) &amp; hardware cache invariants.</b> Every VR4300 <code>CACHE</code> opcode is active. Marking a
 16-byte aligned scratch line dirty-exclusive before overwriting a 64-byte <code>Mtx</code> or vertex buffer genuinely
 eliminates the wasted RDRAM line fill, matching Kaze Emanuar's
-<a href="https://www.youtube.com/watch?v=g5u3zW4SLow">CACHE hardware benchmarks</a>.</li>
-<li><b>RSP vector &amp; scalar cycles.</b> Non-halted RSP cycles are counted across both <code>gspFast3D</code>
-geometry/lighting Display Lists and <code>rspAspMain</code> ADPCM audio synthesis.</li>
-<li><b>Deterministic 62.5 MHz RDP (<code>gclk</code>) cycle &amp; pixel model.</b> Alongside paraLLEl-RDP's exact pixel
+<a href="https://www.youtube.com/watch?v=g5u3zW4SLow">CACHE hardware benchmarks</a>. In v3.1, <code>n64run</code> also enforces real VR4300 cache-safety invariants: non-16-byte-aligned <code>CACHE 0x0d</code> ops, uncached <code>KSEG1</code> accesses aliasing dirty <code>KSEG0</code> D-cache lines, and SP/DP DMA reads overlapping dirty CPU D-cache lines are all detected directly.</li>
+<li><b>RSP vector &amp; scalar cycles (split by task type).</b> Non-halted RSP cycles are counted across both <code>M_GFXTASK</code>
+geometry/lighting Display Lists (<code>rsp_gfx_cycles</code>) and <code>M_AUDTASK</code> ADPCM audio synthesis (<code>rsp_aud_cycles</code>).</li>
+<li><b>Deterministic 62.5 MHz RDP (<code>gclk</code>) cycle, early-Z &amp; 4-bank RDRAM row-miss model.</b> Alongside paraLLEl-RDP's exact pixel
 rendering, our RDP command profiler models 1-cycle vs 2-cycle/copy/fill raster throughput, Z-buffer read/compare/write
-and blender read-modify-write memory penalties, TMEM load stalls (<code>LoadBlock</code>, <code>LoadTile</code>,
-<code>LoadTLUT</code>), and <code>DPPipeSync</code> / <code>DPLoadSync</code> / <code>DPTileSync</code> pipeline
-flushes. Switching opaque layers from <code>G_RM_AA_ZB_OPA_SURF</code> to <code>G_RM_RA_ZB_OPA_SURF</code> or culling
-off-screen skybox tiles directly drops <code>rdp_busy</code> and <code>DP Draw</code> bus traffic.</li>
+(with early-Z write rejection on occluded spans) and blender read-modify-write memory penalties, 4-bank &times; 2 KB RDRAM open-row page misses (24 gclk/switch), TMEM load stalls (<code>LoadBlock</code>, <code>LoadTile</code>,
+<code>LoadTLUT</code>), <code>DPPipeSync</code> / <code>DPLoadSync</code> / <code>DPTileSync</code> pipeline
+flushes, and symmetric MI/RI RDRAM burst turnarounds. Switching opaque layers from <code>G_RM_AA_ZB_OPA_SURF</code> to <code>G_RM_RA_ZB_OPA_SURF</code> or culling
+off-screen skybox tiles directly drops <code>rdp_busy</code>, <code>rdp_effective_cycles</code>, and <code>DP Draw</code> bus traffic.</li>
 <li><b>Per-device RDRAM traffic &amp; 4 MB cacheline footprint.</b> Every RDRAM transfer is attributed to its bus
 master (<code>VR4300 ICache</code>, <code>VR4300 DCache</code>, <code>VR4300 Uncached</code>, <code>SP DMA</code>,
 <code>PI DMA</code>, <code>SI DMA</code>, <code>DP DMA</code>, and <code>DP Draw</code>), and a 16-byte line bitmap
 reset at the game's entry point measures exact post-IPL3 RAM footprint against the 4,194,304-byte limit.</li>
 </ul>
 
-<h2>How the six profiles map to hardware</h2>
+<h2>How the seven profiles map to hardware</h2>
 <ul>
-<li><b><code>console</code> (headline)</b> takes the per-frame bottleneck <code>max(CPU_ms, RSP_ms, RDP_ms)</code>
+<li><b><code>console</code> (headline)</b> takes the per-frame bottleneck <code>max(CPU_ms, RSP_ms, RDP_ms, RDRAM_ms)</code>
 across the suite within 4 MB RAM. A course stalled on VR4300 collision code and a scene stalled on RDP fillrate must
 both get faster to move the headline FPS.</li>
-<li><b><code>speed</code></b> isolates VR4300 <code>COUNT</code> ticks (46.875 MHz) including I/D-cache miss stalls.</li>
+<li><b><code>stutter</code></b> tracks the 99th-percentile per-frame console bottleneck (<code>est_console_p99_ms</code>) so rare frame-time spikes cannot hide behind a fast mean.</li>
+<li><b><code>speed</code></b> isolates VR4300 effective cycles (93.75 MHz) including I/D-cache miss and bus contention stalls.</li>
 <li><b><code>rdp</code></b> isolates 62.5 MHz RDP raster, Z/blend, TMEM, and sync cycles.</li>
 <li><b><code>rsp</code></b> isolates RSP microcode busy cycles.</li>
 <li><b><code>traffic</code></b> sums RDRAM bytes across all bus masters &mdash; standing in directly for shared Rambus
