@@ -304,7 +304,32 @@ svg.tl { display: block; width: 100%; height: 46px; cursor: pointer; }
 .lb-detail { grid-column: 1 / -1; border-top: 1px solid var(--bezel); margin-top: 14px; padding-top: 6px; }
 .sec-lbl { font-family: var(--pixel); font-size: 8.5px; color: var(--amber); text-transform: uppercase; margin: 14px 0 10px; }
 .more { display: inline-block; margin-top: 10px; font-size: 12px; }
-@media (max-width: 600px) { .lb-card { grid-template-columns: 1fr; } .lb-score { flex-direction: row; gap: 12px; align-items: baseline; margin-bottom: 10px; } }
+.lb-saved { font-size: 10px; color: var(--pcb); margin-top: 4px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.diag-strip {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px;
+  margin-top: 9px; padding-top: 8px; border-top: 1px dashed var(--bezel);
+}
+.diag-cell {
+  background: var(--shell); border: 1px solid var(--bezel); border-radius: 3px;
+  padding: 5px 8px; font-size: 10.8px; line-height: 1.35; font-variant-numeric: tabular-nums;
+}
+.diag-cell .dk { display: block; font-family: var(--pixel); font-size: 7px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .3px; margin-bottom: 2px; }
+.diag-cell .dv { color: var(--text); font-weight: 500; }
+.diag-cell .dv.ok { color: var(--pcb); }
+.diag-cell .dv.warn { color: var(--amber); }
+.diag-cell .dv.bad { color: var(--red-soft); }
+.diag-cell .ds { display: block; font-size: 10px; color: var(--text-dim); }
+.fa-list { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; }
+.fa-tag {
+  display: inline-block; font-family: var(--mono); font-size: 10px; padding: 1px 5px;
+  border-radius: 2px; background: var(--shell-grey-2); border: 1px solid var(--bezel-lit);
+  color: #d7d1f5; white-space: nowrap;
+}
+.fa-tag.trap, .fa-tag.overfit { border-color: color-mix(in srgb, var(--red-soft) 55%, var(--bezel)); color: var(--red-soft); }
+.fa-tag.warn { border-color: color-mix(in srgb, var(--amber) 55%, var(--bezel)); color: var(--amber); }
+.fa-tag.clean { border-color: color-mix(in srgb, var(--pcb) 55%, var(--bezel)); color: var(--pcb); }
+@media (max-width: 780px) { .diag-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .lb-card { grid-template-columns: 1fr; } .lb-score { flex-direction: row; gap: 12px; align-items: baseline; margin-bottom: 10px; } .diag-strip { grid-template-columns: 1fr; } }
 
 /* Course tiles */
 .ct-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; }

@@ -152,7 +152,8 @@ document.querySelectorAll(".chart").forEach(function(c){
         var cx=best.getAttribute("cx"),cy=best.getAttribute("cy");
         if(xh){xh.setAttribute("x1",cx);xh.setAttribute("x2",cx);xh.hidden=false;}
         if(dot){dot.setAttribute("cx",cx);dot.setAttribute("cy",cy);dot.setAttribute("fill",best.getAttribute("fill"));dot.hidden=false;}
-        if(tip)tip.textContent=best.getAttribute("data-name")+" @ "+best.getAttribute("data-hr")+"h: "+best.getAttribute("data-val")+"x ("+best.getAttribute("data-cp")+")";
+        var u=best.getAttribute("data-unit")||"x";
+        if(tip)tip.textContent=best.getAttribute("data-name")+" @ "+best.getAttribute("data-hr")+"h: "+best.getAttribute("data-val")+u+" ("+best.getAttribute("data-cp")+")";
       }
     });
     svg.addEventListener("mouseleave",function(){
