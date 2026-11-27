@@ -63,17 +63,16 @@ bandwidth pressure.</li>
 
 <h2>Deterministic, so cache-layout effects are real</h2>
 <p>Two runs of the same ROM produce identical cycle, cache, RDP, and RDRAM counts down to the last tick. That makes
-direct-mapped cache collisions immediately visible. On Pip's Garden, deleting 208 bytes of LOD branch code shifted
-downstream globals into an 8 KB D-cache alias with the stack/heap, quadrupling D-cache misses from ~6,800 to ~28,700
-per frame; on vanilla Super Mario 64, <code>rendering_graph_node.o</code> and <code>math_util.o</code> sit almost
+direct-mapped cache collisions immediately visible. Even a 96-byte shift in code size can push hot globals into an
+8 KB D-cache alias with the stack/heap; on vanilla Super Mario 64, <code>rendering_graph_node.o</code> and <code>math_util.o</code> sit almost
 exactly <code>63 &times; 16 KB</code> apart in <code>sm64.us.map</code>, evicting each other on every scene-graph node.
 Kaze calls this the <a href="https://www.youtube.com/watch?v=QAyMe8T540U">performance lottery</a>; controlling
 <code>sm64.ld</code> section layout turns luck into deterministic engineering.</p>
 
 <h2>What still separates emulation from a physical deck</h2>
-<p>While individual CPU cache stalls, RSP cycles, RDP fill/TMEM cycles, and per-master RDRAM byte counts are all
-modelled deterministically, simultaneous cycle-by-cycle Rambus arbitration stalls between overlapping CPU and RCP burst
-transfers are captured as aggregate bus bytes in <code>traffic</code> rather than dynamic wait states. Validating top
+<p>While individual CPU cache stalls, RSP cycles, RDP fill/TMEM/page-miss cycles, per-master RDRAM byte counts, and
+bus-coupled CPU &amp; RDP RDRAM contention stalls are all modelled deterministically, exact sub-scanline Rambus arbiter
+interleaving between concurrent DMA bursts remains an analytical approximation rather than gate-level RTL. Validating top
 calibration rungs and frontier agent checkpoints on a retail NUS-CPU deck via flashcart remains the ultimate ground
 truth.</p>
 </article></main>

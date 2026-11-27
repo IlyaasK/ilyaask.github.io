@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#141318">
+<title>Mario Eval v4: Held-Out Generalization, Hardware Docs, and Retiring v3 Scores | Mario Eval</title>
+<meta name="description" content="Why we stripped our synthetic workload, closed an Early-Z cost-model exploit, moved to 100% held-out scoring across 18 SM64 courses with real N64brew specs, and reset the leaderboard for v4.">
+<meta property="og:title" content="Mario Eval v4: Held-Out Generalization, Hardware Docs, and Retiring v3 Scores | Mario Eval"><meta property="og:description" content="Why we stripped our synthetic workload, closed an Early-Z cost-model exploit, moved to 100% held-out scoring across 18 SM64 courses with real N64brew specs, and reset the leaderboard for v4.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/mario-eval/style.css">
+</head><body>
+<header class="site"><div class="bar">
+  <div class="brand">
+    <a class="logo" href="/mario-eval/">Mario Eval</a>
+    <span class="sep">&middot;</span><span class="by">BY</span>
+    <span class="leds" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    <a class="org" href="https://ilya.as/">Ilyaas Kapadia</a>
+  </div>
+  <nav class="site"><a href="/mario-eval/">About</a><a href="/mario-eval/leaderboard/">Leaderboard</a><a href="/mario-eval/watch/">Watch</a><a href="/mario-eval/blog/" class=on>Blog</a><a class="cta" href="https://github.com/IlyaasK/mario-eval" target="_blank" rel="noreferrer noopener">GitHub &rarr;</a></nav>
+</div></header>
+<main><article class="col prose"><a class="back" href="/mario-eval/blog/">&larr; Blog</a><h1 class="px-h">Mario Eval v4: Held-Out Generalization, Hardware Docs, and Retiring v3 Scores</h1><p class="meta">ILYAAS KAPADIA &middot; 2026-11-27</p>
+<p>A benchmark is only as honest as what happens when a frontier coding agent spends 24 uninterrupted hours pushing against every seam in its environment. After auditing multi-hundred-step agent transcripts from v2 and v3.1 line by line &mdash; alongside design lessons from Mechanize's <a href="https://gbaeval.com/">GBA Eval</a> &mdash; we are releasing <b>Mario Eval v4</b> and resetting the public leaderboard so every published number comes from the hardened v4 task.</p>
+
+<h2>What we saw in 24-hour frontier runs</h2>
+<p>Across v2 and v3.1, agents discovered genuine Nintendo 64 systems engineering: switching from 1996 SGI IDO <code>-O0</code> to GCC <code>-O2</code>/<code>-O3</code>, enabling Nintendo's <code>F3DEX2</code> RSP microcode, claiming scratch matrices with VR4300 <code>CACHE 0x0d</code> (Create Dirty Exclusive), replacing <code>sins</code>/<code>coss</code> LUTs, and shrinking <code>struct Surface</code> to reduce 8 KB direct-mapped D-cache misses. At the same time, pouring over the raw transcripts exposed four places where our v3 environment measured eval-specific workarounds or rewarded overfitting instead of pure N64 engineering:</p>
+<ul>
+<li><b>Public-course overfitting (40% public weight).</b> Because the 6 public development courses (<code>bob</code>, <code>wf</code>, <code>jrb</code>, <code>ddd</code>, <code>bitfs</code>, <code>rr</code>) carried 40% of the final score and left temporary <code>obs.bin</code> traces in <code>/tmp</code>, an agent could write <code>if (gCurrLevelNum == LEVEL_JRB)</code> branches directly inside the C renderer or tune visibility tables around the exact camera coordinates of the 240-frame public clips.</li>
+<li><b>Boot-table spoilers in <code>mev.c</code>.</b> Our harness boot selector originally hardcoded 11 course IDs in a C switch statement inside <code>src/game/mev.c</code>, inadvertently telling any agent that read the file which courses existed in the held-out pool and preventing agents from booting the remaining courses to test their own changes.</li>
+<li><b>An Early-Z tracker bug in our RDP cost model.</b> In <code>ares</code>'s instrumented RDP model, our shadow Z-buffer tracker reset when a fill-rectangle cleared <code>colorAddr == zAddr</code>. Pointing <code>Set_Color_Image</code> at a scratch address or changing Z-buffer addresses could desynchronize the shadow tracker from actual Z clears and undercount pixel writes.</li>
+<li><b>4 MB RDRAM wrapping under disabled Expansion Pak.</b> With the 8 MB Expansion Pak disabled in <code>ares</code>, physical addresses above <code>0x00400000</code> ignored or wrapped before reaching the 4 MB RDRAM footprint bitmap, meaning an accidental high-address probe could go uncounted unless explicitly trapped on the bus.</li>
+<li><b>Homemade cost-model prose instead of primary N64 hardware specs.</b> Handing agents a custom prose walkthrough of our grader's internal equations mixed benchmark contract rules with optimization hints, whereas real systems engineers work from hardware architecture manuals and profiler counters.</li>
+</ul>
+
+<h2>What changed in Mario Eval v4</h2>
+<ol>
+<li><b>Single-target Super Mario 64 benchmark.</b> We removed the synthetic <i>Pip's Garden</i> calibration toy completely. Every line of the repo, harness, and leaderboard now targets the real 1996 <i>Super Mario 64</i> codebase on retail 4 MB N64 hardware.</li>
+<li><b>0% public weight, 100% unseen held-out scoring across 18 courses.</b> The 6 public courses remain available inside the container via <code>mev check</code> so agents have a fast, deterministic verification loop, and every submission must still pass all 6 public courses plus <code>PLAY=1</code> retail console cold-boot. However, public courses now carry <b>0% weight</b> in the score: <b>100% of the score</b> comes from 20 unseen host-only held-out trajectories (75% scripted multi-course and multi-act routes, 25% seeded random-input routes spanning 18 SM64 courses and sub-areas). Temporary <code>obs.bin</code>, <code>video.bin</code>, and <code>audio.bin</code> artifacts are unlinked immediately after gate verification.</li>
+<li><b>Universal level/act boot + differential <code>mev diff</code>.</b> <code>mev_select_boot_level()</code> in <code>src/game/mev.c</code> now decodes any valid SM64 <code>(level, act)</code> pair digitally on frame 0 with zero course-list spoilers, and the container includes <code>baseline.z64</code> plus <code>mev diff &lt;replay.txt&gt;</code> and differential <code>mev stress</code> (with symbolized VR4300 fault PCs) so agents can build whole-ROM tests on any stage they choose.</li>
+<li><b>Vendored N64brew hardware specs + compact zero-spoiler <code>TASK.md</code>.</b> We replaced our homemade cost-model guide with 20 SHA-256-verified community N64 hardware reference pages from the <a href="https://n64brew.dev/">N64brew Wiki</a> (CC BY-SA 4.0) covering the VR4300 pipeline, MIPS III / COP1 FPU instructions, 16 KB / 8 KB caches, RDRAM bus timing, RSP vector unit, RDP rasterizer pipeline/hazards, and VI/AI/PI/SI/MI DMA interfaces, paired with a 26-line <code>MEASUREMENT.md</code> and a 48-line read-only <code>TASK.md</code>.</li>
+<li><b>Hardened RDP Early-Z, OOB RDRAM, and DMA coherence gates.</b> The RDP shadow-Z tracker now tracks exact Z-buffer physical addresses, <code>Set_Prim_Depth</code>, and <code>!zCompare &amp;&amp; zUpdate</code> writes; physical RDRAM accesses in <code>0x00400000..0x03EFFFFF</code> are counted and gated at zero; <code>DP_DMA</code> checks every 16-byte cache line without early exit; and static integrity checks enforce structural parity between benchmark and <code>PLAY=1</code> builds.</li>
+<li><b>Uncapped N64 FPS on the hero chart + faster C++ devloop.</b> We keep log-scaled RL reward (<code>log<sub>2</sub>(speedup) / 4</code>) for scale-invariant optimization signal, while making <b>Uncapped N64 Console FPS</b> (starting from the ~34 FPS 1996 baseline against the N64's 60 Hz refresh line) the primary homepage chart view alongside Speedup (<code>&times;</code>), vs GCC <code>-O2</code>, and Bounded Cost Saved (<code>%</code>). Moving MIPS ELF word scanning and 4,224-byte gameplay observation matching into <code>-O3</code> C++ and running <code>PLAY=1</code> concurrently with course workers cuts <code>mev check</code> turnaround roughly in half.</li>
+</ol>
+
+<h2>Why prior v2/v3 model runs are retired</h2>
+<p>Because v4 changes the held-out route suite, sets public-course weight to 0%, closes the Early-Z and OOB RDRAM blind spots, and replaces the in-container task prompt and documentation, comparing v2/v3 trajectories directly against v4 runs would mix two different benchmarks. All pre-v4 runs remain preserved in git history, while the live <a href="/mario-eval/leaderboard/">v4 leaderboard</a> starts fresh on the 26-route v4 suite alongside our recalibrated <a href="/mario-eval/calibration/">reference ladder</a> (1996 IDO baseline, GCC <code>-O2</code>, Kaze Master Reference, and Beyond Kaze).</p>
+</article></main>
+<footer class="site">
+  <div><span>Mario Eval &mdash; by Ilyaas Kapadia</span><span class="sep">&middot;</span>
+  <a href="/mario-eval/calibration/">Calibration</a><a href="https://github.com/IlyaasK/mario-eval">Repo</a><a href="/mario-eval/#acknowledgements">Acknowledgements</a></div>
+  <p>Not affiliated with or endorsed by Nintendo. No Nintendo code or assets are distributed; running Super Mario 64 requires your own legally obtained ROM.</p>
+</footer>
+<script>(function(){
+document.querySelectorAll(".chart").forEach(function(c){
+  var btns=c.querySelectorAll("[data-view]"),tip=c.querySelector("[data-tip]");
+  btns.forEach(function(b){b.addEventListener("click",function(){
+    btns.forEach(function(x){x.classList.toggle("on",x===b);});
+    c.querySelectorAll("[data-pane]").forEach(function(p){p.hidden=p.getAttribute("data-pane")!==b.getAttribute("data-view");});
+    if(tip)tip.textContent="";
+  });});
+  c.querySelectorAll("svg.speed-chart").forEach(function(svg){
+    var xh=svg.querySelector(".xhair"),dot=svg.querySelector(".hdot");
+    var pts=svg.querySelectorAll("circle[data-hr]");
+    var series=svg.querySelectorAll("[data-series]");
+    function hi(slug){
+      series.forEach(function(g){g.style.opacity=(!slug||g.getAttribute("data-series")===slug)?"1":"0.22";});
+    }
+    series.forEach(function(g){
+      g.addEventListener("mouseenter",function(){hi(g.getAttribute("data-series"));});
+      g.addEventListener("mouseleave",function(){hi(null);});
+    });
+    svg.addEventListener("mousemove",function(ev){
+      if(!pts.length)return;
+      var r=svg.getBoundingClientRect(),vb=svg.viewBox.baseVal;
+      var mx=(ev.clientX-r.left)/r.width*vb.width;
+      var best=null,bd=1e9;
+      pts.forEach(function(p){var d=Math.abs(+p.getAttribute("cx")-mx);if(d<bd){bd=d;best=p;}});
+      if(best&&bd<45){
+        var cx=best.getAttribute("cx"),cy=best.getAttribute("cy");
+        if(xh){xh.setAttribute("x1",cx);xh.setAttribute("x2",cx);xh.hidden=false;}
+        if(dot){dot.setAttribute("cx",cx);dot.setAttribute("cy",cy);dot.setAttribute("fill",best.getAttribute("fill"));dot.hidden=false;}
+        var u=best.getAttribute("data-unit")||"x";
+        if(tip)tip.textContent=best.getAttribute("data-name")+" @ "+best.getAttribute("data-hr")+"h: "+best.getAttribute("data-val")+u+" ("+best.getAttribute("data-cp")+")";
+      }
+    });
+    svg.addEventListener("mouseleave",function(){
+      if(xh)xh.hidden=true;
+      if(dot)dot.hidden=true;
+      if(tip)tip.textContent="";
+      hi(null);
+    });
+  });
+});
+document.querySelectorAll(".lb-exp").forEach(function(b){b.addEventListener("click",function(){
+  var d=b.closest(".lb-card").querySelector(".lb-detail");d.hidden=!d.hidden;b.textContent=d.hidden?"Expand":"Collapse";
+});});
+document.querySelectorAll("[data-tabs]").forEach(function(t){
+  var btns=t.querySelectorAll("[data-tab]");
+  btns.forEach(function(b){b.addEventListener("click",function(){
+    btns.forEach(function(x){x.classList.toggle("on",x===b);});
+    document.querySelectorAll("[data-tabpane]").forEach(function(p){p.hidden=p.getAttribute("data-tabpane")!==b.getAttribute("data-tab");});
+  });});
+});
+})();</script>
+</body></html>

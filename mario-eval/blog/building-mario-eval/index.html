@@ -50,10 +50,9 @@ suite, the <a href="/mario-eval/leaderboard/">leaderboard and partial Kaze refer
 <a href="/mario-eval/calibration/">calibration</a>.</p>
 
 <h2>What is verified</h2>
-<p>A submission is a source tree &mdash; either <b>Super Mario 64</b> (<code>n64decomp/sm64</code>, prepared locally
-from your own US <code>.z64</code> ROM) or <b>Pip's Garden</b> (our self-contained 3D libdragon game that runs out of
-the box with zero Nintendo assets). The grader rebuilds the ROM from source, verifies that the real-time VBlank console
-build (<code>PLAY=1</code>) also compiles cleanly, and runs every public and held-out route under an instrumented
+<p>A submission is a <b>Super Mario 64</b> source tree (<code>n64decomp/sm64</code>, prepared locally
+from your own US <code>.z64</code> ROM). The grader rebuilds the ROM from source, verifies that the real-time VBlank console
+build (<code>PLAY=1</code>) also compiles and cold-boots cleanly, and runs every public and held-out route under an instrumented
 build of <b>ares</b> (CPU interpreter mode, full direct-mapped I/D-cache simulation, RSP vector microcode cycles,
 deterministic 62.5 MHz RDP combiner/Z/TMEM/sync cycles, per-device RDRAM bytes, and 16-byte RDRAM footprint).</p>
 <p>Two design choices keep the measurement honest:</p>
@@ -74,11 +73,11 @@ action and sub-pixel position, Lakitu camera, whole-frame video within tolerance
 audio SNR) &mdash; while enforcing <b>Hyrum's Law</b> on 1996 gameplay quirks: fixing C/memory undefined behavior is
 welcome, whereas changing quarter-step physics, wall-kick timing, or backwards long jumps fails the gate.</p>
 
-<h2>Headline console score + five hardware diagnostics</h2>
+<h2>Headline console score + six hardware diagnostics</h2>
 <p>The headline leaderboard profile is <b><code>console</code></b>: per-frame
-<code>max(CPU_ms, RSP_ms, RDP_ms)</code> bottleneck time within the 4 MB retail RDRAM limit, reported both as bounded
-RLVR reward and unbounded <code>est_fps</code> / speedup. Five diagnostic profiles (<code>speed</code>,
-<code>rdp</code>, <code>rsp</code>, <code>traffic</code>, and <code>memory</code>) decompose every submission across
+<code>max(CPU_ms, RSP_ms, RDP_ms, RDRAM_ms)</code> bottleneck time within the 4 MB retail RDRAM limit, reported both as
+log-scaled RLVR reward and unbounded <code>est_fps</code> / speedup. Six diagnostic profiles (<code>stutter</code>,
+<code>speed</code>, <code>rdp</code>, <code>rsp</code>, <code>traffic</code>, and <code>memory</code>) decompose every submission across
 each N64 subsystem with cross-budgets preventing pathological resource trades.</p>
 
 <h2>The 24-hour agent sandbox</h2>
